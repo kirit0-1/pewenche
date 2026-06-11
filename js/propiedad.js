@@ -3,6 +3,7 @@ import { LocalPropertyStore } from './storage.js';
 import { ApiPropertyStore } from './api-store.js';
 import { detectApi } from './api.js';
 import { trackClick, saveLead } from './analytics.js';
+import { toast } from './utils.js';
 import { fetchUF, getUF, getUFDate, onUFChange, clpFromUF } from './uf.js';
 import { h, mapsUrl, waLink, mapEmbedUrl } from './utils.js';
 
@@ -119,15 +120,26 @@ function renderProperty(p) {
 
 document.getElementById('leadForm').addEventListener('submit', async e => {
   e.preventDefault();
-  await saveLead({
-    propertyId: property.id,
-    propertyTitle: property.titulo,
-    nombre: document.getElementById('leadNombre').value,
-    email: document.getElementById('leadEmail').value,
-    mensaje: document.getElementById('leadMensaje').value,
-  });
-  document.getElementById('leadForm').classList.add('hidden');
-  document.getElementById('leadSuccess').classList.remove('hidden');
+  if (!property) {
+    toast('Espera a que cargue la propiedad.');
+    return;
+  }
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  try {
+    await saveLead({
+      propertyId: property.id,
+      propertyTitle: property.titulo,
+      nombre: document.getElementById('leadNombre').value,
+      email: document.getElementById('leadEmail').value,
+      mensaje: document.getElementById('leadMensaje').value,
+    });
+    document.getElementById('leadForm').classList.add('hidden');
+    document.getElementById('leadSuccess').classList.remove('hidden');
+  } catch (err) {
+    toast(err.message || 'No se pudo enviar. Intenta de nuevo.');
+    btn.disabled = false;
+  }
 });
 
 async function init() {

@@ -37,7 +37,10 @@ async function init() {
 
   onDataChange(async key => {
     if (key === STORAGE_KEY) await app.reloadProperties();
-    if (auth.isAuthenticated()) await admin.refreshFromStore();
+    if (auth.isAuthenticated()) {
+      await admin.refreshFromStore();
+      if (key === 'leads') await admin.refreshLeads?.();
+    }
   });
 }
 

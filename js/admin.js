@@ -4,7 +4,7 @@ import {
   getWeeklyClickStats, getTotalWeeklyClicks, getLeads, markLeadContacted, onDataChange,
 } from './analytics.js';
 import { clpFromUF } from './uf.js';
-import { hasApi, uploadImages, api } from './api.js';
+import { hasApi, uploadImages, api, getToken } from './api.js';
 
 export function createAdmin(store, auth, state, app) {
   let activeTab = 'inicio';
@@ -155,8 +155,18 @@ export function createAdmin(store, auth, state, app) {
   async function renderLeads() {
     const leads = await getLeads();
     const container = document.getElementById('leadsList');
+    const hint = document.getElementById('leadsHint');
+    if (hint) {
+      if (hasApi() && !getToken()) {
+        hint.innerHTML = '<span class="text-amber-600">Cierra sesión y vuelve a entrar (con npm start activo) para ver consultas del servidor.</span>';
+      } else if (hasApi()) {
+        hint.textContent = 'Consultas en el servidor. Pulsa «Actualizar» si enviaste una desde otra pestaña.';
+      } else {
+        hint.textContent = 'Sin servidor Node: consultas solo en este navegador. Ejecuta npm start para guardarlas en el panel.';
+      }
+    }
     if (!leads.length) {
-      container.innerHTML = '<p class="text-gray-400 text-sm text-center py-8">No hay consultas.</p>';
+      container.innerHTML = '<p class="text-gray-400 text-sm text-center py-8">No hay consultas todavía.</p>';
       return;
     }
     container.innerHTML = leads.map(l => `
@@ -423,14 +433,20 @@ export function createAdmin(store, auth, state, app) {
     });
 
     document.getElementById('btnSaveConfig')?.addEventListener('click', saveConfig);
+    document.getElementById('btnRefreshLeads')?.addEventListener('click', () => renderLeads());
     document.getElementById('loginPass')?.addEventListener('keydown', e => { if (e.key === 'Enter') attemptLogin(); });
     document.getElementById('loginModal')?.addEventListener('click', e => { if (e.target.id === 'loginModal') e.target.classList.add('hidden'); });
 
     onDataChange(() => refreshFromStore());
   }
 
+  async function refreshLeads() {
+    if (activeTab === 'leads') await renderLeads();
+    await updateAdminStats();
+  }
+
   return {
     openLogin, attemptLogin, logoutAdmin, showPanel,
-    openPropertyForm, saveProperty, bindEvents, refreshFromStore,
+    openPropertyForm, saveProperty, bindEvents, refreshFromStore, refreshLeads,
   };
 }

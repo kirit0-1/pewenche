@@ -11,10 +11,10 @@ export function setToken(token) {
   else sessionStorage.removeItem('pewenche_api_token');
 }
 
-export async function detectApi() {
-  if (_hasApi !== null) return _hasApi;
+export async function detectApi(force = false) {
+  if (!force && _hasApi !== null) return _hasApi;
   try {
-    const res = await fetch('/api/health', { signal: AbortSignal.timeout(2000) });
+    const res = await fetch('/api/health', { signal: AbortSignal.timeout(3000) });
     const data = await res.json();
     _hasApi = res.ok && data.backend === true;
   } catch {
