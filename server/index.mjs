@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import crypto from 'crypto';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { DEFAULTS } from '../js/config.js';
@@ -16,6 +17,20 @@ for (const dir of [DATA_DIR, UPLOADS_DIR]) {
 }
 
 const PORT = Number(process.env.PORT) || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
+
+function lanUrls(port) {
+  const nets = os.networkInterfaces();
+  const urls = [];
+  for (const iface of Object.values(nets)) {
+    for (const cfg of iface || []) {
+      if ((cfg.family === 'IPv4' || cfg.family === 4) && !cfg.internal) {
+        urls.push(`http://${cfg.address}:${port}`);
+      }
+    }
+  }
+  return urls;
+}
 const sessions = new Map();
 
 function readJson(file, fallback) {
@@ -201,6 +216,19 @@ app.use((err, _req, res, _next) => {
   res.status(400).json({ error: err.message || 'Error' });
 });
 
-app.listen(PORT, '127.0.0.1', () => {
-  console.log(`\n  Pewenche → http://localhost:${PORT}\n  API: /api/*  |  Admin: pie de página → Acceso administrador\n`);
+app.listen(PORT, HOST, () => {
+  const local = `http://localhost:${PORT}`;
+  const lan = lanUrls(PORT);
+  console.log('\n  Pewenche servidor activo');
+  console.log(`  PC:     ${local}`);
+  if (lan.length) {
+    console.log('  Celular (misma WiFi):');
+    lan.forEach(url => console.log(`          ${url}`));
+  } else {
+    console.log('  Celular: no se detectó IP de red local');
+  }
+  console.log('  Admin → pie de página → Acceso administrador\n');
+  if (HOST === '0.0.0.0') {
+    console.log('  Si el celular no conecta, permite Node.js en el Firewall de Windows.\n');
+  }
 });
