@@ -1,9 +1,11 @@
 import {
-  BADGE, CONTACT, FALLBACK_IMAGE, REGIONES, SECTION_MAP, SITE,
+  BADGE, CONTACT, FALLBACK_IMAGE, REGIONES, SECTION_MAP,
 } from './config.js';
 import {
-  debounce, filterBySearch, getVal, h, mapsUrl, setVal, sortProperties, waLink,
+  debounce, filterBySearch, getVal, h, setVal, sortProperties, waLink,
 } from './utils.js';
+import { trackClick } from './analytics.js';
+import { clpFromUF, getUF, getUFDate, onUFChange } from './uf.js';
 
 const cardIdx = {};
 let mIdx = 0;
@@ -143,6 +145,10 @@ export function createApp(store, state) {
     ).join('');
   }
 
+  function priceCLP(p) {
+    return clpFromUF(p.precioUF, p.precioNota || '') || p.precioCLP || '';
+  }
+
   function buildCard(p, animIdx) {
     const imgs = p.imagenes?.length ? p.imagenes : [FALLBACK_IMAGE];
     const badge = BADGE[p.tipo] || { cls: 'bg-gray-600', label: p.tipo };
@@ -180,7 +186,7 @@ export function createApp(store, state) {
       <div class="p-5">
         <div class="mb-1">
           <span class="price-uf">${p.precioUF ? p.precioUF.toLocaleString('es-CL') + ' UF' : '—'}</span>
-          ${p.precioCLP ? `<span class="text-gray-400 text-xs ml-2">${h(p.precioCLP)}</span>` : ''}
+          ${priceCLP(p) ? `<span class="text-gray-400 dark:text-zinc-400 text-xs ml-2">${h(priceCLP(p))}</span>` : ''}
         </div>
         <h3 class="font-bold text-base leading-snug mb-1">${h(p.titulo)}</h3>
         <p class="text-gray-400 text-xs flex items-center gap-1 mb-3">
@@ -190,9 +196,10 @@ export function createApp(store, state) {
         <div class="flex flex-wrap gap-1.5 mb-3">${buildChips(p)}</div>
         <p class="text-gray-500 dark:text-zinc-400 text-xs leading-relaxed line-clamp-2 mb-4">${h(p.desc || '')}</p>
         <div class="flex gap-2">
-          <button type="button" data-action="open-detail" data-id="${p.id}" class="btn-verde flex-1 py-2.5 text-sm">
-            <i class="fa-solid fa-eye mr-1.5"></i>Ver detalles
-          </button>
+          <a href="propiedad.html?id=${p.id}" target="_blank" rel="noopener" data-action="open-detail" data-id="${p.id}"
+            class="btn-verde flex-1 py-2.5 text-sm text-center">
+            <i class="fa-solid fa-up-right-from-square mr-1.5"></i>Ver detalles
+          </a>
           <a href="${waLink(CONTACT.whatsapp, `Hola, me interesa ${p.titulo}`)}" target="_blank" rel="noopener"
             class="w-10 h-10 flex items-center justify-center bg-[#25D366] hover:bg-[#1ebe5d] rounded-xl transition shrink-0" aria-label="Consultar por WhatsApp">
             <i class="fa-brands fa-whatsapp text-white"></i>
@@ -227,66 +234,9 @@ export function createApp(store, state) {
     });
   }
 
-  function openDetail(id, st) {
-    const p = st.properties.find(x => x.id === id);
-    if (!p) return;
-    const imgs = p.imagenes?.length ? p.imagenes : [FALLBACK_IMAGE];
-    mImgs = imgs;
-    mIdx = 0;
-
-    document.getElementById('modalCarouselTrack').innerHTML = imgs.map(url =>
-      `<div class="carousel-slide h-full shrink-0 w-full">
-         <img src="${h(url)}" alt="${h(p.titulo)}" class="w-full h-full object-cover" onerror="this.src='${FALLBACK_IMAGE}'" />
-       </div>`
-    ).join('');
-
-    document.getElementById('modalDots').innerHTML = imgs.map((_, i) =>
-      `<button type="button" data-action="modal-dot" data-index="${i}"
-         class="mdot w-1.5 h-1.5 rounded-full transition-all ${i === 0 ? 'bg-white' : 'bg-white/50'}"
-         aria-label="Imagen ${i + 1}"></button>`
-    ).join('');
-
-    const badge = BADGE[p.tipo] || { cls: 'bg-gray-600', label: p.tipo };
-    const badgeEl = document.getElementById('modalBadge');
-    badgeEl.textContent = badge.label;
-    badgeEl.className = `absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide text-white ${badge.cls}`;
-
-    document.getElementById('modalTitle').textContent = p.titulo;
-    document.querySelector('#modalLoc span').textContent = `${p.comuna || ''}${p.region ? ', ' + p.region : ''}`;
-    document.getElementById('modalPrecioUF').textContent = p.precioUF ? `${p.precioUF.toLocaleString('es-CL')} UF` : '—';
-    document.getElementById('modalPrecioCLP').textContent = p.precioCLP || '';
-    document.getElementById('modalDesc').textContent = p.desc || '';
-
-    const mapLink = document.getElementById('modalMapLink');
-    if (mapLink) mapLink.href = mapsUrl(p.comuna, p.region);
-
-    const statDefs = [
-      { icon: 'fa-ruler-combined', label: 'Superficie', val: p.superficie ? `${p.superficie} m²` : null },
-      { icon: 'fa-bed', label: 'Dormitorios', val: p.dorms || null },
-      { icon: 'fa-shower', label: 'Baños', val: p.banos || null },
-      { icon: 'fa-car', label: 'Estac.', val: p.estac || null },
-    ].filter(s => s.val !== null);
-
-    document.getElementById('modalStats').innerHTML = statDefs.map(s =>
-      `<div class="bg-gray-50 dark:bg-zinc-800 rounded-2xl p-3 text-center">
-         <i class="fa-solid ${s.icon} text-verde-700 dark:text-green-400 text-lg mb-1 block"></i>
-         <span class="font-bold block">${s.val}</span>
-         <span class="text-xs text-gray-400">${s.label}</span>
-       </div>`
-    ).join('');
-
-    document.getElementById('modalExtras').innerHTML = p.extras?.length ? `
-      <h4 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">Características</h4>
-      <div class="flex flex-wrap gap-2">
-        ${p.extras.map(e => `<span class="bg-verde-50 dark:bg-verde-900/20 text-verde-700 dark:text-green-300 text-xs font-medium px-3 py-1 rounded-full">${h(e)}</span>`).join('')}
-      </div>` : '';
-
-    document.getElementById('modalWA').href = waLink(CONTACT.whatsapp, `Hola, me interesa la propiedad: ${p.titulo}`);
-
-    const modal = document.getElementById('detailModal');
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-    modal.querySelector('[data-focus-trap]')?.focus();
+  function openDetail(id) {
+    trackClick(id);
+    window.open(`propiedad.html?id=${id}`, '_blank', 'noopener');
   }
 
   function closeDetail() {
@@ -315,6 +265,15 @@ export function createApp(store, state) {
     menu.setAttribute('aria-hidden', hidden ? 'true' : 'false');
   }
 
+  function updateUFIndicator() {
+    const el = document.getElementById('ufIndicator');
+    if (!el) return;
+    const uf = getUF();
+    const date = getUFDate();
+    if (!uf) { el.textContent = 'UF: cargando…'; return; }
+    el.textContent = `UF $${uf.toLocaleString('es-CL')}${date ? ` · ${date.split('T')[0]}` : ''}`;
+  }
+
   function initTheme() {
     const saved = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -322,6 +281,11 @@ export function createApp(store, state) {
       document.documentElement.classList.add('dark');
       document.getElementById('themeIcon').className = 'fa-solid fa-sun';
     }
+    onUFChange(() => {
+      updateUFIndicator();
+      applyFilters(state);
+    });
+    updateUFIndicator();
   }
 
   function bindEvents(st) {
@@ -329,7 +293,7 @@ export function createApp(store, state) {
       const btn = e.target.closest('[data-action]');
       if (!btn) return;
       const { action, id, index, total } = btn.dataset;
-      if (action === 'open-detail') openDetail(id, st);
+      if (action === 'open-detail') { trackClick(id); return; }
       if (action === 'card-prev') setCI(id, ((cardIdx[id] || 0) - 1 + +total) % +total);
       if (action === 'card-next') setCI(id, ((cardIdx[id] || 0) + 1) % +total);
       if (action === 'card-dot') setCI(id, +index);
@@ -362,14 +326,17 @@ export function createApp(store, state) {
     setSidebarTipo,
     resetFilters: () => resetFilters(state),
     renderGrid,
-    openDetail: id => openDetail(id, state),
+    openDetail,
     closeDetail,
     toggleTheme,
     toggleMobileMenu,
     initTheme,
     bindEvents,
     setActiveNav,
+    updateUFIndicator,
+    reloadProperties: async () => {
+      state.properties = await store.getAll();
+      applyFilters(state);
+    },
   };
 }
-
-export { SITE, CONTACT };

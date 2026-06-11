@@ -171,3 +171,35 @@ export const DEFAULTS = [
 ];
 
 export const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80';
+
+/** Coordenadas aproximadas por comuna (para mapas) */
+export const COMUNA_COORDS = {
+  'Las Condes': { lat: -33.4078, lng: -70.5672 },
+  'Providencia': { lat: -33.4372, lng: -70.6506 },
+  'Villarrica': { lat: -39.2857, lng: -72.2278 },
+  'Valparaíso': { lat: -33.0472, lng: -71.6127 },
+  'Futaleufú': { lat: -43.1842, lng: -71.8673 },
+  'Vitacura': { lat: -33.3891, lng: -70.5698 },
+  'Ñuñoa': { lat: -33.4569, lng: -70.5975 },
+  'Pucón': { lat: -39.2820, lng: -71.9545 },
+};
+
+export function enrichProperty(p) {
+  const coords = COMUNA_COORDS[p.comuna];
+  let precioNota = p.precioNota || '';
+  if (!precioNota && p.precioCLP) {
+    const m = p.precioCLP.match(/(\/mes|\/noche)$/i);
+    if (m) precioNota = m[1].toLowerCase();
+  }
+  return {
+    ...p,
+    precioNota,
+    lat: p.lat ?? coords?.lat,
+    lng: p.lng ?? coords?.lng,
+    descLarga: p.descLarga || [
+      p.desc,
+      p.extras?.length ? `Características destacadas: ${p.extras.join(', ')}.` : '',
+      p.direccion ? `Ubicación: ${p.direccion}, ${p.comuna}.` : '',
+    ].filter(Boolean).join('\n\n'),
+  };
+}

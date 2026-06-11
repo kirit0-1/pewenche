@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Propiedad — Pewenche</title>
+  <meta name="robots" content="noindex" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: { verde: { 50:'#f0fdf4', 700:'#15803d', 800:'#166534' } } } }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 font-sans antialiased">
+
+<header class="bg-verde-800 text-white px-5 py-4 flex items-center justify-between sticky top-0 z-40 shadow">
+  <a href="index.html" class="flex items-center gap-2 font-bold">
+    <i class="fa-solid fa-arrow-left"></i> Pewenche
+  </a>
+  <button type="button" id="themeToggle" class="w-9 h-9 rounded-full hover:bg-white/10 flex items-center justify-center" aria-label="Cambiar tema">
+    <i id="themeIcon" class="fa-solid fa-moon"></i>
+  </button>
+</header>
+
+<main id="loading" class="max-w-5xl mx-auto px-5 py-20 text-center text-gray-400">
+  <i class="fa-solid fa-spinner fa-spin text-3xl mb-4"></i>
+  <p>Cargando propiedad…</p>
+</main>
+
+<main id="content" class="hidden max-w-5xl mx-auto px-5 py-8">
+  <div id="gallery" class="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-3xl overflow-hidden mb-8" style="min-height:280px"></div>
+
+  <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+    <div>
+      <span id="badge" class="text-xs font-bold px-3 py-1 rounded-full text-white uppercase"></span>
+      <h1 id="title" class="text-3xl font-extrabold mt-3 mb-2"></h1>
+      <p id="location" class="text-gray-500 flex items-center gap-2 text-sm"></p>
+      <p id="ufIndicator" class="text-xs text-gray-400 mt-2"></p>
+    </div>
+    <div class="text-right">
+      <p id="priceUF" class="price-uf"></p>
+      <p id="priceCLP" class="text-gray-400 text-sm mt-1"></p>
+    </div>
+  </div>
+
+  <div id="stats" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8"></div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2 space-y-6">
+      <section>
+        <h2 class="text-lg font-bold mb-3">Descripción</h2>
+        <p id="descShort" class="text-gray-600 dark:text-zinc-400 leading-relaxed mb-4"></p>
+        <div id="descLong" class="text-gray-600 dark:text-zinc-400 leading-relaxed space-y-3 text-sm"></div>
+      </section>
+      <section id="extrasSection"></section>
+      <section>
+        <h2 class="text-lg font-bold mb-3">Ubicación</h2>
+        <div class="rounded-2xl overflow-hidden border border-gray-100 dark:border-zinc-800 shadow-sm">
+          <iframe id="mapFrame" class="w-full" style="height:320px;border:0" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <a id="mapLink" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-sm text-verde-700 dark:text-green-400 mt-3 hover:underline">
+          <i class="fa-solid fa-map-location-dot"></i> Abrir en Google Maps
+        </a>
+      </section>
+    </div>
+
+    <aside class="space-y-5">
+      <div class="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
+        <h2 class="font-bold mb-4">Contacto directo</h2>
+        <div id="contactLinks" class="space-y-2"></div>
+      </div>
+
+      <div class="bg-verde-50 dark:bg-verde-900/20 border border-verde-100 dark:border-verde-800 rounded-2xl p-5">
+        <h2 class="font-bold mb-1">¿Quieres más información?</h2>
+        <p class="text-sm text-gray-500 dark:text-zinc-400 mb-4">Déjanos tu correo y te contactamos automáticamente.</p>
+        <form id="leadForm" class="space-y-3">
+          <input id="leadNombre" type="text" placeholder="Tu nombre" required class="adm-input" />
+          <input id="leadEmail" type="email" placeholder="tu@correo.cl" required class="adm-input" />
+          <textarea id="leadMensaje" rows="3" placeholder="¿Qué te gustaría saber?" class="adm-input resize-none"></textarea>
+          <button type="submit" class="btn-verde w-full py-3 text-sm">
+            <i class="fa-solid fa-paper-plane mr-2"></i>Solicitar información
+          </button>
+        </form>
+        <p id="leadSuccess" class="hidden text-sm text-verde-700 dark:text-green-400 mt-3 text-center font-medium">
+          <i class="fa-solid fa-circle-check mr-1"></i>¡Recibido! Te contactaremos pronto.
+        </p>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<main id="notFound" class="hidden max-w-lg mx-auto px-5 py-24 text-center">
+  <i class="fa-solid fa-house-circle-xmark text-5xl text-gray-300 mb-4"></i>
+  <h1 class="text-xl font-bold mb-2">Propiedad no encontrada</h1>
+  <a href="index.html" class="btn-verde inline-block px-6 py-2.5 mt-4 text-sm">Volver al inicio</a>
+</main>
+
+<script type="module" src="js/propiedad.js"></script>
+</body>
+</html>

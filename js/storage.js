@@ -2,27 +2,30 @@
  * Capa de persistencia — hoy usa localStorage.
  * Para producción: crea SupabasePropertyStore con la misma interfaz.
  */
-import { DEFAULTS, STORAGE_KEY } from './config.js';
+import { DEFAULTS, STORAGE_KEY, enrichProperty } from './config.js';
 
 export class LocalPropertyStore {
   async getAll() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : structuredClone(DEFAULTS);
+      const list = stored ? JSON.parse(stored) : structuredClone(DEFAULTS);
+      return list.map(enrichProperty);
     } catch {
-      return structuredClone(DEFAULTS);
+      return structuredClone(DEFAULTS).map(enrichProperty);
     }
   }
 
   async saveAll(properties) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(properties));
+    window.dispatchEvent(new CustomEvent('pewenche-data-change', { detail: { key: STORAGE_KEY } }));
     return properties;
   }
 
   async upsert(properties, property) {
-    const idx = properties.findIndex(p => p.id === property.id);
-    if (idx >= 0) properties[idx] = property;
-    else properties.push(property);
+    const enriched = enrichProperty(property);
+    const idx = properties.findIndex(p => p.id === enriched.id);
+    if (idx >= 0) properties[idx] = enriched;
+    else properties.push(enriched);
     await this.saveAll(properties);
     return properties;
   }

@@ -64,13 +64,27 @@
       <svg width="26" height="26" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 4 L26 14 L32 10 L28 20 L36 18 L28 28 L30 24 L22 32 L22 38 L18 38 L18 32 L10 24 L12 28 L4 18 L12 20 L8 10 L14 14 Z" fill="#bbf7d0" stroke="#4ade80" stroke-width="1"/></svg>
       <span class="font-bold text-lg tracking-tight">Pewenche · Panel Admin</span>
     </div>
-    <button type="button" data-action="logout-admin" class="text-sm bg-white/10 hover:bg-white/20 px-4 py-1.5 rounded-full transition flex items-center gap-2">
-      <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
-    </button>
+    <div class="flex items-center gap-2">
+      <a href="index.html" target="_blank" rel="noopener" class="text-sm bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition hidden sm:flex items-center gap-2">
+        <i class="fa-solid fa-up-right-from-square"></i> Abrir sitio
+      </a>
+      <button type="button" data-action="logout-admin" class="text-sm bg-white/10 hover:bg-white/20 px-4 py-1.5 rounded-full transition flex items-center gap-2">
+        <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+      </button>
+    </div>
   </header>
 
+  <nav class="bg-white dark:bg-zinc-800 border-b border-gray-100 dark:border-zinc-700 px-4 sticky top-[68px] z-30">
+    <div class="max-w-6xl mx-auto flex gap-1 overflow-x-auto py-2">
+      <button type="button" data-admin-tab="propiedades" class="admin-tab admin-tab-active px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap">Propiedades</button>
+      <button type="button" data-admin-tab="estadisticas" class="admin-tab px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap">Estadísticas</button>
+      <button type="button" data-admin-tab="leads" class="admin-tab px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap">Consultas</button>
+      <button type="button" data-admin-tab="sitio" class="admin-tab px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap">Vista sitio</button>
+    </div>
+  </nav>
+
   <div class="max-w-6xl mx-auto px-4 py-8">
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
       <div class="bg-white dark:bg-zinc-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-zinc-700">
         <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Total</p>
         <p id="statTotal" class="text-3xl font-bold text-verde-800 dark:text-green-400">0</p>
@@ -87,8 +101,35 @@
         <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Hostal/Camping</p>
         <p id="statHostal" class="text-3xl font-bold text-verde-800 dark:text-green-400">0</p>
       </div>
+      <div class="bg-white dark:bg-zinc-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-zinc-700">
+        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Clics semana</p>
+        <p id="statClicks" class="text-3xl font-bold text-verde-800 dark:text-green-400">0</p>
+      </div>
+      <div class="bg-white dark:bg-zinc-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-zinc-700">
+        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Leads nuevos</p>
+        <p id="statLeads" class="text-3xl font-bold text-verde-800 dark:text-green-400">0</p>
+      </div>
     </div>
 
+    <div data-admin-panel="estadisticas" class="hidden mb-8">
+      <h2 class="text-xl font-bold mb-2">Propiedades más visitadas esta semana</h2>
+      <p class="text-sm text-gray-400 mb-5">Total de clics: <strong id="analyticsTotal" class="text-verde-700 dark:text-green-400">0</strong></p>
+      <div id="analyticsList" class="space-y-3"></div>
+    </div>
+
+    <div data-admin-panel="leads" class="hidden mb-8">
+      <h2 class="text-xl font-bold mb-5">Consultas de clientes</h2>
+      <div id="leadsList" class="space-y-3"></div>
+    </div>
+
+    <div data-admin-panel="sitio" class="hidden mb-8">
+      <p class="text-sm text-gray-400 mb-3">Vista en tiempo real del sitio público. Los cambios se reflejan al guardar propiedades.</p>
+      <div id="adminPreviewWrap" class="rounded-2xl overflow-hidden border border-gray-200 dark:border-zinc-700 shadow-sm bg-white">
+        <iframe id="adminPreviewFrame" title="Vista previa del sitio" class="w-full" style="height:70vh;border:0"></iframe>
+      </div>
+    </div>
+
+    <div data-admin-panel="propiedades">
     <div class="flex items-center justify-between mb-5">
       <h2 class="text-xl font-bold">Propiedades publicadas</h2>
       <button type="button" data-action="open-property-form" class="btn-verde px-5 py-2.5 flex items-center gap-2 shadow-sm text-sm">
@@ -111,6 +152,7 @@
           <tbody id="adminTableBody" class="divide-y divide-gray-100 dark:divide-zinc-700"></tbody>
         </table>
       </div>
+    </div>
     </div>
   </div>
 </div>
@@ -176,8 +218,28 @@
           <input id="formPrecioUF" type="number" placeholder="4500" class="adm-input" />
         </div>
         <div>
-          <label for="formPrecioCLP" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Precio CLP</label>
-          <input id="formPrecioCLP" type="text" placeholder="$175.000.000" class="adm-input" />
+          <label for="formPrecioNota" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Nota precio</label>
+          <select id="formPrecioNota" class="adm-input">
+            <option value="">(venta total)</option>
+            <option value="/mes">/mes</option>
+            <option value="/noche">/noche</option>
+          </select>
+        </div>
+        <div>
+          <label for="formPrecioCLP" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Precio CLP (respaldo)</label>
+          <input id="formPrecioCLP" type="text" placeholder="Se calcula con UF si está vacío" class="adm-input" />
+        </div>
+        <div class="sm:col-span-2">
+          <label for="formDireccion" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Dirección (mapa)</label>
+          <input id="formDireccion" type="text" placeholder="Ej: Av. Apoquindo 3000" class="adm-input" />
+        </div>
+        <div>
+          <label for="formLat" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Latitud</label>
+          <input id="formLat" type="number" step="any" placeholder="-33.4078" class="adm-input" />
+        </div>
+        <div>
+          <label for="formLng" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Longitud</label>
+          <input id="formLng" type="number" step="any" placeholder="-70.5672" class="adm-input" />
         </div>
         <div>
           <label for="formSuperficie" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Superficie (m²)</label>
@@ -196,8 +258,12 @@
           <input id="formEstac" type="number" placeholder="1" class="adm-input" />
         </div>
         <div class="sm:col-span-2">
-          <label for="formDesc" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Descripción</label>
-          <textarea id="formDesc" rows="3" placeholder="Describe la propiedad…" class="adm-input resize-none"></textarea>
+          <label for="formDesc" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Descripción corta</label>
+          <textarea id="formDesc" rows="2" placeholder="Resumen para tarjetas…" class="adm-input resize-none"></textarea>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="formDescLarga" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Descripción amplia</label>
+          <textarea id="formDescLarga" rows="5" placeholder="Detalle completo para la página de la propiedad…" class="adm-input resize-none"></textarea>
         </div>
         <div class="sm:col-span-2">
           <label for="formImagenes" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">URLs de imágenes (una por línea)</label>
@@ -283,6 +349,7 @@
       </nav>
 
       <div class="flex items-center gap-2">
+        <span id="ufIndicator" class="hidden sm:block text-xs text-green-200 bg-white/10 px-3 py-1 rounded-full" title="Valor UF actualizado cada 5 min"></span>
         <button type="button" data-action="toggle-theme" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition" aria-label="Cambiar tema">
           <i id="themeIcon" class="fa-solid fa-moon"></i>
         </button>
@@ -316,7 +383,7 @@
       <div class="bg-white dark:bg-zinc-900 rounded-2xl p-3 shadow-2xl max-w-3xl mx-auto">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
           <label class="sr-only" for="heroTipo">Tipo</label>
-          <select id="heroTipo" class="w-full bg-gray-50 dark:bg-zinc-800 dark:text-white border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-verde-700 focus:outline-none">
+          <select id="heroTipo" class="form-select w-full bg-gray-50 dark:bg-zinc-800 dark:text-white border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-verde-700 focus:outline-none">
             <option value="">Todos los tipos</option>
             <option value="venta">En Venta</option>
             <option value="arriendo">En Arriendo</option>
@@ -325,7 +392,7 @@
             <option value="terreno">Terreno / Sitio</option>
           </select>
           <label class="sr-only" for="heroRegion">Región</label>
-          <select id="heroRegion" class="w-full bg-gray-50 dark:bg-zinc-800 dark:text-white border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-verde-700 focus:outline-none">
+          <select id="heroRegion" class="form-select w-full bg-gray-50 dark:bg-zinc-800 dark:text-white border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-verde-700 focus:outline-none">
             <option value="">Todas las regiones</option>
           </select>
           <label class="sr-only" for="searchQuery">Buscar</label>
@@ -345,13 +412,13 @@
     </div>
     <div class="flex items-center gap-2">
       <label class="sr-only" for="sortBy">Ordenar</label>
-      <select id="sortBy" class="bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white focus:outline-none">
+      <select id="sortBy" class="form-select bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white focus:outline-none">
         <option value="relevance">Relevancia</option>
         <option value="price-asc">Precio ↑</option>
         <option value="price-desc">Precio ↓</option>
         <option value="title-asc">Nombre A–Z</option>
       </select>
-      <select id="mobileFilterTipo" class="lg:hidden bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white focus:outline-none">
+      <select id="mobileFilterTipo" class="form-select lg:hidden bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white focus:outline-none">
         <option value="">Todos</option>
         <option value="venta">Venta</option>
         <option value="arriendo">Arriendo</option>
@@ -377,7 +444,7 @@
       </div>
       <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-sm">
         <h3 class="font-semibold text-xs uppercase tracking-widest text-gray-400 mb-3">Región</h3>
-        <select id="sideRegion" class="w-full bg-gray-50 dark:bg-zinc-800 dark:text-white border border-gray-200 dark:border-zinc-700 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-verde-700 focus:outline-none">
+        <select id="sideRegion" class="form-select w-full bg-gray-50 dark:bg-zinc-800 dark:text-white border border-gray-200 dark:border-zinc-700 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-verde-700 focus:outline-none">
           <option value="">Todas</option>
         </select>
       </div>

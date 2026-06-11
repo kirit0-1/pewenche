@@ -1,8 +1,10 @@
-import { SITE } from './config.js';
+import { SITE, STORAGE_KEY } from './config.js';
 import { LocalPropertyStore } from './storage.js';
 import { LocalAuthService } from './auth.js';
 import { createApp } from './app.js';
 import { createAdmin } from './admin.js';
+import { startUFService } from './uf.js';
+import { onDataChange } from './analytics.js';
 
 const store = new LocalPropertyStore();
 const auth = new LocalAuthService();
@@ -16,6 +18,7 @@ const app = createApp(store, state);
 const admin = createAdmin(store, auth, state, app);
 
 async function init() {
+  startUFService();
   state.properties = await store.getAll();
 
   app.initTheme();
@@ -30,6 +33,11 @@ async function init() {
   app.setActiveNav('todas');
 
   if (window.location.hash === '#/admin') admin.goAdmin();
+
+  onDataChange(async key => {
+    if (key === STORAGE_KEY) await app.reloadProperties();
+    if (auth.isAuthenticated()) await admin.refreshFromStore();
+  });
 }
 
 /* Delegación de acciones globales (data-action en HTML estático) */

@@ -49,6 +49,42 @@ body, header, footer, .prop-card, .modal-backdrop, .adm-input, .btn-verde, .side
 .adm-input:focus { outline: 2px solid #166534; outline-offset: 2px; }
 .dark .adm-input:focus { outline-color: #4ade80; }
 
+/* Selects legibles en modo claro y oscuro */
+.form-select,
+.adm-input select,
+select.adm-input {
+  color-scheme: light dark;
+  appearance: auto;
+}
+.form-select,
+select {
+  background-color: #f9fafb;
+  color: #1f2937;
+}
+.dark .form-select,
+.dark select {
+  background-color: #27272a;
+  color: #f4f4f5;
+  border-color: #3f3f46;
+}
+.form-select option,
+select option {
+  background-color: #ffffff;
+  color: #1f2937;
+}
+.dark .form-select option,
+.dark select option {
+  background-color: #27272a;
+  color: #f4f4f5;
+}
+
+.admin-tab { color: #6b7280; transition: background .15s, color .15s; }
+.admin-tab:hover { background: #f3f4f6; color: #166534; }
+.dark .admin-tab { color: #a1a1aa; }
+.dark .admin-tab:hover { background: #3f3f46; color: #bbf7d0; }
+.admin-tab-active { background: #dcfce7 !important; color: #166534 !important; font-weight: 600; }
+.dark .admin-tab-active { background: #14532d !important; color: #bbf7d0 !important; }
+
 .btn-verde { background: #15803d; color: white; font-weight: 600; border-radius: .75rem; }
 .btn-verde:hover { background: #166534; }
 

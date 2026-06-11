@@ -37,9 +37,25 @@ export function debounce(fn, ms = 300) {
   };
 }
 
-export function mapsUrl(comuna, region) {
-  const q = encodeURIComponent(`${comuna || ''}, ${region || ''}, Chile`);
+export function mapsUrl(propOrComuna, region) {
+  const p = typeof propOrComuna === 'object' ? propOrComuna : null;
+  if (p?.lat && p?.lng) {
+    return `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
+  }
+  const comuna = p ? p.comuna : propOrComuna;
+  const reg = p ? p.region : region;
+  const addr = p?.direccion ? `${p.direccion}, ` : '';
+  const q = encodeURIComponent(`${addr}${comuna || ''}, ${reg || ''}, Chile`);
   return `https://www.google.com/maps/search/?api=1&query=${q}`;
+}
+
+export function mapEmbedUrl(prop) {
+  if (prop?.lat && prop?.lng) {
+    return `https://maps.google.com/maps?q=${prop.lat},${prop.lng}&z=15&output=embed`;
+  }
+  const addr = prop?.direccion ? `${prop.direccion}, ` : '';
+  const q = encodeURIComponent(`${addr}${prop?.comuna || ''}, ${prop?.region || ''}, Chile`);
+  return `https://maps.google.com/maps?q=${q}&z=14&output=embed`;
 }
 
 export function waLink(phone, text) {
