@@ -1,8 +1,42 @@
 /**
- * Autenticación — sesión local temporal.
- * REEMPLAZAR en producción con Supabase Auth (ver GUIA-BACKEND.md).
+ * Autenticación — local o API Node según disponibilidad.
  */
 import { ADMIN } from './config.js';
+import { api, setToken, getToken } from './api.js';
+
+export class ApiAuthService {
+  async login(username, password) {
+    try {
+      const data = await api('/api/auth/login', { method: 'POST', body: { username, password } });
+      setToken(data.token);
+      sessionStorage.setItem(ADMIN.sessionKey, JSON.stringify({ at: Date.now(), user: data.user }));
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: e.message || 'Credenciales incorrectas.' };
+    }
+  }
+
+  isAuthenticated() {
+    if (!getToken()) return false;
+    try {
+      const raw = sessionStorage.getItem(ADMIN.sessionKey);
+      if (!raw) return false;
+      const session = JSON.parse(raw);
+      if (Date.now() - session.at > ADMIN.sessionTTL) {
+        this.logout();
+        return false;
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  logout() {
+    setToken('');
+    sessionStorage.removeItem(ADMIN.sessionKey);
+  }
+}
 
 export class LocalAuthService {
   async login(username, password) {

@@ -4,3 +4,9 @@ Thumbs.db
 .env
 .env.*
 node_modules/
+data/properties.json
+data/leads.json
+data/clicks.json
+data/admin.json
+uploads/*
+!uploads/.gitkeep

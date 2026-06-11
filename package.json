@@ -1,11 +1,17 @@
 {
   "name": "pewenche",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
   "description": "Pewenche Propiedades — sitio estático Chile",
   "scripts": {
-    "start": "node scripts/start.mjs",
-    "dev": "node scripts/start.mjs"
+    "start": "node server/index.mjs",
+    "dev": "node server/index.mjs",
+    "static": "node scripts/start.mjs"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "serve": "^14.2.4"

@@ -4,4 +4,4 @@ if (Test-Path "$nodeDir\node.exe") {
   $env:Path = "$nodeDir;$env:Path"
 }
 Set-Location $PSScriptRoot
-& node scripts/start.mjs
+& node server/index.mjs

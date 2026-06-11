@@ -57,103 +57,122 @@
 
 <body class="bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 font-sans antialiased">
 
-<!-- ═══ PANEL ADMIN (acceso: tu-sitio.cl/#/admin) ═══ -->
-<div id="adminPage" class="hidden min-h-screen bg-gray-50 dark:bg-zinc-900">
-  <header class="bg-verde-800 text-white px-6 py-4 flex items-center justify-between shadow-lg sticky top-0 z-40">
-    <div class="flex items-center gap-3">
-      <svg width="26" height="26" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 4 L26 14 L32 10 L28 20 L36 18 L28 28 L30 24 L22 32 L22 38 L18 38 L18 32 L10 24 L12 28 L4 18 L12 20 L8 10 L14 14 Z" fill="#bbf7d0" stroke="#4ade80" stroke-width="1"/></svg>
-      <span class="font-bold text-lg tracking-tight">Pewenche · Panel Admin</span>
+<!-- ═══ PANEL ADMIN (acceso: pie de página) ═══ -->
+<div id="adminPage" class="hidden min-h-screen bg-gray-100 dark:bg-zinc-950 flex">
+  <aside class="admin-sidebar w-64 shrink-0 bg-verde-900 text-white flex flex-col sticky top-0 h-screen">
+    <div class="p-5 border-b border-verde-800">
+      <p class="font-bold text-lg">Pewenche</p>
+      <p class="text-green-200 text-xs">Panel administrador</p>
     </div>
-    <div class="flex items-center gap-2">
-      <a href="index.html" target="_blank" rel="noopener" class="text-sm bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition hidden sm:flex items-center gap-2">
-        <i class="fa-solid fa-up-right-from-square"></i> Abrir sitio
-      </a>
-      <button type="button" data-action="logout-admin" class="text-sm bg-white/10 hover:bg-white/20 px-4 py-1.5 rounded-full transition flex items-center gap-2">
-        <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
-      </button>
+    <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+      <button type="button" data-admin-tab="inicio" class="admin-sidebar-btn admin-sidebar-active w-full text-left px-4 py-2.5 rounded-xl text-sm"><i class="fa-solid fa-gauge-high w-5"></i> Inicio</button>
+      <button type="button" data-admin-tab="propiedades" class="admin-sidebar-btn w-full text-left px-4 py-2.5 rounded-xl text-sm"><i class="fa-solid fa-building w-5"></i> Propiedades</button>
+      <button type="button" data-admin-tab="editor" class="admin-sidebar-btn w-full text-left px-4 py-2.5 rounded-xl text-sm"><i class="fa-solid fa-plus w-5"></i> Nueva / Editar</button>
+      <button type="button" data-admin-tab="leads" class="admin-sidebar-btn w-full text-left px-4 py-2.5 rounded-xl text-sm"><i class="fa-solid fa-envelope w-5"></i> Consultas</button>
+      <button type="button" data-admin-tab="estadisticas" class="admin-sidebar-btn w-full text-left px-4 py-2.5 rounded-xl text-sm"><i class="fa-solid fa-chart-line w-5"></i> Estadísticas</button>
+      <button type="button" data-admin-tab="sitio" class="admin-sidebar-btn w-full text-left px-4 py-2.5 rounded-xl text-sm"><i class="fa-solid fa-globe w-5"></i> Vista sitio</button>
+      <button type="button" data-admin-tab="config" class="admin-sidebar-btn w-full text-left px-4 py-2.5 rounded-xl text-sm"><i class="fa-solid fa-gear w-5"></i> Configuración</button>
+    </nav>
+    <div class="p-3 border-t border-verde-800">
+      <button type="button" data-action="logout-admin" class="w-full text-left px-4 py-2 rounded-xl text-sm hover:bg-verde-800"><i class="fa-solid fa-right-from-bracket w-5"></i> Cerrar sesión</button>
     </div>
-  </header>
+  </aside>
 
-  <nav class="bg-white dark:bg-zinc-800 border-b border-gray-100 dark:border-zinc-700 px-4 sticky top-[68px] z-30">
-    <div class="max-w-6xl mx-auto flex gap-1 overflow-x-auto py-2">
-      <button type="button" data-admin-tab="propiedades" class="admin-tab admin-tab-active px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap">Propiedades</button>
-      <button type="button" data-admin-tab="estadisticas" class="admin-tab px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap">Estadísticas</button>
-      <button type="button" data-admin-tab="leads" class="admin-tab px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap">Consultas</button>
-      <button type="button" data-admin-tab="sitio" class="admin-tab px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap">Vista sitio</button>
-    </div>
-  </nav>
+  <div class="flex-1 min-w-0 flex flex-col">
+    <header class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 z-20">
+      <h1 id="adminPageTitle" class="font-bold text-xl">Inicio</h1>
+      <a href="index.html" target="_blank" rel="noopener" class="text-sm text-verde-700 dark:text-green-400 hover:underline"><i class="fa-solid fa-up-right-from-square mr-1"></i>Ver sitio público</a>
+    </header>
 
-  <div class="max-w-6xl mx-auto px-4 py-8">
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-      <div class="bg-white dark:bg-zinc-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-zinc-700">
-        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Total</p>
-        <p id="statTotal" class="text-3xl font-bold text-verde-800 dark:text-green-400">0</p>
+    <main class="flex-1 p-6 overflow-y-auto max-w-6xl w-full mx-auto">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+        <div class="admin-stat-card"><p class="text-xs text-gray-500 uppercase mb-1">Total</p><p id="statTotal" class="text-2xl font-bold text-verde-800 dark:text-green-400">0</p></div>
+        <div class="admin-stat-card"><p class="text-xs text-gray-500 uppercase mb-1">Venta</p><p id="statVenta" class="text-2xl font-bold text-verde-800 dark:text-green-400">0</p></div>
+        <div class="admin-stat-card"><p class="text-xs text-gray-500 uppercase mb-1">Arriendo</p><p id="statArriendo" class="text-2xl font-bold text-verde-800 dark:text-green-400">0</p></div>
+        <div class="admin-stat-card"><p class="text-xs text-gray-500 uppercase mb-1">Hostal</p><p id="statHostal" class="text-2xl font-bold text-verde-800 dark:text-green-400">0</p></div>
+        <div class="admin-stat-card"><p class="text-xs text-gray-500 uppercase mb-1">Clics/sem</p><p id="statClicks" class="text-2xl font-bold text-verde-800 dark:text-green-400">0</p></div>
+        <div class="admin-stat-card"><p class="text-xs text-gray-500 uppercase mb-1">Leads</p><p id="statLeads" class="text-2xl font-bold text-verde-800 dark:text-green-400">0</p></div>
       </div>
-      <div class="bg-white dark:bg-zinc-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-zinc-700">
-        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">En Venta</p>
-        <p id="statVenta" class="text-3xl font-bold text-verde-800 dark:text-green-400">0</p>
-      </div>
-      <div class="bg-white dark:bg-zinc-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-zinc-700">
-        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Arriendo</p>
-        <p id="statArriendo" class="text-3xl font-bold text-verde-800 dark:text-green-400">0</p>
-      </div>
-      <div class="bg-white dark:bg-zinc-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-zinc-700">
-        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Hostal/Camping</p>
-        <p id="statHostal" class="text-3xl font-bold text-verde-800 dark:text-green-400">0</p>
-      </div>
-      <div class="bg-white dark:bg-zinc-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-zinc-700">
-        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Clics semana</p>
-        <p id="statClicks" class="text-3xl font-bold text-verde-800 dark:text-green-400">0</p>
-      </div>
-      <div class="bg-white dark:bg-zinc-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-zinc-700">
-        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Leads nuevos</p>
-        <p id="statLeads" class="text-3xl font-bold text-verde-800 dark:text-green-400">0</p>
-      </div>
-    </div>
 
-    <div data-admin-panel="estadisticas" class="hidden mb-8">
-      <h2 class="text-xl font-bold mb-2">Propiedades más visitadas esta semana</h2>
-      <p class="text-sm text-gray-400 mb-5">Total de clics: <strong id="analyticsTotal" class="text-verde-700 dark:text-green-400">0</strong></p>
-      <div id="analyticsList" class="space-y-3"></div>
-    </div>
-
-    <div data-admin-panel="leads" class="hidden mb-8">
-      <h2 class="text-xl font-bold mb-5">Consultas de clientes</h2>
-      <div id="leadsList" class="space-y-3"></div>
-    </div>
-
-    <div data-admin-panel="sitio" class="hidden mb-8">
-      <p class="text-sm text-gray-400 mb-3">Vista en tiempo real del sitio público. Los cambios se reflejan al guardar propiedades.</p>
-      <div id="adminPreviewWrap" class="rounded-2xl overflow-hidden border border-gray-200 dark:border-zinc-700 shadow-sm bg-white">
-        <iframe id="adminPreviewFrame" title="Vista previa del sitio" class="w-full" style="height:70vh;border:0"></iframe>
+      <div data-admin-panel="inicio" class="space-y-6">
+        <h2 class="text-lg font-bold">Bienvenido al panel</h2>
+        <div class="grid sm:grid-cols-3 gap-4">
+          <button type="button" id="adminQuickNew" class="admin-action-card"><i class="fa-solid fa-plus text-2xl text-verde-700 mb-2"></i><span class="font-semibold">Agregar propiedad</span><span class="text-xs text-gray-400">Fotos, ubicación, precios</span></button>
+          <button type="button" id="adminQuickList" class="admin-action-card"><i class="fa-solid fa-list text-2xl text-verde-700 mb-2"></i><span class="font-semibold">Gestionar listado</span><span class="text-xs text-gray-400">Filtrar y editar</span></button>
+          <button type="button" id="adminQuickLeads" class="admin-action-card"><i class="fa-solid fa-envelope text-2xl text-verde-700 mb-2"></i><span class="font-semibold">Ver consultas</span><span class="text-xs text-gray-400">Correos de clientes</span></button>
+        </div>
       </div>
-    </div>
 
-    <div data-admin-panel="propiedades">
-    <div class="flex items-center justify-between mb-5">
-      <h2 class="text-xl font-bold">Propiedades publicadas</h2>
-      <button type="button" data-action="open-property-form" class="btn-verde px-5 py-2.5 flex items-center gap-2 shadow-sm text-sm">
-        <i class="fa-solid fa-plus"></i> Agregar propiedad
-      </button>
-    </div>
-
-    <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-700 overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="bg-gray-50 dark:bg-zinc-700/50 border-b border-gray-100 dark:border-zinc-700 text-left">
-              <th class="px-4 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider">Propiedad</th>
-              <th class="px-4 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider hidden sm:table-cell">Tipo</th>
-              <th class="px-4 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider hidden md:table-cell">Región</th>
-              <th class="px-4 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider">Precio UF</th>
-              <th class="px-4 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="adminTableBody" class="divide-y divide-gray-100 dark:divide-zinc-700"></tbody>
-        </table>
+      <div data-admin-panel="propiedades" class="hidden">
+        <div class="flex flex-wrap gap-3 mb-4">
+          <input id="adminFilterSearch" type="search" placeholder="Buscar…" class="adm-input flex-1 min-w-[140px]" />
+          <select id="adminFilterTipo" class="form-select adm-input w-auto"><option value="">Todos los tipos</option><option value="venta">Venta</option><option value="arriendo">Arriendo</option><option value="hostal">Hostal</option><option value="camping">Camping</option><option value="terreno">Terreno</option></select>
+          <select id="adminFilterRegion" class="form-select adm-input w-auto"><option value="">Todas las regiones</option></select>
+          <button type="button" data-action="open-property-form" class="btn-verde px-4 py-2 text-sm"><i class="fa-solid fa-plus mr-1"></i>Nueva</button>
+        </div>
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 overflow-x-auto">
+          <table class="w-full text-sm"><thead><tr class="bg-gray-50 dark:bg-zinc-800 text-left text-xs uppercase text-gray-500"><th class="px-4 py-3">Propiedad</th><th class="px-4 py-3 hidden sm:table-cell">Tipo</th><th class="px-4 py-3 hidden md:table-cell">Región</th><th class="px-4 py-3">Precio</th><th class="px-4 py-3 text-right">Acciones</th></tr></thead><tbody id="adminTableBody"></tbody></table>
+        </div>
       </div>
-    </div>
-    </div>
+
+      <div data-admin-panel="editor" class="hidden space-y-6">
+        <h2 id="editorTitle" class="text-lg font-bold">Nueva propiedad</h2>
+        <input type="hidden" id="formId" />
+        <div class="grid lg:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <div><label class="adm-label">Título *</label><input id="formTitulo" class="adm-input" placeholder="Ej: Casa en Las Condes" /></div>
+            <div class="grid grid-cols-2 gap-3">
+              <div><label class="adm-label">Tipo</label><select id="formTipo" class="form-select adm-input"><option value="venta">Venta</option><option value="arriendo">Arriendo</option><option value="hostal">Hostal</option><option value="camping">Camping</option><option value="terreno">Terreno</option></select></div>
+              <div><label class="adm-label">Precio UF</label><input id="formPrecioUF" type="number" class="adm-input" /></div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div><label class="adm-label">Región</label><select id="formRegion" class="form-select adm-input"></select></div>
+              <div><label class="adm-label">Comuna</label><input id="formComuna" class="adm-input" /></div>
+            </div>
+            <div><label class="adm-label">Dirección real</label><input id="formDireccion" class="adm-input" placeholder="Calle y número" /></div>
+            <div class="grid grid-cols-2 gap-3">
+              <div><label class="adm-label">Latitud</label><input id="formLat" type="number" step="any" class="adm-input" /></div>
+              <div><label class="adm-label">Longitud</label><input id="formLng" type="number" step="any" class="adm-input" /></div>
+            </div>
+            <iframe id="editorMapPreview" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700" style="height:200px" loading="lazy"></iframe>
+            <div class="grid grid-cols-2 gap-3">
+              <div><label class="adm-label">Nota precio</label><select id="formPrecioNota" class="form-select adm-input"><option value="">Venta total</option><option value="/mes">/mes</option><option value="/noche">/noche</option></select></div>
+              <div><label class="adm-label">CLP respaldo</label><input id="formPrecioCLP" class="adm-input" /></div>
+            </div>
+            <div class="grid grid-cols-4 gap-2">
+              <div><label class="adm-label">m²</label><input id="formSuperficie" type="number" class="adm-input" /></div>
+              <div><label class="adm-label">Dorm</label><input id="formDorms" type="number" class="adm-input" /></div>
+              <div><label class="adm-label">Baños</label><input id="formBanos" type="number" class="adm-input" /></div>
+              <div><label class="adm-label">Estac</label><input id="formEstac" type="number" class="adm-input" /></div>
+            </div>
+            <div><label class="adm-label">Descripción corta</label><textarea id="formDesc" rows="2" class="adm-input resize-none"></textarea></div>
+            <div><label class="adm-label">Descripción amplia</label><textarea id="formDescLarga" rows="4" class="adm-input resize-none"></textarea></div>
+            <div><label class="adm-label">Extras (coma)</label><input id="formExtras" class="adm-input" placeholder="Piscina, Jardín" /></div>
+          </div>
+          <div class="space-y-4">
+            <label class="adm-label">Fotos</label>
+            <div id="imageUploadZone" class="upload-zone"><i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-400 mb-2"></i><p class="text-sm text-gray-500">Arrastra imágenes o haz clic</p><p class="text-xs text-gray-400 mt-1">JPG, PNG, WEBP · máx 8 MB</p></div>
+            <input type="file" id="imageFileInput" accept="image/*" multiple class="hidden" />
+            <div class="flex gap-2"><input id="formImageUrl" class="adm-input flex-1 text-xs" placeholder="URL de imagen externa" /><button type="button" id="btnAddImageUrl" class="btn-verde px-3 text-xs">Añadir</button></div>
+            <textarea id="formImagenes" class="hidden"></textarea>
+            <div id="imageGallery" class="grid grid-cols-2 gap-2"></div>
+            <button type="button" data-action="save-property" class="btn-verde w-full py-3 text-sm"><i class="fa-solid fa-floppy-disk mr-2"></i>Guardar propiedad</button>
+          </div>
+        </div>
+      </div>
+
+      <div data-admin-panel="estadisticas" class="hidden"><h2 class="text-lg font-bold mb-4">Más visitadas esta semana</h2><p class="text-sm text-gray-400 mb-4">Total: <strong id="analyticsTotal">0</strong></p><div id="analyticsList" class="space-y-3"></div></div>
+      <div data-admin-panel="leads" class="hidden"><h2 class="text-lg font-bold mb-4">Consultas de clientes</h2><div id="leadsList" class="space-y-3"></div></div>
+      <div data-admin-panel="sitio" class="hidden"><p class="text-sm text-gray-400 mb-3">Vista en tiempo real del sitio.</p><iframe id="adminPreviewFrame" class="w-full rounded-2xl border" style="height:70vh;border:0"></iframe></div>
+      <div data-admin-panel="config" class="hidden max-w-md space-y-4">
+        <h2 class="text-lg font-bold">Credenciales de acceso</h2>
+        <p id="configApiHint" class="text-sm text-gray-400"></p>
+        <div><label class="adm-label">Usuario</label><input id="configUsername" class="adm-input" /></div>
+        <div><label class="adm-label">Contraseña actual</label><input id="configCurrentPass" type="password" class="adm-input" /></div>
+        <div><label class="adm-label">Nueva contraseña</label><input id="configNewPass" type="password" class="adm-input" placeholder="Opcional" /></div>
+        <button type="button" id="btnSaveConfig" class="btn-verde px-5 py-2 text-sm">Guardar cambios</button>
+      </div>
+    </main>
   </div>
 </div>
 
@@ -177,110 +196,6 @@
         <i class="fa-solid fa-lock mr-2"></i>Ingresar
       </button>
       <button type="button" data-action="close-login" class="w-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-sm py-2">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ MODAL FORMULARIO PROPIEDAD ═══ -->
-<div id="propertyFormModal" class="hidden modal-backdrop" style="z-index:9100" role="dialog" aria-modal="true" aria-labelledby="formModalTitle">
-  <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-    <div class="sticky top-0 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-700 px-6 py-4 flex items-center justify-between rounded-t-3xl z-10">
-      <h3 id="formModalTitle" class="font-bold text-lg">Nueva propiedad</h3>
-      <button type="button" data-action="close-property-form" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800" aria-label="Cerrar">✕</button>
-    </div>
-    <div class="p-6 space-y-5">
-      <input type="hidden" id="formId" />
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="sm:col-span-2">
-          <label for="formTitulo" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Título *</label>
-          <input id="formTitulo" type="text" placeholder="Ej: Casa 3D 2B en Las Condes" class="adm-input" />
-        </div>
-        <div>
-          <label for="formTipo" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Tipo *</label>
-          <select id="formTipo" class="adm-input">
-            <option value="venta">Venta</option>
-            <option value="arriendo">Arriendo</option>
-            <option value="hostal">Hostal</option>
-            <option value="camping">Camping</option>
-            <option value="terreno">Terreno / Sitio</option>
-          </select>
-        </div>
-        <div>
-          <label for="formRegion" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Región *</label>
-          <select id="formRegion" class="adm-input"></select>
-        </div>
-        <div>
-          <label for="formComuna" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Comuna *</label>
-          <input id="formComuna" type="text" placeholder="Ej: Las Condes" class="adm-input" />
-        </div>
-        <div>
-          <label for="formPrecioUF" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Precio UF</label>
-          <input id="formPrecioUF" type="number" placeholder="4500" class="adm-input" />
-        </div>
-        <div>
-          <label for="formPrecioNota" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Nota precio</label>
-          <select id="formPrecioNota" class="adm-input">
-            <option value="">(venta total)</option>
-            <option value="/mes">/mes</option>
-            <option value="/noche">/noche</option>
-          </select>
-        </div>
-        <div>
-          <label for="formPrecioCLP" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Precio CLP (respaldo)</label>
-          <input id="formPrecioCLP" type="text" placeholder="Se calcula con UF si está vacío" class="adm-input" />
-        </div>
-        <div class="sm:col-span-2">
-          <label for="formDireccion" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Dirección (mapa)</label>
-          <input id="formDireccion" type="text" placeholder="Ej: Av. Apoquindo 3000" class="adm-input" />
-        </div>
-        <div>
-          <label for="formLat" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Latitud</label>
-          <input id="formLat" type="number" step="any" placeholder="-33.4078" class="adm-input" />
-        </div>
-        <div>
-          <label for="formLng" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Longitud</label>
-          <input id="formLng" type="number" step="any" placeholder="-70.5672" class="adm-input" />
-        </div>
-        <div>
-          <label for="formSuperficie" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Superficie (m²)</label>
-          <input id="formSuperficie" type="number" placeholder="120" class="adm-input" />
-        </div>
-        <div>
-          <label for="formDorms" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Dormitorios</label>
-          <input id="formDorms" type="number" placeholder="3" class="adm-input" />
-        </div>
-        <div>
-          <label for="formBanos" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Baños</label>
-          <input id="formBanos" type="number" placeholder="2" class="adm-input" />
-        </div>
-        <div>
-          <label for="formEstac" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Estacionamientos</label>
-          <input id="formEstac" type="number" placeholder="1" class="adm-input" />
-        </div>
-        <div class="sm:col-span-2">
-          <label for="formDesc" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Descripción corta</label>
-          <textarea id="formDesc" rows="2" placeholder="Resumen para tarjetas…" class="adm-input resize-none"></textarea>
-        </div>
-        <div class="sm:col-span-2">
-          <label for="formDescLarga" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Descripción amplia</label>
-          <textarea id="formDescLarga" rows="5" placeholder="Detalle completo para la página de la propiedad…" class="adm-input resize-none"></textarea>
-        </div>
-        <div class="sm:col-span-2">
-          <label for="formImagenes" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">URLs de imágenes (una por línea)</label>
-          <textarea id="formImagenes" rows="4" placeholder="https://images.unsplash.com/…" class="adm-input resize-none font-mono text-xs"></textarea>
-          <p class="text-xs text-gray-400 mt-1">La primera URL se usará como imagen principal.</p>
-        </div>
-        <div class="sm:col-span-2">
-          <label for="formExtras" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Características extra (separadas por coma)</label>
-          <input id="formExtras" type="text" placeholder="Jardín, Piscina, Bodega" class="adm-input" />
-        </div>
-      </div>
-      <div class="flex gap-3 pt-2">
-        <button type="button" data-action="save-property" class="btn-verde flex-1 py-3 text-sm">
-          <i class="fa-solid fa-floppy-disk mr-2"></i>Guardar propiedad
-        </button>
-        <button type="button" data-action="close-property-form" class="px-6 py-3 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-800 text-sm font-medium">Cancelar</button>
-      </div>
     </div>
   </div>
 </div>
@@ -542,6 +457,11 @@
       </div>
     </div>
     <p class="text-center text-zinc-600 text-xs mt-6">© <span id="siteYear">2026</span> Pewenche Propiedades · Chile · Todos los derechos reservados</p>
+    <p class="text-center mt-3">
+      <button type="button" data-action="open-admin-login" class="text-zinc-700 hover:text-zinc-400 text-[11px] transition underline-offset-2 hover:underline">
+        Acceso administrador
+      </button>
+    </p>
   </footer>
 </div>
 

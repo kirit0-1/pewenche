@@ -85,6 +85,21 @@ select option {
 .admin-tab-active { background: #dcfce7 !important; color: #166534 !important; font-weight: 600; }
 .dark .admin-tab-active { background: #14532d !important; color: #bbf7d0 !important; }
 
+/* Admin sidebar */
+.admin-sidebar-btn { display: flex; align-items: center; gap: 0.65rem; color: #bbf7d0; transition: background .15s; }
+.admin-sidebar-btn:hover { background: rgba(255,255,255,.08); }
+.admin-sidebar-active { background: rgba(255,255,255,.15) !important; color: #fff !important; font-weight: 600; }
+.admin-stat-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 1rem; padding: 1rem; }
+.dark .admin-stat-card { background: #18181b; border-color: #3f3f46; }
+.admin-action-card { display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: 1.25rem; background: #fff; border: 1px solid #e5e7eb; border-radius: 1rem; transition: box-shadow .2s, border-color .2s; }
+.admin-action-card:hover { border-color: #166534; box-shadow: 0 4px 14px rgba(22,101,52,.12); }
+.dark .admin-action-card { background: #18181b; border-color: #3f3f46; }
+.adm-label { display: block; font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: #6b7280; margin-bottom: .35rem; }
+.upload-zone { border: 2px dashed #d1d5db; border-radius: 1rem; padding: 2rem; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; }
+.upload-zone:hover, .upload-zone.drag-over { border-color: #166534; background: #f0fdf4; }
+.dark .upload-zone { border-color: #3f3f46; }
+.dark .upload-zone:hover, .dark .upload-zone.drag-over { background: #14532d33; }
+
 .btn-verde { background: #15803d; color: white; font-weight: 600; border-radius: .75rem; }
 .btn-verde:hover { background: #166534; }
 

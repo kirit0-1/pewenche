@@ -1,23 +1,24 @@
 import { SITE, STORAGE_KEY } from './config.js';
 import { LocalPropertyStore } from './storage.js';
-import { LocalAuthService } from './auth.js';
+import { LocalAuthService, ApiAuthService } from './auth.js';
+import { ApiPropertyStore } from './api-store.js';
 import { createApp } from './app.js';
 import { createAdmin } from './admin.js';
 import { startUFService } from './uf.js';
 import { onDataChange } from './analytics.js';
+import { detectApi } from './api.js';
 
-const store = new LocalPropertyStore();
-const auth = new LocalAuthService();
-
-const state = {
-  properties: [],
-  currentSection: 'todas',
-};
-
-const app = createApp(store, state);
-const admin = createAdmin(store, auth, state, app);
+const state = { properties: [], currentSection: 'todas' };
+let store, auth, app, admin;
 
 async function init() {
+  const apiOk = await detectApi();
+  store = apiOk ? new ApiPropertyStore() : new LocalPropertyStore();
+  auth = apiOk ? new ApiAuthService() : new LocalAuthService();
+
+  app = createApp(store, state);
+  admin = createAdmin(store, auth, state, app);
+
   startUFService();
   state.properties = await store.getAll();
 
@@ -32,7 +33,7 @@ async function init() {
   app.renderGrid(state.properties);
   app.setActiveNav('todas');
 
-  if (window.location.hash === '#/admin') admin.goAdmin();
+  if (auth.isAuthenticated()) admin.showPanel();
 
   onDataChange(async key => {
     if (key === STORAGE_KEY) await app.reloadProperties();
@@ -40,10 +41,9 @@ async function init() {
   });
 }
 
-/* Delegación de acciones globales (data-action en HTML estático) */
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-action]');
-  if (!el || el.closest('#propertiesGrid, #adminTableBody, #detailModal')) return;
+  if (!el || el.closest('#propertiesGrid, #adminTableBody, #detailModal, #imageGallery')) return;
 
   const action = el.dataset.action;
   const handlers = {
@@ -53,9 +53,9 @@ document.addEventListener('click', e => {
     'reset-filters': () => { e.preventDefault(); app.resetFilters(); },
     'sidebar-tipo': () => app.setSidebarTipo(el.dataset.tipo),
     'close-login': () => document.getElementById('loginModal').classList.add('hidden'),
+    'open-admin-login': () => admin.openLogin(),
     'attempt-login': () => admin.attemptLogin(),
     'open-property-form': () => admin.openPropertyForm(null),
-    'close-property-form': () => admin.closePropertyForm(),
     'save-property': () => admin.saveProperty(),
     'close-detail': () => app.closeDetail(),
     'logout-admin': () => admin.logoutAdmin(),
@@ -64,7 +64,7 @@ document.addEventListener('click', e => {
 
   const fn = handlers[action];
   if (fn) {
-    if (action !== 'reset-filters') e.preventDefault();
+    if (!['reset-filters', 'show-section'].includes(action)) e.preventDefault();
     fn();
     if (action === 'show-section' && el.closest('#mobileMenu')) app.toggleMobileMenu();
   }

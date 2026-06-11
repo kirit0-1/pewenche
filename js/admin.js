@@ -1,28 +1,29 @@
-import { BADGE } from './config.js';
-import { getVal, genId, h, setVal, toast } from './utils.js';
+import { BADGE, REGIONES } from './config.js';
+import { getVal, genId, h, setVal, toast, mapEmbedUrl } from './utils.js';
 import {
   getWeeklyClickStats, getTotalWeeklyClicks, getLeads, markLeadContacted, onDataChange,
 } from './analytics.js';
 import { clpFromUF } from './uf.js';
+import { hasApi, uploadImages, api } from './api.js';
 
 export function createAdmin(store, auth, state, app) {
-  let activeTab = 'propiedades';
+  let activeTab = 'inicio';
+  let editorImages = [];
 
   function showPanel() {
     document.getElementById('mainPage').classList.add('hidden');
     document.getElementById('adminPage').classList.remove('hidden');
-    window.location.hash = '#/admin';
-    switchTab('propiedades');
+    document.getElementById('waFloat')?.classList.add('hidden');
+    switchTab('inicio');
   }
 
   function hidePanel() {
     document.getElementById('adminPage').classList.add('hidden');
     document.getElementById('mainPage').classList.remove('hidden');
-    document.getElementById('adminPreviewWrap')?.classList.add('hidden');
-    window.history.replaceState(null, '', window.location.pathname);
+    document.getElementById('waFloat')?.classList.remove('hidden');
   }
 
-  function goAdmin() {
+  function openLogin() {
     if (auth.isAuthenticated()) showPanel();
     else {
       document.getElementById('loginModal').classList.remove('hidden');
@@ -56,34 +57,49 @@ export function createAdmin(store, auth, state, app) {
   function switchTab(tab) {
     activeTab = tab;
     document.querySelectorAll('[data-admin-tab]').forEach(btn => {
-      btn.classList.toggle('admin-tab-active', btn.dataset.adminTab === tab);
+      btn.classList.toggle('admin-sidebar-active', btn.dataset.adminTab === tab);
     });
     document.querySelectorAll('[data-admin-panel]').forEach(panel => {
       panel.classList.toggle('hidden', panel.dataset.adminPanel !== tab);
     });
+    document.getElementById('adminPageTitle').textContent = {
+      inicio: 'Inicio', propiedades: 'Propiedades', editor: 'Editor de propiedad',
+      estadisticas: 'Estadísticas', leads: 'Consultas de clientes', sitio: 'Vista del sitio', config: 'Configuración',
+    }[tab] || 'Panel Admin';
 
-    if (tab === 'propiedades') { renderAdminTable(); updateAdminStats(); }
+    if (tab === 'inicio' || tab === 'propiedades') { updateAdminStats(); if (tab === 'propiedades') renderAdminTable(); }
     if (tab === 'estadisticas') renderAnalytics();
     if (tab === 'leads') renderLeads();
     if (tab === 'sitio') showSitePreview();
+    if (tab === 'config') loadConfig();
+    if (tab === 'editor') updateMapPreview();
   }
 
   function showSitePreview() {
-    const wrap = document.getElementById('adminPreviewWrap');
-    const frame = document.getElementById('adminPreviewFrame');
-    if (!wrap || !frame) return;
-    wrap.classList.remove('hidden');
-    frame.src = 'index.html?_preview=1';
+    document.getElementById('adminPreviewFrame').src = 'index.html';
+  }
+
+  function filteredProperties() {
+    const q = (getVal('adminFilterSearch') || '').toLowerCase();
+    const tipo = getVal('adminFilterTipo');
+    const region = getVal('adminFilterRegion');
+    return state.properties.filter(p => {
+      if (tipo && p.tipo !== tipo) return false;
+      if (region && p.region !== region) return false;
+      if (q && ![p.titulo, p.comuna, p.region, p.desc].join(' ').toLowerCase().includes(q)) return false;
+      return true;
+    });
   }
 
   function renderAdminTable() {
     const tbody = document.getElementById('adminTableBody');
+    const list = filteredProperties();
     tbody.innerHTML = '';
-    if (!state.properties.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="text-center py-12 text-gray-400 text-sm">No hay propiedades. ¡Agrega la primera!</td></tr>';
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center py-12 text-gray-400 text-sm">No hay propiedades con esos filtros.</td></tr>';
       return;
     }
-    state.properties.forEach(p => {
+    list.forEach(p => {
       const badge = BADGE[p.tipo] || { cls: 'bg-gray-600', label: p.tipo };
       const clp = clpFromUF(p.precioUF, p.precioNota || '') || p.precioCLP || '';
       const tr = document.createElement('tr');
@@ -91,112 +107,111 @@ export function createAdmin(store, auth, state, app) {
       tr.innerHTML = `
         <td class="px-4 py-3">
           <div class="flex items-center gap-3">
-            <img src="${(p.imagenes && p.imagenes[0]) || ''}" alt=""
-              class="w-10 h-10 rounded-xl object-cover shrink-0 border border-gray-100 dark:border-zinc-700"
-              onerror="this.src='https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=100'" />
-            <div>
-              <p class="font-medium text-sm">${h(p.titulo)}</p>
-              <p class="text-xs text-gray-400">${h(p.comuna || '')}${p.region ? ', ' + h(p.region) : ''}</p>
-            </div>
+            <img src="${(p.imagenes && p.imagenes[0]) || ''}" alt="" class="w-12 h-12 rounded-xl object-cover shrink-0 border border-gray-100 dark:border-zinc-700" onerror="this.style.display='none'" />
+            <div><p class="font-medium text-sm">${h(p.titulo)}</p><p class="text-xs text-gray-400">${h(p.comuna || '')}${p.region ? ', ' + h(p.region) : ''}</p></div>
           </div>
         </td>
-        <td class="px-4 py-3 hidden sm:table-cell">
-          <span class="text-xs font-semibold px-2.5 py-1 rounded-full text-white ${badge.cls}">${badge.label}</span>
-        </td>
-        <td class="px-4 py-3 hidden md:table-cell text-sm text-gray-500 dark:text-zinc-400">${h(p.region || '—')}</td>
-        <td class="px-4 py-3 text-sm">
-          <span class="font-semibold text-verde-700 dark:text-green-400">${p.precioUF ? p.precioUF.toLocaleString('es-CL') + ' UF' : '—'}</span>
-          ${clp ? `<br><span class="text-xs text-gray-400">${h(clp)}</span>` : ''}
-        </td>
+        <td class="px-4 py-3 hidden sm:table-cell"><span class="text-xs font-semibold px-2.5 py-1 rounded-full text-white ${badge.cls}">${badge.label}</span></td>
+        <td class="px-4 py-3 hidden md:table-cell text-sm text-gray-500">${h(p.region || '—')}</td>
+        <td class="px-4 py-3 text-sm"><span class="font-semibold text-verde-700 dark:text-green-400">${p.precioUF ? p.precioUF.toLocaleString('es-CL') + ' UF' : '—'}</span>${clp ? `<br><span class="text-xs text-gray-400">${h(clp)}</span>` : ''}</td>
         <td class="px-4 py-3 text-right whitespace-nowrap">
-          <a href="propiedad.html?id=${p.id}" target="_blank" rel="noopener"
-            class="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline px-2 py-1 mr-1">
-            <i class="fa-solid fa-eye mr-1"></i>Ver
-          </a>
-          <button type="button" data-action="edit-prop" data-id="${p.id}"
-            class="text-xs font-medium text-verde-700 dark:text-green-400 hover:underline px-2 py-1 rounded-lg hover:bg-verde-50 dark:hover:bg-verde-900/20 transition mr-1">
-            <i class="fa-solid fa-pen-to-square mr-1"></i>Editar
-          </button>
-          <button type="button" data-action="delete-prop" data-id="${p.id}"
-            class="text-xs font-medium text-red-500 hover:underline px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition">
-            <i class="fa-solid fa-trash mr-1"></i>Eliminar
-          </button>
+          <a href="propiedad.html?id=${p.id}" target="_blank" rel="noopener" class="text-xs text-blue-600 hover:underline px-2"><i class="fa-solid fa-eye"></i></a>
+          <button type="button" data-action="edit-prop" data-id="${p.id}" class="text-xs text-verde-700 hover:underline px-2"><i class="fa-solid fa-pen-to-square"></i> Editar</button>
+          <button type="button" data-action="delete-prop" data-id="${p.id}" class="text-xs text-red-500 hover:underline px-2"><i class="fa-solid fa-trash"></i></button>
         </td>`;
       tbody.appendChild(tr);
     });
   }
 
-  function updateAdminStats() {
+  async function updateAdminStats() {
     document.getElementById('statTotal').textContent = state.properties.length;
     document.getElementById('statVenta').textContent = state.properties.filter(p => p.tipo === 'venta').length;
     document.getElementById('statArriendo').textContent = state.properties.filter(p => p.tipo === 'arriendo').length;
     document.getElementById('statHostal').textContent = state.properties.filter(p => ['hostal', 'camping'].includes(p.tipo)).length;
-    const clicksEl = document.getElementById('statClicks');
-    if (clicksEl) clicksEl.textContent = getTotalWeeklyClicks();
-    const leadsEl = document.getElementById('statLeads');
-    if (leadsEl) leadsEl.textContent = getLeads().filter(l => !l.contacted).length;
+    document.getElementById('statClicks').textContent = await getTotalWeeklyClicks();
+    const leads = await getLeads();
+    document.getElementById('statLeads').textContent = leads.filter(l => !l.contacted).length;
   }
 
-  function renderAnalytics() {
-    const stats = getWeeklyClickStats(state.properties);
+  async function renderAnalytics() {
+    const stats = await getWeeklyClickStats(state.properties);
     const container = document.getElementById('analyticsList');
-    const total = document.getElementById('analyticsTotal');
-    if (!container) return;
-    total.textContent = getTotalWeeklyClicks();
+    document.getElementById('analyticsTotal').textContent = await getTotalWeeklyClicks();
     if (!stats.length) {
-      container.innerHTML = '<p class="text-gray-400 text-sm text-center py-8">Sin clics esta semana aún.</p>';
+      container.innerHTML = '<p class="text-gray-400 text-sm text-center py-8">Sin clics esta semana.</p>';
       return;
     }
     const max = stats[0].count;
     container.innerHTML = stats.map((s, i) => `
-      <div class="flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-zinc-700 ${i === 0 ? 'bg-verde-50 dark:bg-verde-900/20 border-verde-200 dark:border-verde-800' : ''}">
-        <span class="w-8 h-8 rounded-full bg-verde-800 text-white text-sm font-bold flex items-center justify-center shrink-0">${i + 1}</span>
-        <div class="flex-1 min-w-0">
-          <p class="font-semibold text-sm truncate">${h(s.titulo)}</p>
-          <div class="mt-2 h-2 bg-gray-100 dark:bg-zinc-700 rounded-full overflow-hidden">
-            <div class="h-full bg-verde-600 rounded-full" style="width:${Math.round((s.count / max) * 100)}%"></div>
-          </div>
+      <div class="flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-zinc-700 ${i === 0 ? 'bg-verde-50 dark:bg-verde-900/20' : ''}">
+        <span class="w-8 h-8 rounded-full bg-verde-800 text-white text-sm font-bold flex items-center justify-center">${i + 1}</span>
+        <div class="flex-1"><p class="font-semibold text-sm">${h(s.titulo)}</p>
+          <div class="mt-2 h-2 bg-gray-100 dark:bg-zinc-700 rounded-full"><div class="h-full bg-verde-600 rounded-full" style="width:${Math.round((s.count / max) * 100)}%"></div></div>
         </div>
-        <span class="text-lg font-bold text-verde-700 dark:text-green-400 shrink-0">${s.count}</span>
+        <span class="text-lg font-bold text-verde-700">${s.count}</span>
       </div>`).join('');
   }
 
-  function renderLeads() {
-    const leads = getLeads();
+  async function renderLeads() {
+    const leads = await getLeads();
     const container = document.getElementById('leadsList');
-    if (!container) return;
     if (!leads.length) {
-      container.innerHTML = '<p class="text-gray-400 text-sm text-center py-8">No hay consultas pendientes.</p>';
+      container.innerHTML = '<p class="text-gray-400 text-sm text-center py-8">No hay consultas.</p>';
       return;
     }
     container.innerHTML = leads.map(l => `
       <div class="p-4 rounded-xl border border-gray-100 dark:border-zinc-700 ${l.contacted ? 'opacity-60' : 'bg-white dark:bg-zinc-800'}">
-        <div class="flex flex-wrap items-start justify-between gap-2 mb-2">
-          <div>
-            <p class="font-semibold">${h(l.nombre)}</p>
-            <p class="text-sm text-gray-400">${h(l.email)}</p>
-          </div>
+        <div class="flex justify-between gap-2 mb-2">
+          <div><p class="font-semibold">${h(l.nombre)}</p><p class="text-sm text-gray-400">${h(l.email)}</p></div>
           <span class="text-xs text-gray-400">${new Date(l.at).toLocaleString('es-CL')}</span>
         </div>
-        <p class="text-sm text-verde-700 dark:text-green-400 mb-1"><i class="fa-solid fa-house mr-1"></i>${h(l.propertyTitle)}</p>
-        ${l.mensaje ? `<p class="text-sm text-gray-500 dark:text-zinc-400 mb-3">${h(l.mensaje)}</p>` : ''}
-        <div class="flex gap-2 flex-wrap">
-          <a href="mailto:${h(l.email)}?subject=${encodeURIComponent('Re: ' + l.propertyTitle)}&body=${encodeURIComponent('Hola ' + l.nombre + ',\n\nGracias por tu interés en ' + l.propertyTitle + '.\n\n')}"
-             class="text-xs btn-verde px-3 py-1.5 inline-flex items-center gap-1">
-            <i class="fa-solid fa-envelope"></i> Contactar
-          </a>
-          ${!l.contacted ? `<button type="button" data-action="mark-contacted" data-id="${l.id}"
-            class="text-xs px-3 py-1.5 border border-gray-200 dark:border-zinc-600 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700">
-            Marcar contactado
-          </button>` : '<span class="text-xs text-gray-400"><i class="fa-solid fa-check mr-1"></i>Contactado</span>'}
+        <p class="text-sm text-verde-700 mb-1"><i class="fa-solid fa-house mr-1"></i>${h(l.propertyTitle)}</p>
+        ${l.mensaje ? `<p class="text-sm text-gray-500 mb-3">${h(l.mensaje)}</p>` : ''}
+        <div class="flex gap-2">
+          <a href="mailto:${h(l.email)}?subject=${encodeURIComponent('Re: ' + l.propertyTitle)}" class="text-xs btn-verde px-3 py-1.5"><i class="fa-solid fa-envelope mr-1"></i>Contactar</a>
+          ${!l.contacted ? `<button type="button" data-action="mark-contacted" data-id="${l.id}" class="text-xs px-3 py-1.5 border rounded-lg">Marcar contactado</button>` : '<span class="text-xs text-gray-400">✓ Contactado</span>'}
         </div>
       </div>`).join('');
   }
 
-  function openPropertyForm(id) {
-    document.getElementById('formModalTitle').textContent = id ? 'Editar propiedad' : 'Nueva propiedad';
-    const fields = ['formId', 'formTitulo', 'formPrecioUF', 'formPrecioNota', 'formPrecioCLP', 'formSuperficie', 'formDorms', 'formBanos', 'formEstac', 'formDesc', 'formDescLarga', 'formDireccion', 'formLat', 'formLng', 'formImagenes', 'formExtras', 'formComuna'];
+  function renderImageGallery() {
+    const el = document.getElementById('imageGallery');
+    if (!el) return;
+    if (!editorImages.length) {
+      el.innerHTML = '<p class="text-xs text-gray-400 col-span-full">Sin imágenes. Sube fotos o agrega URLs.</p>';
+      return;
+    }
+    el.innerHTML = editorImages.map((url, i) => `
+      <div class="relative group rounded-xl overflow-hidden border border-gray-200 dark:border-zinc-700 aspect-video bg-gray-100">
+        <img src="${h(url)}" alt="" class="w-full h-full object-cover" />
+        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+          ${i > 0 ? `<button type="button" data-action="img-up" data-i="${i}" class="w-8 h-8 bg-white rounded-full text-xs">↑</button>` : ''}
+          <button type="button" data-action="img-remove" data-i="${i}" class="w-8 h-8 bg-red-500 text-white rounded-full text-xs">✕</button>
+        </div>
+        ${i === 0 ? '<span class="absolute top-1 left-1 text-[10px] bg-verde-800 text-white px-1.5 py-0.5 rounded">Principal</span>' : ''}
+      </div>`).join('');
+  }
 
+  function syncImagesToTextarea() {
+    setVal('formImagenes', editorImages.join('\n'));
+  }
+
+  function updateMapPreview() {
+    const frame = document.getElementById('editorMapPreview');
+    if (!frame) return;
+    const prop = {
+      direccion: getVal('formDireccion'),
+      comuna: getVal('formComuna'),
+      region: getVal('formRegion'),
+      lat: parseFloat(getVal('formLat')) || undefined,
+      lng: parseFloat(getVal('formLng')) || undefined,
+    };
+    frame.src = mapEmbedUrl(prop);
+  }
+
+  function openPropertyForm(id) {
+    document.getElementById('editorTitle').textContent = id ? 'Editar propiedad' : 'Nueva propiedad';
+    const fields = ['formId', 'formTitulo', 'formPrecioUF', 'formPrecioNota', 'formPrecioCLP', 'formSuperficie', 'formDorms', 'formBanos', 'formEstac', 'formDesc', 'formDescLarga', 'formDireccion', 'formLat', 'formLng', 'formImagenes', 'formExtras', 'formComuna'];
     if (id) {
       const p = state.properties.find(x => x.id === id);
       if (!p) return;
@@ -217,130 +232,205 @@ export function createAdmin(store, auth, state, app) {
       setVal('formEstac', p.estac || '');
       setVal('formDesc', p.desc || '');
       setVal('formDescLarga', p.descLarga || '');
-      setVal('formImagenes', (p.imagenes || []).join('\n'));
+      editorImages = [...(p.imagenes || [])];
       setVal('formExtras', (p.extras || []).join(', '));
     } else {
       fields.forEach(f => setVal(f, ''));
       setVal('formTipo', 'venta');
       setVal('formRegion', 'Metropolitana de Santiago');
+      editorImages = [];
     }
-
-    document.getElementById('propertyFormModal').classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => document.getElementById('formTitulo').focus(), 50);
+    syncImagesToTextarea();
+    renderImageGallery();
+    switchTab('editor');
+    setTimeout(() => document.getElementById('formTitulo')?.focus(), 50);
   }
 
-  function closePropertyForm() {
-    document.getElementById('propertyFormModal').classList.add('hidden');
-    document.body.style.overflow = '';
+  async function handleImageUpload(files) {
+    if (!files?.length) return;
+    if (hasApi()) {
+      try {
+        const { urls } = await uploadImages(files);
+        editorImages.push(...urls);
+      } catch (e) {
+        toast(e.message || 'Error al subir');
+        return;
+      }
+    } else {
+      toast('Sube fotos con el servidor Node (npm start). Usa URLs por ahora.');
+      return;
+    }
+    syncImagesToTextarea();
+    renderImageGallery();
+    toast(`${files.length} imagen(es) subida(s) ✓`);
   }
 
   async function saveProperty() {
     const id = getVal('formId') || genId();
     const titulo = getVal('formTitulo').trim();
     if (!titulo) { toast('El título es obligatorio.'); return; }
+    const urlLines = getVal('formImagenes').split('\n').map(s => s.trim()).filter(Boolean);
+    const imagenes = [...new Set([...editorImages, ...urlLines])];
 
     const prop = {
-      id,
-      titulo,
-      tipo: getVal('formTipo'),
-      region: getVal('formRegion'),
-      comuna: getVal('formComuna').trim(),
-      direccion: getVal('formDireccion').trim(),
-      lat: parseFloat(getVal('formLat')) || undefined,
-      lng: parseFloat(getVal('formLng')) || undefined,
-      precioUF: parseFloat(getVal('formPrecioUF')) || 0,
-      precioNota: getVal('formPrecioNota').trim(),
+      id, titulo, tipo: getVal('formTipo'), region: getVal('formRegion'),
+      comuna: getVal('formComuna').trim(), direccion: getVal('formDireccion').trim(),
+      lat: parseFloat(getVal('formLat')) || undefined, lng: parseFloat(getVal('formLng')) || undefined,
+      precioUF: parseFloat(getVal('formPrecioUF')) || 0, precioNota: getVal('formPrecioNota').trim(),
       precioCLP: getVal('formPrecioCLP').trim(),
       superficie: parseInt(getVal('formSuperficie'), 10) || 0,
       dorms: parseInt(getVal('formDorms'), 10) || 0,
       banos: parseInt(getVal('formBanos'), 10) || 0,
       estac: parseInt(getVal('formEstac'), 10) || 0,
-      desc: getVal('formDesc').trim(),
-      descLarga: getVal('formDescLarga').trim(),
-      imagenes: getVal('formImagenes').split('\n').map(s => s.trim()).filter(Boolean),
-      extras: getVal('formExtras').split(',').map(s => s.trim()).filter(Boolean),
+      desc: getVal('formDesc').trim(), descLarga: getVal('formDescLarga').trim(),
+      imagenes, extras: getVal('formExtras').split(',').map(s => s.trim()).filter(Boolean),
     };
 
     const existed = state.properties.some(x => x.id === id);
     state.properties = await store.upsert(state.properties, prop);
-    closePropertyForm();
-    renderAdminTable();
-    updateAdminStats();
+    await updateAdminStats();
     app.applyFilters();
-    if (activeTab === 'sitio') showSitePreview();
+    switchTab('propiedades');
+    renderAdminTable();
     toast(existed ? 'Propiedad actualizada ✓' : 'Propiedad agregada ✓');
   }
 
   async function deleteProperty(id) {
-    if (!confirm('¿Eliminar esta propiedad? No se puede deshacer.')) return;
+    if (!confirm('¿Eliminar esta propiedad?')) return;
     state.properties = await store.remove(state.properties, id);
     renderAdminTable();
-    updateAdminStats();
+    await updateAdminStats();
     app.applyFilters();
     toast('Propiedad eliminada');
   }
 
+  async function loadConfig() {
+    const hint = document.getElementById('configApiHint');
+    if (hint) hint.textContent = hasApi() ? 'Backend Node activo — credenciales en data/admin.json' : 'Modo local — credenciales en config.js';
+    if (hasApi()) {
+      try {
+        const cfg = await api('/api/admin/config', { auth: true });
+        setVal('configUsername', cfg.username);
+      } catch { /* ignore */ }
+    }
+  }
+
+  async function saveConfig() {
+    if (!hasApi()) { toast('Cambia credenciales en js/config.js (modo sin servidor).'); return; }
+    try {
+      await api('/api/admin/config', {
+        method: 'PUT', auth: true,
+        body: {
+          username: getVal('configUsername').trim(),
+          password: getVal('configCurrentPass'),
+          newPassword: getVal('configNewPass').trim() || undefined,
+        },
+      });
+      setVal('configCurrentPass', '');
+      setVal('configNewPass', '');
+      toast('Credenciales actualizadas ✓');
+    } catch (e) {
+      toast(e.message);
+    }
+  }
+
   async function refreshFromStore() {
     state.properties = await store.getAll();
-    if (activeTab === 'propiedades') { renderAdminTable(); updateAdminStats(); }
+    await updateAdminStats();
+    if (activeTab === 'propiedades') renderAdminTable();
     if (activeTab === 'estadisticas') renderAnalytics();
     if (activeTab === 'leads') renderLeads();
     app.applyFilters();
   }
 
+  function populateAdminFilters() {
+    const sel = document.getElementById('adminFilterRegion');
+    if (!sel || sel.options.length > 1) return;
+    REGIONES.forEach(r => {
+      const o = document.createElement('option');
+      o.value = o.textContent = r;
+      sel.appendChild(o);
+    });
+  }
+
   function bindEvents() {
+    populateAdminFilters();
+
     document.querySelectorAll('[data-admin-tab]').forEach(btn => {
-      btn.addEventListener('click', () => switchTab(btn.dataset.adminTab));
+      btn.addEventListener('click', () => {
+        if (btn.dataset.adminTab === 'editor' && !getVal('formId') && activeTab !== 'editor') openPropertyForm(null);
+        else switchTab(btn.dataset.adminTab);
+      });
     });
 
-    document.getElementById('adminTableBody').addEventListener('click', e => {
+    document.getElementById('adminQuickNew')?.addEventListener('click', () => openPropertyForm(null));
+    document.getElementById('adminQuickList')?.addEventListener('click', () => switchTab('propiedades'));
+    document.getElementById('adminQuickLeads')?.addEventListener('click', () => switchTab('leads'));
+
+    ['adminFilterSearch', 'adminFilterTipo', 'adminFilterRegion'].forEach(id => {
+      document.getElementById(id)?.addEventListener('input', renderAdminTable);
+      document.getElementById(id)?.addEventListener('change', renderAdminTable);
+    });
+
+    document.getElementById('adminTableBody')?.addEventListener('click', e => {
       const btn = e.target.closest('[data-action]');
       if (!btn) return;
       if (btn.dataset.action === 'edit-prop') openPropertyForm(btn.dataset.id);
       if (btn.dataset.action === 'delete-prop') deleteProperty(btn.dataset.id);
     });
 
-    document.getElementById('leadsList')?.addEventListener('click', e => {
+    document.getElementById('imageGallery')?.addEventListener('click', e => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const i = +btn.dataset.i;
+      if (btn.dataset.action === 'img-remove') editorImages.splice(i, 1);
+      if (btn.dataset.action === 'img-up' && i > 0) [editorImages[i - 1], editorImages[i]] = [editorImages[i], editorImages[i - 1]];
+      syncImagesToTextarea();
+      renderImageGallery();
+    });
+
+    document.getElementById('imageUploadZone')?.addEventListener('click', () => document.getElementById('imageFileInput')?.click());
+    document.getElementById('imageFileInput')?.addEventListener('change', e => handleImageUpload(e.target.files));
+    document.getElementById('imageUploadZone')?.addEventListener('dragover', e => { e.preventDefault(); e.currentTarget.classList.add('drag-over'); });
+    document.getElementById('imageUploadZone')?.addEventListener('dragleave', e => e.currentTarget.classList.remove('drag-over'));
+    document.getElementById('imageUploadZone')?.addEventListener('drop', e => {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drag-over');
+      handleImageUpload(e.dataTransfer.files);
+    });
+
+    document.getElementById('btnAddImageUrl')?.addEventListener('click', () => {
+      const url = getVal('formImageUrl').trim();
+      if (!url) return;
+      editorImages.push(url);
+      setVal('formImageUrl', '');
+      syncImagesToTextarea();
+      renderImageGallery();
+    });
+
+    ['formDireccion', 'formComuna', 'formRegion', 'formLat', 'formLng'].forEach(id => {
+      document.getElementById(id)?.addEventListener('input', updateMapPreview);
+    });
+
+    document.getElementById('leadsList')?.addEventListener('click', async e => {
       const btn = e.target.closest('[data-action]');
       if (btn?.dataset.action === 'mark-contacted') {
-        markLeadContacted(btn.dataset.id);
+        await markLeadContacted(btn.dataset.id);
         renderLeads();
-        updateAdminStats();
-        toast('Lead marcado como contactado');
+        await updateAdminStats();
+        toast('Marcado como contactado');
       }
     });
 
-    document.getElementById('loginPass').addEventListener('keydown', e => {
-      if (e.key === 'Enter') attemptLogin();
-    });
-
-    document.getElementById('loginModal').addEventListener('click', e => {
-      if (e.target.id === 'loginModal') e.target.classList.add('hidden');
-    });
-
-    document.getElementById('propertyFormModal').addEventListener('click', e => {
-      if (e.target.id === 'propertyFormModal') closePropertyForm();
-    });
-
-    document.addEventListener('keydown', e => {
-      if (e.key !== 'Escape') return;
-      closePropertyForm();
-      document.getElementById('loginModal').classList.add('hidden');
-    });
+    document.getElementById('btnSaveConfig')?.addEventListener('click', saveConfig);
+    document.getElementById('loginPass')?.addEventListener('keydown', e => { if (e.key === 'Enter') attemptLogin(); });
+    document.getElementById('loginModal')?.addEventListener('click', e => { if (e.target.id === 'loginModal') e.target.classList.add('hidden'); });
 
     onDataChange(() => refreshFromStore());
   }
 
   return {
-    goAdmin,
-    attemptLogin,
-    logoutAdmin,
-    showPanel,
-    openPropertyForm,
-    closePropertyForm,
-    saveProperty,
-    bindEvents,
-    refreshFromStore,
+    openLogin, attemptLogin, logoutAdmin, showPanel,
+    openPropertyForm, saveProperty, bindEvents, refreshFromStore,
   };
 }

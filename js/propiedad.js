@@ -1,10 +1,12 @@
 import { BADGE, CONTACT, FALLBACK_IMAGE } from './config.js';
 import { LocalPropertyStore } from './storage.js';
+import { ApiPropertyStore } from './api-store.js';
+import { detectApi } from './api.js';
 import { trackClick, saveLead } from './analytics.js';
 import { fetchUF, getUF, getUFDate, onUFChange, clpFromUF } from './uf.js';
 import { h, mapsUrl, waLink, mapEmbedUrl } from './utils.js';
 
-const store = new LocalPropertyStore();
+let store = new LocalPropertyStore();
 const params = new URLSearchParams(window.location.search);
 const propertyId = params.get('id');
 
@@ -115,9 +117,9 @@ function renderProperty(p) {
   document.getElementById('content').classList.remove('hidden');
 }
 
-document.getElementById('leadForm').addEventListener('submit', e => {
+document.getElementById('leadForm').addEventListener('submit', async e => {
   e.preventDefault();
-  saveLead({
+  await saveLead({
     propertyId: property.id,
     propertyTitle: property.titulo,
     nombre: document.getElementById('leadNombre').value,
@@ -130,6 +132,7 @@ document.getElementById('leadForm').addEventListener('submit', e => {
 
 async function init() {
   initTheme();
+  if (await detectApi()) store = new ApiPropertyStore();
   await fetchUF();
   onUFChange(updatePrices);
 
