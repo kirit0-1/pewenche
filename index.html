@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pewenche Propiedades — Chile</title>
+  <meta name="description" content="Propiedades en venta, arriendo, terrenos, hostales y campings en Chile. Encuentra tu próximo hogar con Pewenche." />
+  <meta name="theme-color" content="#166534" />
+  <link rel="canonical" href="https://pewenche.cl" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Pewenche Propiedades — Chile" />
+  <meta property="og:description" content="Casas, departamentos, terrenos, hostales y campings en todo Chile." />
+  <meta property="og:url" content="https://pewenche.cl" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80" />
+  <meta property="og:locale" content="es_CL" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Pewenche Propiedades — Chile" />
+  <meta name="twitter:description" content="Propiedades en venta, arriendo y turismo en Chile." />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            verde: { 50:'#f0fdf4', 100:'#dcfce7', 600:'#16a34a', 700:'#15803d', 800:'#166534', 900:'#14532d' }
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    "name": "Pewenche Propiedades",
+    "description": "Propiedades en venta, arriendo, terrenos, hostales y campings en Chile.",
+    "url": "https://pewenche.cl",
+    "areaServed": "CL",
+    "email": "contacto@pewenche.cl"
+  }
+  </script>
+</head>
+
+<body class="bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 font-sans antialiased">
+
+<!-- ═══ PANEL ADMIN (acceso: tu-sitio.cl/#/admin) ═══ -->
+<div id="adminPage" class="hidden min-h-screen bg-gray-50 dark:bg-zinc-900">
+  <header class="bg-verde-800 text-white px-6 py-4 flex items-center justify-between shadow-lg sticky top-0 z-40">
+    <div class="flex items-center gap-3">
+      <svg width="26" height="26" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 4 L26 14 L32 10 L28 20 L36 18 L28 28 L30 24 L22 32 L22 38 L18 38 L18 32 L10 24 L12 28 L4 18 L12 20 L8 10 L14 14 Z" fill="#bbf7d0" stroke="#4ade80" stroke-width="1"/></svg>
+      <span class="font-bold text-lg tracking-tight">Pewenche · Panel Admin</span>
+    </div>
+    <button type="button" data-action="logout-admin" class="text-sm bg-white/10 hover:bg-white/20 px-4 py-1.5 rounded-full transition flex items-center gap-2">
+      <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+    </button>
+  </header>
+
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white dark:bg-zinc-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-zinc-700">
+        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Total</p>
+        <p id="statTotal" class="text-3xl font-bold text-verde-800 dark:text-green-400">0</p>
+      </div>
+      <div class="bg-white dark:bg-zinc-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-zinc-700">
+        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">En Venta</p>
+        <p id="statVenta" class="text-3xl font-bold text-verde-800 dark:text-green-400">0</p>
+      </div>
+      <div class="bg-white dark:bg-zinc-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-zinc-700">
+        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Arriendo</p>
+        <p id="statArriendo" class="text-3xl font-bold text-verde-800 dark:text-green-400">0</p>
+      </div>
+      <div class="bg-white dark:bg-zinc-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-zinc-700">
+        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Hostal/Camping</p>
+        <p id="statHostal" class="text-3xl font-bold text-verde-800 dark:text-green-400">0</p>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="text-xl font-bold">Propiedades publicadas</h2>
+      <button type="button" data-action="open-property-form" class="btn-verde px-5 py-2.5 flex items-center gap-2 shadow-sm text-sm">
+        <i class="fa-solid fa-plus"></i> Agregar propiedad
+      </button>
+    </div>
+
+    <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-700 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50 dark:bg-zinc-700/50 border-b border-gray-100 dark:border-zinc-700 text-left">
+              <th class="px-4 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider">Propiedad</th>
+              <th class="px-4 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider hidden sm:table-cell">Tipo</th>
+              <th class="px-4 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider hidden md:table-cell">Región</th>
+              <th class="px-4 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider">Precio UF</th>
+              <th class="px-4 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="adminTableBody" class="divide-y divide-gray-100 dark:divide-zinc-700"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL LOGIN ═══ -->
+<div id="loginModal" class="hidden modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl p-8 w-full max-w-sm">
+    <div class="flex flex-col items-center mb-6">
+      <div class="w-16 h-16 bg-verde-800 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+        <svg width="32" height="32" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 4 L26 14 L32 10 L28 20 L36 18 L28 28 L30 24 L22 32 L22 38 L18 38 L18 32 L10 24 L12 28 L4 18 L12 20 L8 10 L14 14 Z" fill="#bbf7d0"/></svg>
+      </div>
+      <h2 id="loginTitle" class="text-2xl font-bold">Acceso Admin</h2>
+      <p class="text-gray-400 text-sm mt-1">Panel de gestión · Pewenche</p>
+    </div>
+    <div class="space-y-3">
+      <label class="sr-only" for="loginUser">Usuario</label>
+      <input id="loginUser" type="text" placeholder="Usuario" autocomplete="username" class="adm-input" />
+      <label class="sr-only" for="loginPass">Contraseña</label>
+      <input id="loginPass" type="password" placeholder="Contraseña" autocomplete="current-password" class="adm-input" />
+      <p id="loginError" class="hidden text-red-500 text-xs text-center">Credenciales incorrectas.</p>
+      <button type="button" data-action="attempt-login" class="btn-verde w-full py-3 text-sm">
+        <i class="fa-solid fa-lock mr-2"></i>Ingresar
+      </button>
+      <button type="button" data-action="close-login" class="w-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-sm py-2">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL FORMULARIO PROPIEDAD ═══ -->
+<div id="propertyFormModal" class="hidden modal-backdrop" style="z-index:9100" role="dialog" aria-modal="true" aria-labelledby="formModalTitle">
+  <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div class="sticky top-0 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-700 px-6 py-4 flex items-center justify-between rounded-t-3xl z-10">
+      <h3 id="formModalTitle" class="font-bold text-lg">Nueva propiedad</h3>
+      <button type="button" data-action="close-property-form" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="p-6 space-y-5">
+      <input type="hidden" id="formId" />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="sm:col-span-2">
+          <label for="formTitulo" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Título *</label>
+          <input id="formTitulo" type="text" placeholder="Ej: Casa 3D 2B en Las Condes" class="adm-input" />
+        </div>
+        <div>
+          <label for="formTipo" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Tipo *</label>
+          <select id="formTipo" class="adm-input">
+            <option value="venta">Venta</option>
+            <option value="arriendo">Arriendo</option>
+            <option value="hostal">Hostal</option>
+            <option value="camping">Camping</option>
+            <option value="terreno">Terreno / Sitio</option>
+          </select>
+        </div>
+        <div>
+          <label for="formRegion" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Región *</label>
+          <select id="formRegion" class="adm-input"></select>
+        </div>
+        <div>
+          <label for="formComuna" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Comuna *</label>
+          <input id="formComuna" type="text" placeholder="Ej: Las Condes" class="adm-input" />
+        </div>
+        <div>
+          <label for="formPrecioUF" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Precio UF</label>
+          <input id="formPrecioUF" type="number" placeholder="4500" class="adm-input" />
+        </div>
+        <div>
+          <label for="formPrecioCLP" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Precio CLP</label>
+          <input id="formPrecioCLP" type="text" placeholder="$175.000.000" class="adm-input" />
+        </div>
+        <div>
+          <label for="formSuperficie" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Superficie (m²)</label>
+          <input id="formSuperficie" type="number" placeholder="120" class="adm-input" />
+        </div>
+        <div>
+          <label for="formDorms" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Dormitorios</label>
+          <input id="formDorms" type="number" placeholder="3" class="adm-input" />
+        </div>
+        <div>
+          <label for="formBanos" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Baños</label>
+          <input id="formBanos" type="number" placeholder="2" class="adm-input" />
+        </div>
+        <div>
+          <label for="formEstac" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Estacionamientos</label>
+          <input id="formEstac" type="number" placeholder="1" class="adm-input" />
+        </div>
+        <div class="sm:col-span-2">
+          <label for="formDesc" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Descripción</label>
+          <textarea id="formDesc" rows="3" placeholder="Describe la propiedad…" class="adm-input resize-none"></textarea>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="formImagenes" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">URLs de imágenes (una por línea)</label>
+          <textarea id="formImagenes" rows="4" placeholder="https://images.unsplash.com/…" class="adm-input resize-none font-mono text-xs"></textarea>
+          <p class="text-xs text-gray-400 mt-1">La primera URL se usará como imagen principal.</p>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="formExtras" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Características extra (separadas por coma)</label>
+          <input id="formExtras" type="text" placeholder="Jardín, Piscina, Bodega" class="adm-input" />
+        </div>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="button" data-action="save-property" class="btn-verde flex-1 py-3 text-sm">
+          <i class="fa-solid fa-floppy-disk mr-2"></i>Guardar propiedad
+        </button>
+        <button type="button" data-action="close-property-form" class="px-6 py-3 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-800 text-sm font-medium">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL DETALLE ═══ -->
+<div id="detailModal" class="hidden modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto">
+    <div class="relative overflow-hidden rounded-t-3xl bg-gray-100 dark:bg-zinc-800" style="height:290px">
+      <div id="modalCarouselTrack" class="carousel-inner h-full"></div>
+      <button type="button" data-action="modal-prev" class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/80 dark:bg-zinc-900/80 rounded-full flex items-center justify-center shadow" aria-label="Imagen anterior">
+        <i class="fa-solid fa-chevron-left text-sm"></i>
+      </button>
+      <button type="button" data-action="modal-next" class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/80 dark:bg-zinc-900/80 rounded-full flex items-center justify-center shadow" aria-label="Imagen siguiente">
+        <i class="fa-solid fa-chevron-right text-sm"></i>
+      </button>
+      <div id="modalDots" class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5"></div>
+      <button type="button" data-action="close-detail" class="absolute top-3 right-3 w-8 h-8 bg-white/80 dark:bg-zinc-900/80 rounded-full flex items-center justify-center shadow" aria-label="Cerrar">✕</button>
+      <span id="modalBadge" class="absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide text-white"></span>
+    </div>
+    <div class="p-6">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <h2 id="modalTitle" class="text-xl font-bold leading-tight mb-1"></h2>
+          <p id="modalLoc" class="text-gray-500 text-sm flex items-center gap-1.5">
+            <i class="fa-solid fa-location-dot text-verde-700"></i><span></span>
+          </p>
+          <a id="modalMapLink" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-xs text-verde-700 dark:text-green-400 mt-2 hover:underline">
+            <i class="fa-solid fa-map-location-dot"></i> Ver en mapa
+          </a>
+        </div>
+        <div class="text-right shrink-0">
+          <p id="modalPrecioUF" class="price-uf"></p>
+          <p id="modalPrecioCLP" class="text-gray-400 text-sm mt-0.5"></p>
+        </div>
+      </div>
+      <div id="modalStats" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5"></div>
+      <p id="modalDesc" class="text-gray-600 dark:text-zinc-400 text-sm leading-relaxed mb-5"></p>
+      <div id="modalExtras" class="mb-6"></div>
+      <div class="flex gap-3">
+        <a id="modalWA" href="#" target="_blank" rel="noopener" class="flex-1 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-semibold py-3 rounded-2xl flex items-center justify-center gap-2 transition">
+          <i class="fa-brands fa-whatsapp text-lg"></i> Consultar por WhatsApp
+        </a>
+        <button type="button" data-action="close-detail" class="px-5 py-3 border border-gray-200 dark:border-zinc-700 rounded-2xl hover:bg-gray-50 dark:hover:bg-zinc-800 text-sm font-medium">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PÁGINA PRINCIPAL ═══ -->
+<div id="mainPage">
+
+  <header class="fixed top-0 left-0 right-0 z-50 bg-verde-800 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between gap-4">
+      <a href="#" data-action="reset-filters" class="flex items-center gap-2.5 shrink-0">
+        <svg width="30" height="30" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 4 L26 14 L32 10 L28 20 L36 18 L28 28 L30 24 L22 32 L22 38 L18 38 L18 32 L10 24 L12 28 L4 18 L12 20 L8 10 L14 14 Z" fill="#bbf7d0" stroke="#4ade80" stroke-width="1"/></svg>
+        <span class="font-bold text-xl tracking-tight">Pewenche</span>
+        <span class="text-green-200 text-xs font-light hidden sm:inline">Propiedades</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-1 text-sm font-medium" aria-label="Principal">
+        <a href="#" data-action="show-section" data-section="todas" class="nav-link px-4 py-2 rounded-full hover:bg-white/10 transition">Propiedades</a>
+        <a href="#" data-action="show-section" data-section="arriendo" class="nav-link px-4 py-2 rounded-full hover:bg-white/10 transition">Arriendos</a>
+        <a href="#" data-action="show-section" data-section="hostales" class="nav-link px-4 py-2 rounded-full hover:bg-white/10 transition">Hostales &amp; Campings</a>
+        <a href="#nosotros" class="px-4 py-2 rounded-full hover:bg-white/10 transition">Nosotros</a>
+        <a href="#contacto" class="px-4 py-2 rounded-full hover:bg-white/10 transition">Contacto</a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <button type="button" data-action="toggle-theme" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition" aria-label="Cambiar tema">
+          <i id="themeIcon" class="fa-solid fa-moon"></i>
+        </button>
+        <button type="button" data-action="toggle-menu" class="md:hidden w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+          <i id="menuIcon" class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="mobileMenu" class="hidden md:hidden bg-verde-900 border-t border-verde-700 px-4 pb-4 space-y-1" aria-hidden="true">
+      <a href="#" data-action="show-section" data-section="todas" class="block px-4 py-2.5 rounded-xl hover:bg-white/10 text-sm font-medium">Propiedades</a>
+      <a href="#" data-action="show-section" data-section="arriendo" class="block px-4 py-2.5 rounded-xl hover:bg-white/10 text-sm font-medium">Arriendos</a>
+      <a href="#" data-action="show-section" data-section="hostales" class="block px-4 py-2.5 rounded-xl hover:bg-white/10 text-sm font-medium">Hostales &amp; Campings</a>
+      <a href="#nosotros" data-action="toggle-menu" class="block px-4 py-2.5 rounded-xl hover:bg-white/10 text-sm font-medium">Nosotros</a>
+      <a href="#contacto" data-action="toggle-menu" class="block px-4 py-2.5 rounded-xl hover:bg-white/10 text-sm font-medium">Contacto</a>
+    </div>
+  </header>
+
+  <section class="hero-bg pt-16">
+    <div class="max-w-4xl mx-auto px-5 pt-16 pb-14 text-center text-white">
+      <p class="text-green-200 text-sm font-semibold uppercase tracking-widest mb-3">Propiedades en Chile</p>
+      <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight mb-4">Encuentra tu lugar<br class="hidden sm:block"/> en la naturaleza.</h1>
+      <p class="text-green-100 text-lg mb-8 max-w-xl mx-auto leading-relaxed">Casas, departamentos, terrenos, hostales y campings en todo Chile.</p>
+
+      <div class="flex flex-wrap justify-center gap-6 mb-10 text-sm text-green-100">
+        <span><i class="fa-solid fa-house mr-1"></i> 50+ propiedades</span>
+        <span><i class="fa-solid fa-map mr-1"></i> 16 regiones</span>
+        <span><i class="fa-solid fa-clock mr-1"></i> Respuesta en 24h</span>
+      </div>
+
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl p-3 shadow-2xl max-w-3xl mx-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+          <label class="sr-only" for="heroTipo">Tipo</label>
+          <select id="heroTipo" class="w-full bg-gray-50 dark:bg-zinc-800 dark:text-white border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-verde-700 focus:outline-none">
+            <option value="">Todos los tipos</option>
+            <option value="venta">En Venta</option>
+            <option value="arriendo">En Arriendo</option>
+            <option value="hostal">Hostal</option>
+            <option value="camping">Camping</option>
+            <option value="terreno">Terreno / Sitio</option>
+          </select>
+          <label class="sr-only" for="heroRegion">Región</label>
+          <select id="heroRegion" class="w-full bg-gray-50 dark:bg-zinc-800 dark:text-white border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-verde-700 focus:outline-none">
+            <option value="">Todas las regiones</option>
+          </select>
+          <label class="sr-only" for="searchQuery">Buscar</label>
+          <input id="searchQuery" type="search" placeholder="Buscar comuna, título…" class="w-full bg-gray-50 dark:bg-zinc-800 dark:text-white border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-verde-700 focus:outline-none" />
+          <button type="button" data-action="apply-filters" class="btn-verde w-full py-3 text-sm flex items-center justify-center gap-2">
+            <i class="fa-solid fa-magnifying-glass"></i> Buscar
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-5 pt-10 pb-2 flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h2 id="sectionTitle" class="text-2xl font-bold">Todas las propiedades</h2>
+      <p id="resultCount" class="text-gray-400 text-sm mt-0.5">Cargando…</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <label class="sr-only" for="sortBy">Ordenar</label>
+      <select id="sortBy" class="bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white focus:outline-none">
+        <option value="relevance">Relevancia</option>
+        <option value="price-asc">Precio ↑</option>
+        <option value="price-desc">Precio ↓</option>
+        <option value="title-asc">Nombre A–Z</option>
+      </select>
+      <select id="mobileFilterTipo" class="lg:hidden bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white focus:outline-none">
+        <option value="">Todos</option>
+        <option value="venta">Venta</option>
+        <option value="arriendo">Arriendo</option>
+        <option value="hostal">Hostal</option>
+        <option value="camping">Camping</option>
+        <option value="terreno">Terreno</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-5 py-6 flex gap-8 items-start">
+    <aside class="hidden lg:block w-60 shrink-0 sticky top-24 space-y-5" aria-label="Filtros">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-sm">
+        <h3 class="font-semibold text-xs uppercase tracking-widest text-gray-400 mb-3">Tipo</h3>
+        <ul class="space-y-0.5">
+          <li><button type="button" data-action="sidebar-tipo" data-tipo="" class="sidebar-link w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-zinc-800 transition">Todos</button></li>
+          <li><button type="button" data-action="sidebar-tipo" data-tipo="venta" class="sidebar-link w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-zinc-800 transition"><i class="fa-solid fa-house mr-2 text-verde-700 w-4 inline-block"></i>En Venta</button></li>
+          <li><button type="button" data-action="sidebar-tipo" data-tipo="arriendo" class="sidebar-link w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-zinc-800 transition"><i class="fa-solid fa-key mr-2 text-blue-600 w-4 inline-block"></i>En Arriendo</button></li>
+          <li><button type="button" data-action="sidebar-tipo" data-tipo="hostal" class="sidebar-link w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-zinc-800 transition"><i class="fa-solid fa-bed mr-2 text-amber-500 w-4 inline-block"></i>Hostales</button></li>
+          <li><button type="button" data-action="sidebar-tipo" data-tipo="camping" class="sidebar-link w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-zinc-800 transition"><i class="fa-solid fa-tent mr-2 text-teal-500 w-4 inline-block"></i>Campings</button></li>
+          <li><button type="button" data-action="sidebar-tipo" data-tipo="terreno" class="sidebar-link w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-zinc-800 transition"><i class="fa-solid fa-mountain-sun mr-2 text-stone-500 w-4 inline-block"></i>Terrenos</button></li>
+        </ul>
+      </div>
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-sm">
+        <h3 class="font-semibold text-xs uppercase tracking-widest text-gray-400 mb-3">Región</h3>
+        <select id="sideRegion" class="w-full bg-gray-50 dark:bg-zinc-800 dark:text-white border border-gray-200 dark:border-zinc-700 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-verde-700 focus:outline-none">
+          <option value="">Todas</option>
+        </select>
+      </div>
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-sm">
+        <h3 class="font-semibold text-xs uppercase tracking-widest text-gray-400 mb-3">Precio máx. (UF)</h3>
+        <input id="sidePrecioMax" type="number" placeholder="Ej: 5000" class="adm-input" />
+        <button type="button" data-action="reset-filters" class="mt-3 w-full text-xs text-gray-400 hover:text-verde-700 dark:hover:text-green-400 transition py-1">
+          <i class="fa-solid fa-rotate-left mr-1"></i>Limpiar filtros
+        </button>
+      </div>
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-sm">
+        <h3 class="font-semibold text-xs uppercase tracking-widest text-gray-400 mb-3">Síguenos</h3>
+        <div class="flex gap-3">
+          <a data-contact="instagram" target="_blank" rel="noopener" class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center hover:scale-110 transition text-white" aria-label="Instagram"><i class="fa-brands fa-instagram text-sm"></i></a>
+          <a data-contact="facebook" target="_blank" rel="noopener" class="w-9 h-9 rounded-xl bg-[#1877F2] flex items-center justify-center hover:scale-110 transition text-white" aria-label="Facebook"><i class="fa-brands fa-facebook-f text-sm"></i></a>
+          <a data-contact="whatsapp" data-wa-text="Hola, me interesa Pewenche Propiedades" target="_blank" rel="noopener" class="w-9 h-9 rounded-xl bg-[#25D366] flex items-center justify-center hover:scale-110 transition text-white" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp text-sm"></i></a>
+        </div>
+      </div>
+    </aside>
+
+    <section class="flex-1 min-w-0" aria-label="Listado de propiedades">
+      <div id="propertiesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
+      <div id="emptyState" class="hidden text-center py-24">
+        <i class="fa-solid fa-house-circle-xmark text-6xl text-gray-200 dark:text-zinc-700 mb-5"></i>
+        <h3 class="text-xl font-semibold text-gray-400 mb-2">Sin resultados</h3>
+        <p class="text-gray-400 text-sm mb-6">No hay propiedades que coincidan con tu búsqueda.</p>
+        <button type="button" data-action="reset-filters" class="btn-verde px-6 py-2.5 text-sm">Ver todas las propiedades</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Nosotros -->
+  <section id="nosotros" class="bg-verde-50 dark:bg-zinc-900/50 border-t border-gray-100 dark:border-zinc-800 py-16">
+    <div class="max-w-4xl mx-auto px-5 text-center">
+      <p class="text-verde-700 dark:text-green-400 text-sm font-semibold uppercase tracking-widest mb-2">Quiénes somos</p>
+      <h2 class="text-3xl font-bold mb-4">Tu aliado inmobiliario en Chile</h2>
+      <p class="text-gray-600 dark:text-zinc-400 leading-relaxed max-w-2xl mx-auto mb-10">
+        En Pewenche conectamos personas con propiedades únicas: desde departamentos urbanos hasta terrenos en la Patagonia,
+        hostales con vista al mar y campings junto a ríos de aguas cristalinas. Asesoría personalizada y respuesta rápida.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
+        <div class="bg-white dark:bg-zinc-800 rounded-2xl p-6 border border-gray-100 dark:border-zinc-700">
+          <i class="fa-solid fa-handshake text-verde-700 dark:text-green-400 text-2xl mb-3"></i>
+          <h3 class="font-bold mb-1">Asesoría directa</h3>
+          <p class="text-gray-500 dark:text-zinc-400 text-sm">Te acompañamos en cada paso, sin intermediarios innecesarios.</p>
+        </div>
+        <div class="bg-white dark:bg-zinc-800 rounded-2xl p-6 border border-gray-100 dark:border-zinc-700">
+          <i class="fa-solid fa-mountain-sun text-verde-700 dark:text-green-400 text-2xl mb-3"></i>
+          <h3 class="font-bold mb-1">Cobertura nacional</h3>
+          <p class="text-gray-500 dark:text-zinc-400 text-sm">Propiedades en las 16 regiones de Chile, urbanas y rurales.</p>
+        </div>
+        <div class="bg-white dark:bg-zinc-800 rounded-2xl p-6 border border-gray-100 dark:border-zinc-700">
+          <i class="fa-solid fa-bolt text-verde-700 dark:text-green-400 text-2xl mb-3"></i>
+          <h3 class="font-bold mb-1">Respuesta rápida</h3>
+          <p class="text-gray-500 dark:text-zinc-400 text-sm">Respondemos por WhatsApp en <span data-contact="response">menos de 24 horas</span>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contacto -->
+  <section id="contacto" class="bg-gray-50 dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 py-16">
+    <div class="max-w-4xl mx-auto px-5 text-center">
+      <p class="text-verde-700 dark:text-green-400 text-sm font-semibold uppercase tracking-widest mb-2">¿Tienes dudas?</p>
+      <h2 class="text-3xl font-bold mb-4">Contáctanos</h2>
+      <p class="text-gray-500 dark:text-zinc-400 mb-10 max-w-lg mx-auto">Escríbenos por WhatsApp, correo o redes sociales.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <a data-contact="whatsapp" data-wa-text="Hola, quiero más información" target="_blank" rel="noopener" class="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-zinc-700 hover:shadow-md transition flex flex-col items-center gap-3">
+          <div class="w-12 h-12 bg-[#25D366]/10 rounded-2xl flex items-center justify-center"><i class="fa-brands fa-whatsapp text-2xl text-[#25D366]"></i></div>
+          <div><p class="font-semibold">WhatsApp</p><p class="text-gray-400 text-sm" data-contact="whatsapp-display"></p></div>
+        </a>
+        <a data-contact="email" data-fill="true" class="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-zinc-700 hover:shadow-md transition flex flex-col items-center gap-3">
+          <div class="w-12 h-12 bg-verde-50 dark:bg-verde-900/20 rounded-2xl flex items-center justify-center"><i class="fa-solid fa-envelope text-2xl text-verde-700 dark:text-green-400"></i></div>
+          <div><p class="font-semibold">Correo</p><p class="text-gray-400 text-sm"></p></div>
+        </a>
+        <a data-contact="instagram" data-fill="true" target="_blank" rel="noopener" class="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-zinc-700 hover:shadow-md transition flex flex-col items-center gap-3">
+          <div class="w-12 h-12 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-2xl flex items-center justify-center"><i class="fa-brands fa-instagram text-2xl text-pink-500"></i></div>
+          <div><p class="font-semibold">Instagram</p><p class="text-gray-400 text-sm"></p></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-zinc-900 text-white py-12">
+    <div class="max-w-7xl mx-auto px-5 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-2.5">
+        <svg width="24" height="24" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 4 L26 14 L32 10 L28 20 L36 18 L28 28 L30 24 L22 32 L22 38 L18 38 L18 32 L10 24 L12 28 L4 18 L12 20 L8 10 L14 14 Z" fill="#bbf7d0"/></svg>
+        <span class="font-bold text-lg">Pewenche Propiedades</span>
+      </div>
+      <p class="text-zinc-400 text-sm text-center">Propiedades, arriendos, terrenos, hostales y campings en Chile.</p>
+      <div class="flex items-center gap-5">
+        <a data-contact="whatsapp" data-wa-text="Hola" target="_blank" rel="noopener" class="text-zinc-400 hover:text-[#25D366] transition text-2xl" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a data-contact="instagram" target="_blank" rel="noopener" class="text-zinc-400 hover:text-pink-400 transition text-2xl" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a data-contact="facebook" target="_blank" rel="noopener" class="text-zinc-400 hover:text-[#1877F2] transition text-2xl" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+      </div>
+    </div>
+    <p class="text-center text-zinc-600 text-xs mt-6">© <span id="siteYear">2026</span> Pewenche Propiedades · Chile · Todos los derechos reservados</p>
+  </footer>
+</div>
+
+<a data-contact="whatsapp" data-wa-text="Hola, me interesa una propiedad de Pewenche" target="_blank" rel="noopener" id="waFloat"
+   class="fixed bottom-6 right-6 z-40 w-14 h-14 bg-[#25D366] hover:bg-[#1ebe5d] rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all"
+   aria-label="Contactar por WhatsApp">
+  <i class="fa-brands fa-whatsapp text-white text-2xl"></i>
+</a>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
