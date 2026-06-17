@@ -1,6 +1,7 @@
 /**
- * Analytics y leads — API Node o localStorage (con respaldo cruzado).
+ * Analytics y leads — Supabase > API Node > localStorage.
  */
+import { isSupabaseConfigured, getSupabase } from './supabase-client.js';
 import { hasApi, api, detectApi } from './api.js';
 
 const CLICKS_KEY = 'pewenche_clicks';
@@ -54,6 +55,12 @@ function saveLeadLocal(payload) {
 }
 
 export async function trackClick(propertyId) {
+  if (isSupabaseConfigured()) {
+    const sb = getSupabase();
+    await sb.from('clicks').insert({ property_id: propertyId });
+    window.dispatchEvent(new CustomEvent('pewenche-data-change', { detail: { key: 'clicks' } }));
+    return;
+  }
   await detectApi(true);
   if (hasApi()) {
     await api('/api/analytics/click', { method: 'POST', body: { propertyId } }).catch(() => {});
@@ -67,12 +74,17 @@ export async function trackClick(propertyId) {
 }
 
 async function getClicks() {
+  const start = weekStart();
+  if (isSupabaseConfigured()) {
+    const sb = getSupabase();
+    const { data } = await sb.from('clicks').select('property_id, created_at').gte('created_at', new Date(start).toISOString());
+    return (data || []).map(c => ({ propertyId: c.property_id, at: new Date(c.created_at).getTime() }));
+  }
   await detectApi(true);
   if (hasApi()) {
     const data = await api('/api/analytics/weekly');
     return data.clicks || [];
   }
-  const start = weekStart();
   return read(CLICKS_KEY, []).filter(c => c.at >= start);
 }
 
@@ -91,13 +103,8 @@ export async function getWeeklyClickStats(properties) {
 }
 
 export async function getTotalWeeklyClicks() {
-  await detectApi(true);
-  if (hasApi()) {
-    const data = await api('/api/analytics/weekly');
-    return data.total || 0;
-  }
-  const start = weekStart();
-  return read(CLICKS_KEY, []).filter(c => c.at >= start).length;
+  const clicks = await getClicks();
+  return clicks.length;
 }
 
 export async function saveLead(payload) {
@@ -105,27 +112,60 @@ export async function saveLead(payload) {
     throw new Error('Nombre y correo son obligatorios.');
   }
 
-  await detectApi(true);
+  if (isSupabaseConfigured()) {
+    const sb = getSupabase();
+    const lead = {
+      id: 'l' + Date.now().toString(36),
+      property_id: payload.propertyId,
+      property_title: payload.propertyTitle,
+      nombre: payload.nombre.trim(),
+      email: payload.email.trim(),
+      mensaje: (payload.mensaje || '').trim(),
+      contacted: false,
+    };
+    const { error } = await sb.from('leads').insert(lead);
+    if (error) throw new Error(error.message);
+    notifyLeadsChanged();
+    return { ...lead, propertyId: lead.property_id, propertyTitle: lead.property_title, at: Date.now() };
+  }
 
+  await detectApi(true);
   if (hasApi()) {
     try {
       const lead = await api('/api/leads', { method: 'POST', body: payload });
       notifyLeadsChanged();
       return lead;
     } catch (err) {
-      console.warn('API leads falló, guardando en localStorage:', err.message);
+      console.warn('API leads falló, guardando local:', err.message);
     }
   }
-
   return saveLeadLocal(payload);
 }
 
+function mapLead(row) {
+  return {
+    id: row.id,
+    propertyId: row.property_id,
+    propertyTitle: row.property_title,
+    nombre: row.nombre,
+    email: row.email,
+    mensaje: row.mensaje,
+    contacted: row.contacted,
+    at: new Date(row.created_at || row.at).getTime(),
+  };
+}
+
 export async function getLeads() {
+  if (isSupabaseConfigured()) {
+    const sb = getSupabase();
+    const { data, error } = await sb.from('leads').select('*').order('created_at', { ascending: false });
+    if (error) return read(LEADS_KEY, []);
+    return (data || []).map(mapLead);
+  }
+
   await detectApi(true);
   const local = read(LEADS_KEY, []);
-
   if (!hasApi()) return local;
-
   try {
     const remote = await api('/api/leads', { auth: true });
     const byId = new Map();
@@ -137,16 +177,20 @@ export async function getLeads() {
 }
 
 export async function markLeadContacted(id) {
+  if (isSupabaseConfigured()) {
+    const sb = getSupabase();
+    await sb.from('leads').update({ contacted: true }).eq('id', id);
+    notifyLeadsChanged();
+    return getLeads();
+  }
   await detectApi(true);
-
   if (hasApi()) {
     try {
-      const leads = await api(`/api/leads/${id}`, { method: 'PATCH', body: { contacted: true }, auth: true });
+      await api(`/api/leads/${id}`, { method: 'PATCH', body: { contacted: true }, auth: true });
       notifyLeadsChanged();
-      return leads;
-    } catch { /* fallback local */ }
+      return getLeads();
+    } catch { /* fallback */ }
   }
-
   const leads = read(LEADS_KEY, []);
   const lead = leads.find(l => l.id === id);
   if (lead) lead.contacted = true;

@@ -30,7 +30,7 @@ export const TRUST = {
 /** Solo desarrollo/demo — reemplazar con Supabase Auth en producción */
 export const ADMIN = {
   username: 'admin',
-  password: 'pehuenche2026',
+  password: 'prueba12345',
   sessionKey: 'pewenche_admin_session',
   sessionTTL: 8 * 60 * 60 * 1000, // 8 horas
 };

@@ -1,6 +1,8 @@
 import { BADGE, CONTACT, FALLBACK_IMAGE } from './config.js';
 import { LocalPropertyStore } from './storage.js';
 import { ApiPropertyStore } from './api-store.js';
+import { SupabasePropertyStore } from './supabase-store.js';
+import { isSupabaseConfigured } from './supabase-client.js';
 import { detectApi } from './api.js';
 import { trackClick, saveLead } from './analytics.js';
 import { toast } from './utils.js';
@@ -144,7 +146,8 @@ document.getElementById('leadForm').addEventListener('submit', async e => {
 
 async function init() {
   initTheme();
-  if (await detectApi()) store = new ApiPropertyStore();
+  if (isSupabaseConfigured()) store = new SupabasePropertyStore();
+  else if (await detectApi()) store = new ApiPropertyStore();
   await fetchUF();
   onUFChange(updatePrices);
 

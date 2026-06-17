@@ -5,6 +5,9 @@ import {
 } from './analytics.js';
 import { clpFromUF } from './uf.js';
 import { hasApi, uploadImages, api, getToken } from './api.js';
+import { isSupabaseConfigured } from './supabase-client.js';
+import { createCloudBackup } from './backup.js';
+import { uploadPropertyImage } from './supabase-store.js';
 
 export function createAdmin(store, auth, state, app) {
   let activeTab = 'inicio';
@@ -54,7 +57,18 @@ export function createAdmin(store, auth, state, app) {
     hidePanel();
   }
 
+  function closeMobileSidebar() {
+    document.getElementById('adminSidebar')?.classList.remove('admin-sidebar-open');
+    document.getElementById('adminSidebarOverlay')?.classList.add('hidden');
+  }
+
+  function toggleMobileSidebar() {
+    const open = document.getElementById('adminSidebar')?.classList.toggle('admin-sidebar-open');
+    document.getElementById('adminSidebarOverlay')?.classList.toggle('hidden', !open);
+  }
+
   function switchTab(tab) {
+    closeMobileSidebar();
     activeTab = tab;
     document.querySelectorAll('[data-admin-tab]').forEach(btn => {
       btn.classList.toggle('admin-sidebar-active', btn.dataset.adminTab === tab);
@@ -157,12 +171,14 @@ export function createAdmin(store, auth, state, app) {
     const container = document.getElementById('leadsList');
     const hint = document.getElementById('leadsHint');
     if (hint) {
-      if (hasApi() && !getToken()) {
+      if (isSupabaseConfigured()) {
+        hint.textContent = 'Consultas sincronizadas en Supabase. Pulsa «Actualizar» si hace falta.';
+      } else if (hasApi() && !getToken()) {
         hint.innerHTML = '<span class="text-amber-600">Cierra sesión y vuelve a entrar (con npm start activo) para ver consultas del servidor.</span>';
       } else if (hasApi()) {
         hint.textContent = 'Consultas en el servidor. Pulsa «Actualizar» si enviaste una desde otra pestaña.';
       } else {
-        hint.textContent = 'Sin servidor Node: consultas solo en este navegador. Ejecuta npm start para guardarlas en el panel.';
+        hint.textContent = 'Sin servidor: consultas solo en este navegador. Configura Supabase o npm start.';
       }
     }
     if (!leads.length) {
@@ -258,7 +274,15 @@ export function createAdmin(store, auth, state, app) {
 
   async function handleImageUpload(files) {
     if (!files?.length) return;
-    if (hasApi()) {
+    if (isSupabaseConfigured()) {
+      try {
+        const urls = await Promise.all([...files].map(f => uploadPropertyImage(f)));
+        editorImages.push(...urls);
+      } catch (e) {
+        toast(e.message || 'Error al subir a Supabase');
+        return;
+      }
+    } else if (hasApi()) {
       try {
         const { urls } = await uploadImages(files);
         editorImages.push(...urls);
@@ -267,7 +291,7 @@ export function createAdmin(store, auth, state, app) {
         return;
       }
     } else {
-      toast('Sube fotos con el servidor Node (npm start). Usa URLs por ahora.');
+      toast('Sube fotos con Supabase o servidor Node (npm start). Usa URLs por ahora.');
       return;
     }
     syncImagesToTextarea();
@@ -316,7 +340,11 @@ export function createAdmin(store, auth, state, app) {
 
   async function loadConfig() {
     const hint = document.getElementById('configApiHint');
-    if (hint) hint.textContent = hasApi() ? 'Backend Node activo — credenciales en data/admin.json' : 'Modo local — credenciales en config.js';
+    if (hint) {
+      if (isSupabaseConfigured()) hint.textContent = 'Supabase activo — respaldos en tabla backups.';
+      else if (hasApi()) hint.textContent = 'Backend Node activo — credenciales en data/admin.json';
+      else hint.textContent = 'Modo local — credenciales en js/config.js';
+    }
     if (hasApi()) {
       try {
         const cfg = await api('/api/admin/config', { auth: true });
@@ -341,6 +369,19 @@ export function createAdmin(store, auth, state, app) {
       toast('Credenciales actualizadas ✓');
     } catch (e) {
       toast(e.message);
+    }
+  }
+
+  async function createBackup() {
+    if (!isSupabaseConfigured()) {
+      toast('Configura js/supabase-config.js con tu URL y anon key.');
+      return;
+    }
+    try {
+      await createCloudBackup('manual');
+      toast('Respaldo guardado en Supabase ✓');
+    } catch (e) {
+      toast(e.message || 'Error al crear respaldo');
     }
   }
 
@@ -448,5 +489,6 @@ export function createAdmin(store, auth, state, app) {
   return {
     openLogin, attemptLogin, logoutAdmin, showPanel,
     openPropertyForm, saveProperty, bindEvents, refreshFromStore, refreshLeads,
+    toggleMobileSidebar, createBackup,
   };
 }

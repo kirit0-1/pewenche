@@ -49,7 +49,7 @@ function writeJson(file, data) {
 
 function initData() {
   if (!fs.existsSync(path.join(DATA_DIR, 'admin.json'))) {
-    writeJson('admin.json', { username: 'admin', password: 'pehuenche2026' });
+    writeJson('admin.json', { username: 'admin', password: 'prueba12345' });
   }
   if (!fs.existsSync(path.join(DATA_DIR, 'properties.json'))) {
     writeJson('properties.json', structuredClone(DEFAULTS));

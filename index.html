@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pewenche Propiedades — Chile</title>
   <meta name="description" content="Propiedades en venta, arriendo, terrenos, hostales y campings en Chile. Encuentra tu próximo hogar con Pewenche." />
-  <meta name="theme-color" content="#166534" />
+  <meta name="theme-color" content="#22c55e" />
   <link rel="canonical" href="https://pewenche.cl" />
 
   <!-- Open Graph -->
@@ -28,7 +28,7 @@
       theme: {
         extend: {
           colors: {
-            verde: { 50:'#f0fdf4', 100:'#dcfce7', 600:'#16a34a', 700:'#15803d', 800:'#166534', 900:'#14532d' }
+            verde: { 50:'#f0fdf4', 100:'#dcfce7', 400:'#4ade80', 500:'#22c55e', 600:'#16a34a', 700:'#15803d', 800:'#166534', 900:'#14532d' }
           },
           fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
         }
@@ -59,7 +59,8 @@
 
 <!-- ═══ PANEL ADMIN (acceso: pie de página) ═══ -->
 <div id="adminPage" class="hidden min-h-screen bg-gray-100 dark:bg-zinc-950 flex">
-  <aside class="admin-sidebar w-64 shrink-0 bg-verde-900 text-white flex flex-col sticky top-0 h-screen">
+  <div id="adminSidebarOverlay" class="hidden md:hidden" data-action="toggle-admin-menu" aria-hidden="true"></div>
+  <aside id="adminSidebar" class="admin-sidebar w-64 shrink-0 bg-verde-700 text-white flex flex-col sticky top-0 h-screen md:translate-x-0">
     <div class="p-5 border-b border-verde-800">
       <p class="font-bold text-lg">Pewenche</p>
       <p class="text-green-200 text-xs">Panel administrador</p>
@@ -79,9 +80,14 @@
   </aside>
 
   <div class="flex-1 min-w-0 flex flex-col">
-    <header class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 z-20">
-      <h1 id="adminPageTitle" class="font-bold text-xl">Inicio</h1>
-      <a href="index.html" target="_blank" rel="noopener" class="text-sm text-verde-700 dark:text-green-400 hover:underline"><i class="fa-solid fa-up-right-from-square mr-1"></i>Ver sitio público</a>
+    <header class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3 sticky top-0 z-20">
+      <div class="flex items-center gap-2 min-w-0">
+        <button type="button" data-action="toggle-admin-menu" class="md:hidden w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 shrink-0" aria-label="Menú admin">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <h1 id="adminPageTitle" class="font-bold text-lg sm:text-xl truncate">Inicio</h1>
+      </div>
+      <a href="index.html" target="_blank" rel="noopener" class="text-xs sm:text-sm text-verde-600 dark:text-green-400 hover:underline shrink-0"><i class="fa-solid fa-up-right-from-square mr-1"></i><span class="hidden sm:inline">Ver sitio público</span><span class="sm:hidden">Sitio</span></a>
     </header>
 
     <main class="flex-1 p-6 overflow-y-auto max-w-6xl w-full mx-auto">
@@ -174,8 +180,13 @@
       </div>
       <div data-admin-panel="sitio" class="hidden"><p class="text-sm text-gray-400 mb-3">Vista en tiempo real del sitio.</p><iframe id="adminPreviewFrame" class="w-full rounded-2xl border" style="height:70vh;border:0"></iframe></div>
       <div data-admin-panel="config" class="hidden max-w-md space-y-4">
-        <h2 class="text-lg font-bold">Credenciales de acceso</h2>
+        <h2 class="text-lg font-bold">Credenciales y respaldo</h2>
         <p id="configApiHint" class="text-sm text-gray-400"></p>
+        <div class="p-4 rounded-xl border border-verde-200 dark:border-verde-800 bg-verde-50 dark:bg-verde-900/20">
+          <p class="text-sm font-medium mb-2"><i class="fa-solid fa-cloud-arrow-up mr-1 text-verde-600"></i>Respaldo en Supabase</p>
+          <p class="text-xs text-gray-500 dark:text-zinc-400 mb-3">Guarda propiedades y consultas en la nube.</p>
+          <button type="button" data-action="create-backup" class="btn-verde px-4 py-2 text-sm w-full sm:w-auto"><i class="fa-solid fa-database mr-1"></i>Crear respaldo ahora</button>
+        </div>
         <div><label class="adm-label">Usuario</label><input id="configUsername" class="adm-input" /></div>
         <div><label class="adm-label">Contraseña actual</label><input id="configCurrentPass" type="password" class="adm-input" /></div>
         <div><label class="adm-label">Nueva contraseña</label><input id="configNewPass" type="password" class="adm-input" placeholder="Opcional" /></div>
@@ -256,7 +267,7 @@
 <!-- ═══ PÁGINA PRINCIPAL ═══ -->
 <div id="mainPage">
 
-  <header class="fixed top-0 left-0 right-0 z-50 bg-verde-800 text-white shadow-md">
+  <header class="fixed top-0 left-0 right-0 z-50 bg-verde-600 text-white shadow-md">
     <div class="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between gap-4">
       <a href="#" data-action="reset-filters" class="flex items-center gap-2.5 shrink-0">
         <svg width="30" height="30" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 4 L26 14 L32 10 L28 20 L36 18 L28 28 L30 24 L22 32 L22 38 L18 38 L18 32 L10 24 L12 28 L4 18 L12 20 L8 10 L14 14 Z" fill="#bbf7d0" stroke="#4ade80" stroke-width="1"/></svg>
@@ -283,7 +294,7 @@
       </div>
     </div>
 
-    <div id="mobileMenu" class="hidden md:hidden bg-verde-900 border-t border-verde-700 px-4 pb-4 space-y-1" aria-hidden="true">
+    <div id="mobileMenu" class="hidden md:hidden bg-verde-700 border-t border-verde-500 px-4 pb-4 space-y-1" aria-hidden="true">
       <a href="#" data-action="show-section" data-section="todas" class="block px-4 py-2.5 rounded-xl hover:bg-white/10 text-sm font-medium">Propiedades</a>
       <a href="#" data-action="show-section" data-section="arriendo" class="block px-4 py-2.5 rounded-xl hover:bg-white/10 text-sm font-medium">Arriendos</a>
       <a href="#" data-action="show-section" data-section="hostales" class="block px-4 py-2.5 rounded-xl hover:bg-white/10 text-sm font-medium">Hostales &amp; Campings</a>
@@ -304,7 +315,7 @@
         <span><i class="fa-solid fa-clock mr-1"></i> Respuesta en 24h</span>
       </div>
 
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl p-3 shadow-2xl max-w-3xl mx-auto">
+      <div class="hero-search-box bg-white dark:bg-zinc-900 rounded-2xl p-3 shadow-2xl max-w-3xl mx-auto">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
           <label class="sr-only" for="heroTipo">Tipo</label>
           <select id="heroTipo" class="form-select w-full bg-gray-50 dark:bg-zinc-800 dark:text-white border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-verde-700 focus:outline-none">
@@ -325,24 +336,27 @@
             <i class="fa-solid fa-magnifying-glass"></i> Buscar
           </button>
         </div>
+        <button type="button" data-action="clear-hero-filters" class="mt-2 w-full text-xs text-gray-400 hover:text-verde-600 dark:hover:text-green-400 py-1 transition">
+          <i class="fa-solid fa-rotate-left mr-1"></i>Limpiar búsqueda
+        </button>
       </div>
     </div>
   </section>
 
-  <div class="max-w-7xl mx-auto px-5 pt-10 pb-2 flex flex-wrap items-center justify-between gap-4">
-    <div>
-      <h2 id="sectionTitle" class="text-2xl font-bold">Todas las propiedades</h2>
+  <div class="max-w-7xl mx-auto px-5 pt-10 pb-2 flex flex-wrap items-center justify-between gap-4 mobile-filter-bar">
+    <div class="min-w-0 flex-1">
+      <h2 id="sectionTitle" class="text-xl sm:text-2xl font-bold">Todas las propiedades</h2>
       <p id="resultCount" class="text-gray-400 text-sm mt-0.5">Cargando…</p>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 w-full sm:w-auto">
       <label class="sr-only" for="sortBy">Ordenar</label>
-      <select id="sortBy" class="form-select bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white focus:outline-none">
+      <select id="sortBy" class="form-select flex-1 sm:flex-none bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white focus:outline-none">
         <option value="relevance">Relevancia</option>
         <option value="price-asc">Precio ↑</option>
         <option value="price-desc">Precio ↓</option>
         <option value="title-asc">Nombre A–Z</option>
       </select>
-      <select id="mobileFilterTipo" class="form-select lg:hidden bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white focus:outline-none">
+      <select id="mobileFilterTipo" class="form-select flex-1 sm:flex-none lg:hidden bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white focus:outline-none">
         <option value="">Todos</option>
         <option value="venta">Venta</option>
         <option value="arriendo">Arriendo</option>
@@ -430,23 +444,23 @@
   </section>
 
   <!-- Contacto -->
-  <section id="contacto" class="bg-gray-50 dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 py-16">
+  <section id="contacto" class="contact-section py-16 sm:py-20">
     <div class="max-w-4xl mx-auto px-5 text-center">
-      <p class="text-verde-700 dark:text-green-400 text-sm font-semibold uppercase tracking-widest mb-2">¿Tienes dudas?</p>
-      <h2 class="text-3xl font-bold mb-4">Contáctanos</h2>
-      <p class="text-gray-500 dark:text-zinc-400 mb-10 max-w-lg mx-auto">Escríbenos por WhatsApp, correo o redes sociales.</p>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <a data-contact="whatsapp" data-wa-text="Hola, quiero más información" target="_blank" rel="noopener" class="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-zinc-700 hover:shadow-md transition flex flex-col items-center gap-3">
-          <div class="w-12 h-12 bg-[#25D366]/10 rounded-2xl flex items-center justify-center"><i class="fa-brands fa-whatsapp text-2xl text-[#25D366]"></i></div>
-          <div><p class="font-semibold">WhatsApp</p><p class="text-gray-400 text-sm" data-contact="whatsapp-display"></p></div>
+      <p class="text-verde-600 dark:text-green-400 text-sm font-bold uppercase tracking-widest mb-2">¿Tienes dudas?</p>
+      <h2 class="text-3xl sm:text-4xl font-extrabold mb-3 text-zinc-900 dark:text-white">Contáctanos</h2>
+      <p class="text-zinc-600 dark:text-zinc-300 mb-10 max-w-lg mx-auto text-base">Escríbenos por WhatsApp, correo o redes. Te respondemos en <span data-contact="response">menos de 24 horas</span>.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <a data-contact="whatsapp" data-wa-text="Hola, quiero más información" target="_blank" rel="noopener" class="contact-card rounded-2xl p-6 transition flex flex-col items-center gap-3">
+          <div class="w-14 h-14 bg-[#25D366]/15 rounded-2xl flex items-center justify-center ring-2 ring-[#25D366]/30"><i class="fa-brands fa-whatsapp text-3xl text-[#25D366]"></i></div>
+          <div><p class="font-bold text-lg">WhatsApp</p><p class="text-zinc-500 dark:text-zinc-300 text-sm font-medium" data-contact="whatsapp-display"></p></div>
         </a>
-        <a data-contact="email" data-fill="true" class="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-zinc-700 hover:shadow-md transition flex flex-col items-center gap-3">
-          <div class="w-12 h-12 bg-verde-50 dark:bg-verde-900/20 rounded-2xl flex items-center justify-center"><i class="fa-solid fa-envelope text-2xl text-verde-700 dark:text-green-400"></i></div>
-          <div><p class="font-semibold">Correo</p><p class="text-gray-400 text-sm"></p></div>
+        <a data-contact="email" data-fill="true" class="contact-card rounded-2xl p-6 transition flex flex-col items-center gap-3">
+          <div class="w-14 h-14 bg-verde-100 dark:bg-verde-900/40 rounded-2xl flex items-center justify-center ring-2 ring-verde-400/40"><i class="fa-solid fa-envelope text-3xl text-verde-600 dark:text-green-400"></i></div>
+          <div><p class="font-bold text-lg">Correo</p><p class="text-zinc-500 dark:text-zinc-300 text-sm font-medium"></p></div>
         </a>
-        <a data-contact="instagram" data-fill="true" target="_blank" rel="noopener" class="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-zinc-700 hover:shadow-md transition flex flex-col items-center gap-3">
-          <div class="w-12 h-12 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-2xl flex items-center justify-center"><i class="fa-brands fa-instagram text-2xl text-pink-500"></i></div>
-          <div><p class="font-semibold">Instagram</p><p class="text-gray-400 text-sm"></p></div>
+        <a data-contact="instagram" data-fill="true" target="_blank" rel="noopener" class="contact-card rounded-2xl p-6 transition flex flex-col items-center gap-3">
+          <div class="w-14 h-14 bg-gradient-to-br from-purple-500/15 to-pink-500/15 rounded-2xl flex items-center justify-center ring-2 ring-pink-400/30"><i class="fa-brands fa-instagram text-3xl text-pink-500"></i></div>
+          <div><p class="font-bold text-lg">Instagram</p><p class="text-zinc-500 dark:text-zinc-300 text-sm font-medium"></p></div>
         </a>
       </div>
     </div>

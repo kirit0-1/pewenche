@@ -38,14 +38,14 @@ export function createApp(store, state) {
     document.querySelectorAll('[data-contact="email"]').forEach(el => {
       el.href = `mailto:${CONTACT.email}`;
       if (el.dataset.fill) {
-        const p = el.querySelector('p.text-gray-400, p.text-sm');
+        const p = el.querySelector('p.text-gray-400, p.text-sm, p.text-zinc-500');
         if (p) p.textContent = CONTACT.email;
       }
     });
     document.querySelectorAll('[data-contact="instagram"]').forEach(el => {
       el.href = CONTACT.instagram;
       if (el.dataset.fill) {
-        const p = el.querySelector('p.text-gray-400, p.text-sm');
+        const p = el.querySelector('p.text-gray-400, p.text-sm, p.text-zinc-500');
         if (p) p.textContent = CONTACT.instagramHandle;
       }
     });
@@ -83,18 +83,20 @@ export function createApp(store, state) {
     });
   }
 
+  function syncFilterFields(sourceId) {
+    if (sourceId === 'heroTipo') setVal('mobileFilterTipo', getVal('heroTipo'));
+    if (sourceId === 'mobileFilterTipo') setVal('heroTipo', getVal('mobileFilterTipo'));
+    if (sourceId === 'heroRegion') setVal('sideRegion', getVal('heroRegion'));
+    if (sourceId === 'sideRegion') setVal('heroRegion', getVal('sideRegion'));
+  }
+
   function applyFilters(st) {
-    const tipo = getVal('heroTipo') || getVal('mobileFilterTipo');
-    const region = getVal('heroRegion') || getVal('sideRegion');
+    const tipo = getVal('heroTipo');
+    const region = getVal('heroRegion');
     const maxUF = parseFloat(getVal('sidePrecioMax')) || 0;
     const search = getVal('searchQuery');
     const sortBy = getVal('sortBy') || 'relevance';
     const sectionTipos = SECTION_MAP[currentSection] || [];
-
-    setVal('heroTipo', tipo);
-    setVal('mobileFilterTipo', tipo);
-    setVal('heroRegion', region);
-    setVal('sideRegion', region);
 
     let list = st.properties.filter(p => {
       if (sectionTipos.length && !sectionTipos.includes(p.tipo)) return false;
@@ -123,15 +125,20 @@ export function createApp(store, state) {
     applyFilters(state);
   }
 
+  function clearHeroFilters() {
+    ['heroTipo', 'heroRegion', 'searchQuery', 'mobileFilterTipo'].forEach(id => setVal(id, ''));
+    applyFilters(state);
+  }
+
   function resetFilters(st) {
     currentSection = 'todas';
-    state.currentSection = 'todas';
+    st.currentSection = 'todas';
     ['heroTipo', 'heroRegion', 'sideRegion', 'sidePrecioMax', 'mobileFilterTipo', 'searchQuery'].forEach(id => setVal(id, ''));
     setVal('sortBy', 'relevance');
     document.getElementById('sectionTitle').textContent = 'Todas las propiedades';
     document.querySelectorAll('.sidebar-link').forEach(b => b.classList.remove('active'));
     setActiveNav('todas');
-    renderGrid(st.properties);
+    applyFilters(st);
   }
 
   function buildChips(p) {
@@ -309,8 +316,15 @@ export function createApp(store, state) {
     });
 
     document.getElementById('searchQuery')?.addEventListener('input', () => debouncedApply());
+    document.getElementById('searchQuery')?.addEventListener('search', () => applyFilters(st));
     ['heroTipo', 'heroRegion', 'sideRegion', 'sidePrecioMax', 'mobileFilterTipo', 'sortBy'].forEach(id => {
-      document.getElementById(id)?.addEventListener('change', () => applyFilters(st));
+      const el = document.getElementById(id);
+      if (!el) return;
+      const evt = id === 'sidePrecioMax' ? 'input' : 'change';
+      el.addEventListener(evt, () => {
+        syncFilterFields(id);
+        applyFilters(st);
+      });
     });
 
     document.addEventListener('keydown', e => {
@@ -325,6 +339,7 @@ export function createApp(store, state) {
     applyFilters: () => applyFilters(state),
     setSidebarTipo,
     resetFilters: () => resetFilters(state),
+    clearHeroFilters: () => clearHeroFilters(),
     renderGrid,
     openDetail,
     closeDetail,
