@@ -8,15 +8,38 @@ import { hasApi, uploadImages, api, getToken } from './api.js';
 import { isSupabaseConfigured } from './supabase-client.js';
 import { createCloudBackup } from './backup.js';
 import { uploadPropertyImage } from './supabase-store.js';
+import { isLocalDev, getBackendLabel } from './env.js';
 
 export function createAdmin(store, auth, state, app) {
   let activeTab = 'inicio';
   let editorImages = [];
+  let leadsRefreshTimer = null;
+
+  function updateBackendBanner() {
+    const el = document.getElementById('adminBackendBanner');
+    if (!el) return;
+    const mode = window.__PEWENCHE_BACKEND__ || (isSupabaseConfigured() ? 'supabase' : hasApi() ? 'api' : 'local');
+    const label = getBackendLabel(mode);
+    if (mode === 'supabase') {
+      el.className = 'mb-4 p-3 rounded-xl text-sm border border-verde-200 dark:border-verde-800 bg-verde-50 dark:bg-verde-900/20 text-verde-800 dark:text-green-300';
+      el.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> Datos en <strong>Supabase</strong> — las consultas de cualquier dispositivo aparecen aquí.`;
+      el.classList.remove('hidden');
+    } else if (!isLocalDev()) {
+      el.className = 'mb-4 p-3 rounded-xl text-sm border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300';
+      el.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> <strong>Problema:</strong> el sitio está en modo «${label}». Las consultas de visitantes <strong>no llegan al admin</strong>. Configura <code>SUPABASE_URL</code> y <code>SUPABASE_ANON_KEY</code> en Vercel y redeploy.`;
+      el.classList.remove('hidden');
+    } else {
+      el.className = 'mb-4 p-3 rounded-xl text-sm border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-200';
+      el.innerHTML = `<i class="fa-solid fa-laptop mr-1"></i> Modo local: <strong>${label}</strong>. En producción (Vercel) debe decir Supabase.`;
+      el.classList.remove('hidden');
+    }
+  }
 
   function showPanel() {
     document.getElementById('mainPage').classList.add('hidden');
     document.getElementById('adminPage').classList.remove('hidden');
     document.getElementById('waFloat')?.classList.add('hidden');
+    updateBackendBanner();
     switchTab('inicio');
   }
 
@@ -69,6 +92,10 @@ export function createAdmin(store, auth, state, app) {
 
   function switchTab(tab) {
     closeMobileSidebar();
+    if (leadsRefreshTimer) {
+      clearInterval(leadsRefreshTimer);
+      leadsRefreshTimer = null;
+    }
     activeTab = tab;
     document.querySelectorAll('[data-admin-tab]').forEach(btn => {
       btn.classList.toggle('admin-sidebar-active', btn.dataset.adminTab === tab);
@@ -83,7 +110,10 @@ export function createAdmin(store, auth, state, app) {
 
     if (tab === 'inicio' || tab === 'propiedades') { updateAdminStats(); if (tab === 'propiedades') renderAdminTable(); }
     if (tab === 'estadisticas') renderAnalytics();
-    if (tab === 'leads') renderLeads();
+    if (tab === 'leads') {
+      renderLeads();
+      leadsRefreshTimer = setInterval(() => renderLeads(), 30000);
+    }
     if (tab === 'sitio') showSitePreview();
     if (tab === 'config') loadConfig();
     if (tab === 'editor') updateMapPreview();
@@ -167,12 +197,19 @@ export function createAdmin(store, auth, state, app) {
   }
 
   async function renderLeads() {
-    const leads = await getLeads();
     const container = document.getElementById('leadsList');
     const hint = document.getElementById('leadsHint');
+    let leads = [];
+    try {
+      leads = await getLeads();
+    } catch (err) {
+      if (hint) hint.innerHTML = `<span class="text-red-600">${h(err.message)}</span>`;
+      container.innerHTML = '<p class="text-red-500 text-sm text-center py-8">Error al cargar consultas.</p>';
+      return;
+    }
     if (hint) {
       if (isSupabaseConfigured()) {
-        hint.textContent = 'Consultas sincronizadas en Supabase. Pulsa «Actualizar» si hace falta.';
+        hint.textContent = 'Consultas en Supabase (cualquier red/dispositivo). Se actualiza cada 30 s.';
       } else if (hasApi() && !getToken()) {
         hint.innerHTML = '<span class="text-amber-600">Cierra sesión y vuelve a entrar (con npm start activo) para ver consultas del servidor.</span>';
       } else if (hasApi()) {

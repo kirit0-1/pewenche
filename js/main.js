@@ -9,6 +9,7 @@ import { createAdmin } from './admin.js';
 import { startUFService } from './uf.js';
 import { onDataChange } from './analytics.js';
 import { detectApi } from './api.js';
+import { isLocalDev, getBackendLabel } from './env.js';
 
 const state = { properties: [], currentSection: 'todas' };
 let store, auth, app, admin;
@@ -28,6 +29,11 @@ async function init() {
   const backend = await resolveBackend();
   store = backend.store;
   auth = backend.auth;
+  window.__PEWENCHE_BACKEND__ = backend.mode;
+
+  if (backend.mode === 'local' && !isLocalDev()) {
+    console.error('[Pewenche] Sin Supabase en producción — consultas NO se sincronizan entre dispositivos.');
+  }
 
   app = createApp(store, state);
   admin = createAdmin(store, auth, state, app);

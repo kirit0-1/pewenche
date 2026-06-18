@@ -3,6 +3,7 @@
  */
 import { isSupabaseConfigured, getSupabase } from './supabase-client.js';
 import { hasApi, api, detectApi } from './api.js';
+import { isLocalDev } from './env.js';
 
 const CLICKS_KEY = 'pewenche_clicks';
 const LEADS_KEY = 'pewenche_leads';
@@ -115,7 +116,7 @@ export async function saveLead(payload) {
   if (isSupabaseConfigured()) {
     const sb = getSupabase();
     const lead = {
-      id: 'l' + Date.now().toString(36),
+      id: 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       property_id: payload.propertyId,
       property_title: payload.propertyTitle,
       nombre: payload.nombre.trim(),
@@ -127,6 +128,10 @@ export async function saveLead(payload) {
     if (error) throw new Error(error.message);
     notifyLeadsChanged();
     return { ...lead, propertyId: lead.property_id, propertyTitle: lead.property_title, at: Date.now() };
+  }
+
+  if (!isLocalDev()) {
+    throw new Error('El formulario no está conectado a la nube. Contacta al administrador del sitio.');
   }
 
   await detectApi(true);
@@ -159,7 +164,11 @@ export async function getLeads() {
   if (isSupabaseConfigured()) {
     const sb = getSupabase();
     const { data, error } = await sb.from('leads').select('*').order('created_at', { ascending: false });
-    if (error) return read(LEADS_KEY, []);
+    if (error) {
+      console.error('Supabase leads:', error.message);
+      if (!isLocalDev()) throw new Error('No se pudieron cargar las consultas: ' + error.message);
+      return read(LEADS_KEY, []);
+    }
     return (data || []).map(mapLead);
   }
 
