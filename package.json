@@ -8,6 +8,7 @@
     "start": "node server/index.mjs",
     "dev": "node server/index.mjs",
     "static": "node scripts/start.mjs",
+    "build": "node scripts/vercel-build.mjs",
     "seed:supabase": "node scripts/seed-supabase.mjs",
     "schema:supabase": "node scripts/apply-schema.mjs"
   },
