@@ -4,7 +4,7 @@
  */
 import { createClient } from '@supabase/supabase-js';
 import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { dirname, join } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -55,13 +55,13 @@ if (!url || !key || url.includes('TU-PROYECTO')) {
   process.exit(1);
 }
 
-const { DEFAULTS } = await import(join(root, 'js/config.js'));
+const { DEFAULTS } = await import(pathToFileURL(join(root, 'js/config.js')).href);
 const sb = createClient(url, key);
 
 const rows = DEFAULTS.map(propToRow);
 const { error } = await sb.from('properties').upsert(rows);
 if (error) {
-  console.error('Error:', error.message);
+  console.error('Error:', error.message, error.details || '', error.hint || '');
   process.exit(1);
 }
 

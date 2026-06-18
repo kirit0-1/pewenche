@@ -4,6 +4,7 @@ Thumbs.db
 .env
 .env.*
 node_modules/
+js/supabase-config.js
 data/properties.json
 data/leads.json
 data/clicks.json

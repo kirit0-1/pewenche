@@ -8,12 +8,14 @@
     "start": "node server/index.mjs",
     "dev": "node server/index.mjs",
     "static": "node scripts/start.mjs",
-    "seed:supabase": "node scripts/seed-supabase.mjs"
+    "seed:supabase": "node scripts/seed-supabase.mjs",
+    "schema:supabase": "node scripts/apply-schema.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
     "express": "^4.21.2",
-    "multer": "^1.4.5-lts.1"
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.21.0"
   },
   "devDependencies": {
     "serve": "^14.2.4"
