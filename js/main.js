@@ -1,8 +1,8 @@
 import { SITE, STORAGE_KEY } from './config.js';
 import { LocalPropertyStore } from './storage.js';
 import { SupabasePropertyStore } from './supabase-store.js';
-import { isSupabaseConfigured } from './supabase-client.js';
-import { LocalAuthService, ApiAuthService } from './auth.js';
+import { isSupabaseConfigured, getSupabase } from './supabase-client.js';
+import { LocalAuthService, ApiAuthService, SupabaseAuthService } from './auth.js';
 import { ApiPropertyStore } from './api-store.js';
 import { createApp } from './app.js';
 import { createAdmin } from './admin.js';
@@ -16,7 +16,7 @@ let store, auth, app, admin;
 
 async function resolveBackend() {
   if (isSupabaseConfigured()) {
-    return { store: new SupabasePropertyStore(), auth: new LocalAuthService(), mode: 'supabase' };
+    return { store: new SupabasePropertyStore(), auth: new SupabaseAuthService(), mode: 'supabase' };
   }
   const apiOk = await detectApi();
   if (apiOk) {
@@ -53,6 +53,12 @@ async function init() {
   app.setActiveNav('todas');
 
   if (auth.isAuthenticated()) admin.showPanel();
+
+  if (backend.mode === 'supabase') {
+    const sb = getSupabase();
+    const { data } = await sb.auth.getSession();
+    if (!data.session && auth.isAuthenticated()) await auth.logout();
+  }
 
   onDataChange(async key => {
     if (key === STORAGE_KEY || key === 'leads' || key === 'clicks') {

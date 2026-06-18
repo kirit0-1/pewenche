@@ -188,10 +188,20 @@
           <p class="text-xs text-gray-500 dark:text-zinc-400 mb-3">Guarda propiedades y consultas en la nube.</p>
           <button type="button" data-action="create-backup" class="btn-verde px-4 py-2 text-sm w-full sm:w-auto"><i class="fa-solid fa-database mr-1"></i>Crear respaldo ahora</button>
         </div>
+        <div id="configCredBlock" class="space-y-4">
         <div><label class="adm-label">Usuario</label><input id="configUsername" class="adm-input" /></div>
         <div><label class="adm-label">Contraseña actual</label><input id="configCurrentPass" type="password" class="adm-input" /></div>
         <div><label class="adm-label">Nueva contraseña</label><input id="configNewPass" type="password" class="adm-input" placeholder="Opcional" /></div>
         <button type="button" id="btnSaveConfig" class="btn-verde px-5 py-2 text-sm">Guardar cambios</button>
+        </div>
+        <div id="configSupabaseAuth" class="hidden p-4 rounded-xl border border-gray-200 dark:border-zinc-700 text-sm text-gray-500">
+          <p class="font-medium text-gray-700 dark:text-zinc-300 mb-1">Acceso admin</p>
+          <p>Gestiona usuarios en Supabase → Authentication. Login: <code>admin@pewenche.cl</code></p>
+        </div>
+        <div id="backupsListWrap" class="hidden">
+          <p class="adm-label">Respaldos recientes</p>
+          <ul id="backupsList" class="text-sm space-y-1 text-gray-500"></ul>
+        </div>
       </div>
     </main>
   </div>
@@ -208,6 +218,7 @@
       <p class="text-gray-400 text-sm mt-1">Panel de gestión · Pewenche</p>
     </div>
     <div class="space-y-3">
+      <p id="loginHint" class="text-gray-400 text-xs text-center hidden"></p>
       <label class="sr-only" for="loginUser">Usuario</label>
       <input id="loginUser" type="text" placeholder="Usuario" autocomplete="username" class="adm-input" />
       <label class="sr-only" for="loginPass">Contraseña</label>

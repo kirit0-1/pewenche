@@ -6,7 +6,7 @@ import {
 import { clpFromUF } from './uf.js';
 import { hasApi, uploadImages, api, getToken } from './api.js';
 import { isSupabaseConfigured } from './supabase-client.js';
-import { createCloudBackup } from './backup.js';
+import { createCloudBackup, listBackups } from './backup.js';
 import { uploadPropertyImage } from './supabase-store.js';
 import { isLocalDev, getBackendLabel } from './env.js';
 
@@ -50,6 +50,20 @@ export function createAdmin(store, auth, state, app) {
   }
 
   function openLogin() {
+    const hint = document.getElementById('loginHint');
+    const userEl = document.getElementById('loginUser');
+    if (isSupabaseConfigured()) {
+      userEl.placeholder = 'admin@pewenche.cl';
+      userEl.type = 'email';
+      if (hint) {
+        hint.textContent = 'Email y contraseña de Supabase Auth';
+        hint.classList.remove('hidden');
+      }
+    } else {
+      userEl.placeholder = 'Usuario';
+      userEl.type = 'text';
+      hint?.classList.add('hidden');
+    }
     if (auth.isAuthenticated()) showPanel();
     else {
       document.getElementById('loginModal').classList.remove('hidden');
@@ -377,10 +391,23 @@ export function createAdmin(store, auth, state, app) {
 
   async function loadConfig() {
     const hint = document.getElementById('configApiHint');
-    if (hint) {
-      if (isSupabaseConfigured()) hint.textContent = 'Supabase activo — respaldos en tabla backups.';
-      else if (hasApi()) hint.textContent = 'Backend Node activo — credenciales en data/admin.json';
-      else hint.textContent = 'Modo local — credenciales en js/config.js';
+    const credBlock = document.getElementById('configCredBlock');
+    const authNote = document.getElementById('configSupabaseAuth');
+    const backupsWrap = document.getElementById('backupsListWrap');
+    if (isSupabaseConfigured()) {
+      if (hint) hint.textContent = 'Supabase activo — respaldos en tabla backups.';
+      credBlock?.classList.add('hidden');
+      authNote?.classList.remove('hidden');
+      backupsWrap?.classList.remove('hidden');
+      await renderBackupsList();
+    } else {
+      credBlock?.classList.remove('hidden');
+      authNote?.classList.add('hidden');
+      backupsWrap?.classList.add('hidden');
+      if (hint) {
+        if (hasApi()) hint.textContent = 'Backend Node activo — credenciales en data/admin.json';
+        else hint.textContent = 'Modo local — credenciales en js/config.js';
+      }
     }
     if (hasApi()) {
       try {
@@ -391,6 +418,10 @@ export function createAdmin(store, auth, state, app) {
   }
 
   async function saveConfig() {
+    if (isSupabaseConfigured()) {
+      toast('En producción el admin usa Supabase Auth (Authentication en el dashboard).');
+      return;
+    }
     if (!hasApi()) { toast('Cambia credenciales en js/config.js (modo sin servidor).'); return; }
     try {
       await api('/api/admin/config', {
@@ -411,14 +442,28 @@ export function createAdmin(store, auth, state, app) {
 
   async function createBackup() {
     if (!isSupabaseConfigured()) {
-      toast('Configura js/supabase-config.js con tu URL y anon key.');
+      toast('Configura Supabase primero.');
       return;
     }
     try {
       await createCloudBackup('manual');
       toast('Respaldo guardado en Supabase ✓');
+      await renderBackupsList();
     } catch (e) {
       toast(e.message || 'Error al crear respaldo');
+    }
+  }
+
+  async function renderBackupsList() {
+    const ul = document.getElementById('backupsList');
+    if (!ul || !isSupabaseConfigured()) return;
+    try {
+      const rows = await listBackups();
+      ul.innerHTML = rows.length
+        ? rows.map(b => `<li>· ${h(b.label || 'Respaldo')} — ${new Date(b.created_at).toLocaleString('es-CL')}</li>`).join('')
+        : '<li class="text-gray-400">Sin respaldos todavía.</li>';
+    } catch {
+      ul.innerHTML = '<li class="text-red-400">No se pudieron cargar respaldos.</li>';
     }
   }
 
@@ -503,10 +548,14 @@ export function createAdmin(store, auth, state, app) {
     document.getElementById('leadsList')?.addEventListener('click', async e => {
       const btn = e.target.closest('[data-action]');
       if (btn?.dataset.action === 'mark-contacted') {
-        await markLeadContacted(btn.dataset.id);
-        renderLeads();
-        await updateAdminStats();
-        toast('Marcado como contactado');
+        try {
+          await markLeadContacted(btn.dataset.id);
+          renderLeads();
+          await updateAdminStats();
+          toast('Marcado como contactado');
+        } catch (err) {
+          toast(err.message || 'Error al actualizar');
+        }
       }
     });
 
@@ -514,8 +563,6 @@ export function createAdmin(store, auth, state, app) {
     document.getElementById('btnRefreshLeads')?.addEventListener('click', () => renderLeads());
     document.getElementById('loginPass')?.addEventListener('keydown', e => { if (e.key === 'Enter') attemptLogin(); });
     document.getElementById('loginModal')?.addEventListener('click', e => { if (e.target.id === 'loginModal') e.target.classList.add('hidden'); });
-
-    onDataChange(() => refreshFromStore());
   }
 
   async function refreshLeads() {

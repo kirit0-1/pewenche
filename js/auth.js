@@ -1,8 +1,9 @@
 /**
- * Autenticación — local o API Node según disponibilidad.
+ * Autenticación — Supabase Auth, API Node o local.
  */
 import { ADMIN } from './config.js';
 import { api, setToken, getToken } from './api.js';
+import { getSupabase } from './supabase-client.js';
 
 export class ApiAuthService {
   async login(username, password) {
@@ -41,8 +42,7 @@ export class ApiAuthService {
 export class LocalAuthService {
   async login(username, password) {
     if (username === ADMIN.username && password === ADMIN.password) {
-      const session = { at: Date.now(), user: username };
-      sessionStorage.setItem(ADMIN.sessionKey, JSON.stringify(session));
+      sessionStorage.setItem(ADMIN.sessionKey, JSON.stringify({ at: Date.now(), user: username }));
       return { ok: true };
     }
     return { ok: false, error: 'Credenciales incorrectas.' };
@@ -68,22 +68,44 @@ export class LocalAuthService {
   }
 }
 
-/* ── Plantilla Supabase Auth ──
 export class SupabaseAuthService {
-  constructor(supabase) { this.supabase = supabase; }
+  normalizeEmail(user) {
+    const u = user.trim();
+    return u.includes('@') ? u : `${u}@pewenche.cl`;
+  }
 
-  async login(email, password) {
-    const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
+  async login(user, password) {
+    const sb = getSupabase();
+    const email = this.normalizeEmail(user);
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
     if (error) return { ok: false, error: error.message };
-    return { ok: true, user: data.user };
+    sessionStorage.setItem(ADMIN.sessionKey, JSON.stringify({
+      at: Date.now(),
+      user: data.user?.email || email,
+      mode: 'supabase',
+    }));
+    return { ok: true };
   }
 
   isAuthenticated() {
-    return !!this.supabase.auth.getSession()?.data?.session;
+    try {
+      const raw = sessionStorage.getItem(ADMIN.sessionKey);
+      if (!raw) return false;
+      const session = JSON.parse(raw);
+      if (session.mode !== 'supabase') return false;
+      if (Date.now() - session.at > ADMIN.sessionTTL) {
+        this.logout();
+        return false;
+      }
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async logout() {
-    await this.supabase.auth.signOut();
+    const sb = getSupabase();
+    await sb?.auth.signOut().catch(() => {});
+    sessionStorage.removeItem(ADMIN.sessionKey);
   }
 }
-*/

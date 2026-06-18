@@ -1,5 +1,5 @@
 /**
- * Analytics y leads — Supabase > API Node > localStorage.
+ * Analytics y leads — Supabase > API Node > localStorage (solo dev local).
  */
 import { isSupabaseConfigured, getSupabase } from './supabase-client.js';
 import { hasApi, api, detectApi } from './api.js';
@@ -58,7 +58,8 @@ function saveLeadLocal(payload) {
 export async function trackClick(propertyId) {
   if (isSupabaseConfigured()) {
     const sb = getSupabase();
-    await sb.from('clicks').insert({ property_id: propertyId });
+    const { error } = await sb.from('clicks').insert({ property_id: propertyId });
+    if (error) console.warn('trackClick:', error.message);
     window.dispatchEvent(new CustomEvent('pewenche-data-change', { detail: { key: 'clicks' } }));
     return;
   }
@@ -78,7 +79,8 @@ async function getClicks() {
   const start = weekStart();
   if (isSupabaseConfigured()) {
     const sb = getSupabase();
-    const { data } = await sb.from('clicks').select('property_id, created_at').gte('created_at', new Date(start).toISOString());
+    const { data, error } = await sb.from('clicks').select('property_id, created_at').gte('created_at', new Date(start).toISOString());
+    if (error) console.warn('getClicks:', error.message);
     return (data || []).map(c => ({ propertyId: c.property_id, at: new Date(c.created_at).getTime() }));
   }
   await detectApi(true);
@@ -104,8 +106,7 @@ export async function getWeeklyClickStats(properties) {
 }
 
 export async function getTotalWeeklyClicks() {
-  const clicks = await getClicks();
-  return clicks.length;
+  return (await getClicks()).length;
 }
 
 export async function saveLead(payload) {
@@ -166,8 +167,7 @@ export async function getLeads() {
     const { data, error } = await sb.from('leads').select('*').order('created_at', { ascending: false });
     if (error) {
       console.error('Supabase leads:', error.message);
-      if (!isLocalDev()) throw new Error('No se pudieron cargar las consultas: ' + error.message);
-      return read(LEADS_KEY, []);
+      throw new Error('No se pudieron cargar las consultas. ¿Iniciaste sesión como admin? ' + error.message);
     }
     return (data || []).map(mapLead);
   }
@@ -188,7 +188,8 @@ export async function getLeads() {
 export async function markLeadContacted(id) {
   if (isSupabaseConfigured()) {
     const sb = getSupabase();
-    await sb.from('leads').update({ contacted: true }).eq('id', id);
+    const { error } = await sb.from('leads').update({ contacted: true }).eq('id', id);
+    if (error) throw new Error(error.message);
     notifyLeadsChanged();
     return getLeads();
   }

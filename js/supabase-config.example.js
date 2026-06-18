@@ -1,4 +1,4 @@
-export const SUPABASE_URL = 'https://kiatnwjnvuutrwfivlzx.supabase.co';
+export const SUPABASE_URL = 'https://TU-PROYECTO.supabase.co';
 export const SUPABASE_ANON_KEY = 'tu-anon-key-aqui';
 
 export function isSupabaseConfigured() {
