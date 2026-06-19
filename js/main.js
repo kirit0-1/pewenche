@@ -9,7 +9,8 @@ import { createAdmin } from './admin.js';
 import { startUFService } from './uf.js';
 import { onDataChange } from './analytics.js';
 import { detectApi } from './api.js';
-import { isLocalDev, getBackendLabel } from './env.js';
+import { isLocalDev } from './env.js';
+import { toast } from './utils.js';
 
 const state = { properties: [], currentSection: 'todas' };
 let store, auth, app, admin;
@@ -26,50 +27,62 @@ async function resolveBackend() {
 }
 
 async function init() {
-  const backend = await resolveBackend();
-  store = backend.store;
-  auth = backend.auth;
-  window.__PEWENCHE_BACKEND__ = backend.mode;
+  try {
+    const backend = await resolveBackend();
+    store = backend.store;
+    auth = backend.auth;
+    window.__PEWENCHE_BACKEND__ = backend.mode;
 
-  if (backend.mode === 'local' && !isLocalDev()) {
-    console.error('[Pewenche] Sin Supabase en producción — consultas NO se sincronizan entre dispositivos.');
-  }
+    if (backend.mode === 'supabase' && auth.init) {
+      await auth.init();
+    }
 
-  app = createApp(store, state);
-  admin = createAdmin(store, auth, state, app);
+    if (backend.mode !== 'supabase' && !isLocalDev()) {
+      console.error('[Pewenche] Sin Supabase en producción — consultas no sincronizan.');
+    }
 
-  startUFService();
-  state.properties = await store.getAll();
+    app = createApp(store, state);
+    admin = createAdmin(store, auth, state, app);
 
-  app.initTheme();
-  app.populateRegionSelects();
-  app.injectContactLinks();
-  app.bindEvents(state);
-  admin.bindEvents();
+    startUFService();
 
-  document.getElementById('siteYear').textContent = SITE.year;
-  document.getElementById('resultCount').textContent = `${state.properties.length} propiedades disponibles`;
-  app.renderGrid(state.properties);
-  app.setActiveNav('todas');
-
-  if (auth.isAuthenticated()) admin.showPanel();
-
-  if (backend.mode === 'supabase') {
-    const sb = getSupabase();
-    const { data } = await sb.auth.getSession();
-    if (!data.session && auth.isAuthenticated()) await auth.logout();
-  }
-
-  onDataChange(async key => {
-    if (key === STORAGE_KEY || key === 'leads' || key === 'clicks') {
+    try {
       state.properties = await store.getAll();
-      await app.reloadProperties();
+    } catch (err) {
+      console.error('Error cargando propiedades:', err);
+      toast('No se pudieron cargar las propiedades. Revisa la conexión.');
+      state.properties = [];
     }
-    if (auth.isAuthenticated()) {
-      await admin.refreshFromStore();
-      if (key === 'leads') await admin.refreshLeads?.();
-    }
-  });
+
+    app.initTheme();
+    app.populateRegionSelects();
+    app.injectContactLinks();
+    app.bindEvents(state);
+    admin.bindEvents();
+
+    document.getElementById('siteYear').textContent = SITE.year;
+    document.getElementById('resultCount').textContent = `${state.properties.length} propiedades disponibles`;
+    app.renderGrid(state.properties);
+    app.setActiveNav('todas');
+
+    if (auth.isAuthenticated()) admin.showPanel();
+
+    onDataChange(async key => {
+      if (key === STORAGE_KEY || key === 'leads' || key === 'clicks') {
+        try {
+          state.properties = await store.getAll();
+          await app.reloadProperties();
+        } catch { /* ignore */ }
+      }
+      if (auth.isAuthenticated()) {
+        await admin.refreshFromStore();
+        if (key === 'leads') await admin.refreshLeads?.();
+      }
+    });
+  } catch (err) {
+    console.error('[Pewenche] init failed:', err);
+    toast('Error al iniciar la aplicación.');
+  }
 }
 
 document.addEventListener('click', e => {
@@ -78,29 +91,29 @@ document.addEventListener('click', e => {
 
   const action = el.dataset.action;
   const handlers = {
-    'toggle-theme': () => app.toggleTheme(),
-    'toggle-menu': () => app.toggleMobileMenu(),
-    'toggle-admin-menu': () => admin.toggleMobileSidebar?.(),
-    'apply-filters': () => app.applyFilters(),
-    'clear-hero-filters': () => app.clearHeroFilters(),
-    'reset-filters': () => { e.preventDefault(); app.resetFilters(); },
-    'sidebar-tipo': () => app.setSidebarTipo(el.dataset.tipo),
+    'toggle-theme': () => app?.toggleTheme(),
+    'toggle-menu': () => app?.toggleMobileMenu(),
+    'toggle-admin-menu': () => admin?.toggleMobileSidebar?.(),
+    'apply-filters': () => app?.applyFilters(),
+    'clear-hero-filters': () => app?.clearHeroFilters(),
+    'reset-filters': () => { e.preventDefault(); app?.resetFilters(); },
+    'sidebar-tipo': () => app?.setSidebarTipo(el.dataset.tipo),
     'close-login': () => document.getElementById('loginModal').classList.add('hidden'),
-    'open-admin-login': () => admin.openLogin(),
-    'attempt-login': () => admin.attemptLogin(),
-    'open-property-form': () => admin.openPropertyForm(null),
-    'save-property': () => admin.saveProperty(),
-    'create-backup': () => admin.createBackup?.(),
-    'close-detail': () => app.closeDetail(),
-    'logout-admin': () => admin.logoutAdmin(),
-    'show-section': () => { e.preventDefault(); app.showSection(el.dataset.section); },
+    'open-admin-login': () => admin?.openLogin(),
+    'attempt-login': () => admin?.attemptLogin(),
+    'open-property-form': () => admin?.openPropertyForm(null),
+    'save-property': () => admin?.saveProperty(),
+    'create-backup': () => admin?.createBackup?.(),
+    'close-detail': () => app?.closeDetail(),
+    'logout-admin': () => admin?.logoutAdmin(),
+    'show-section': () => { e.preventDefault(); app?.showSection(el.dataset.section); },
   };
 
   const fn = handlers[action];
   if (fn) {
     if (!['reset-filters', 'show-section'].includes(action)) e.preventDefault();
     fn();
-    if (action === 'show-section' && el.closest('#mobileMenu')) app.toggleMobileMenu();
+    if (action === 'show-section' && el.closest('#mobileMenu')) app?.toggleMobileMenu();
   }
 });
 

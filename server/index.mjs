@@ -100,6 +100,15 @@ const upload = multer({
 const app = express();
 app.use(express.json({ limit: '2mb' }));
 
+const BLOCKED_PREFIXES = ['/data', '/server', '/scripts', '/supabase', '/node_modules', '/.git'];
+app.use((req, res, next) => {
+  const p = req.path.toLowerCase();
+  if (BLOCKED_PREFIXES.some(b => p.startsWith(b)) || p.includes('admin.json') || p.includes('supabase-config')) {
+    return res.status(404).end();
+  }
+  next();
+});
+
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, backend: true });
 });
@@ -210,7 +219,7 @@ app.patch('/api/leads/:id', authMiddleware, (req, res) => {
 });
 
 app.use('/uploads', express.static(UPLOADS_DIR));
-app.use(express.static(ROOT));
+app.use(express.static(ROOT, { dotfiles: 'deny', index: ['index.html'] }));
 
 app.use((err, _req, res, _next) => {
   res.status(400).json({ error: err.message || 'Error' });

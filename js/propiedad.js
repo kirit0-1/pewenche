@@ -135,6 +135,7 @@ document.getElementById('leadForm').addEventListener('submit', async e => {
       nombre: document.getElementById('leadNombre').value,
       email: document.getElementById('leadEmail').value,
       mensaje: document.getElementById('leadMensaje').value,
+      website: document.getElementById('leadWebsite')?.value || '',
     });
     document.getElementById('leadForm').classList.add('hidden');
     document.getElementById('leadSuccess').classList.remove('hidden');
@@ -157,7 +158,16 @@ async function init() {
     return;
   }
 
-  const properties = await store.getAll();
+  let properties = [];
+  try {
+    properties = await store.getAll();
+  } catch (err) {
+    console.error(err);
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('notFound').classList.remove('hidden');
+    toast('Error al cargar la propiedad.');
+    return;
+  }
   const p = properties.find(x => x.id === propertyId);
   if (!p) {
     document.getElementById('loading').classList.add('hidden');

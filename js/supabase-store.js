@@ -75,6 +75,12 @@ export class SupabasePropertyStore {
 }
 
 export async function uploadPropertyImage(file) {
+  if (!file || !/^image\/(jpeg|png|webp|gif)$/i.test(file.type)) {
+    throw new Error('Solo imágenes JPG, PNG, WEBP o GIF');
+  }
+  if (file.size > 8 * 1024 * 1024) {
+    throw new Error('Imagen demasiado grande (máx 8 MB)');
+  }
   const sb = getSupabase();
   const ext = file.name.split('.').pop() || 'jpg';
   const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;

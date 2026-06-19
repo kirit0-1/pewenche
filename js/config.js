@@ -27,12 +27,11 @@ export const TRUST = {
   experience: '5 años',
 };
 
-/** Solo desarrollo/demo — reemplazar con Supabase Auth en producción */
+/** Sesión admin — contraseña solo en Supabase Auth o servidor Node (data/admin.json) */
 export const ADMIN = {
-  username: 'admin',
-  password: 'prueba12345',
+  email: 'admin@pewenche.cl',
   sessionKey: 'pewenche_admin_session',
-  sessionTTL: 8 * 60 * 60 * 1000, // 8 horas
+  sessionTTL: 8 * 60 * 60 * 1000,
 };
 
 export const STORAGE_KEY = 'pewenche_props';

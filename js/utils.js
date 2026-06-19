@@ -3,7 +3,30 @@ export function h(str) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/** Solo URLs http(s) — evita javascript: y XSS en atributos src/href */
+export function safeUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  const t = url.trim();
+  if (!/^https?:\/\//i.test(t)) return '';
+  try {
+    const u = new URL(t);
+    if (!['http:', 'https:'].includes(u.protocol)) return '';
+    return u.href;
+  } catch {
+    return '';
+  }
+}
+
+export function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(String(email || '').trim());
+}
+
+export function filterImageUrls(urls) {
+  return (urls || []).map(u => safeUrl(u)).filter(Boolean);
 }
 
 export function getVal(id) {

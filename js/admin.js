@@ -1,5 +1,5 @@
-import { BADGE, REGIONES } from './config.js';
-import { getVal, genId, h, setVal, toast, mapEmbedUrl } from './utils.js';
+import { BADGE, REGIONES, ADMIN } from './config.js';
+import { getVal, genId, h, setVal, toast, mapEmbedUrl, safeUrl, filterImageUrls } from './utils.js';
 import {
   getWeeklyClickStats, getTotalWeeklyClicks, getLeads, markLeadContacted, onDataChange,
 } from './analytics.js';
@@ -49,11 +49,11 @@ export function createAdmin(store, auth, state, app) {
     document.getElementById('waFloat')?.classList.remove('hidden');
   }
 
-  function openLogin() {
+  async function openLogin() {
     const hint = document.getElementById('loginHint');
     const userEl = document.getElementById('loginUser');
     if (isSupabaseConfigured()) {
-      userEl.placeholder = 'admin@pewenche.cl';
+      userEl.placeholder = ADMIN.email;
       userEl.type = 'email';
       if (hint) {
         hint.textContent = 'Email y contraseña de Supabase Auth';
@@ -64,6 +64,7 @@ export function createAdmin(store, auth, state, app) {
       userEl.type = 'text';
       hint?.classList.add('hidden');
     }
+    if (auth.refreshSession) await auth.refreshSession();
     if (auth.isAuthenticated()) showPanel();
     else {
       document.getElementById('loginModal').classList.remove('hidden');
@@ -90,8 +91,7 @@ export function createAdmin(store, auth, state, app) {
   }
 
   function logoutAdmin() {
-    auth.logout();
-    hidePanel();
+    auth.logout().then(() => hidePanel());
   }
 
   function closeMobileSidebar() {
@@ -165,7 +165,7 @@ export function createAdmin(store, auth, state, app) {
       tr.innerHTML = `
         <td class="px-4 py-3">
           <div class="flex items-center gap-3">
-            <img src="${(p.imagenes && p.imagenes[0]) || ''}" alt="" class="w-12 h-12 rounded-xl object-cover shrink-0 border border-gray-100 dark:border-zinc-700" onerror="this.style.display='none'" />
+            <img src="${h(safeUrl(p.imagenes?.[0]) || '')}" alt="" class="w-12 h-12 rounded-xl object-cover shrink-0 border border-gray-100 dark:border-zinc-700" onerror="this.style.display='none'" />
             <div><p class="font-medium text-sm">${h(p.titulo)}</p><p class="text-xs text-gray-400">${h(p.comuna || '')}${p.region ? ', ' + h(p.region) : ''}</p></div>
           </div>
         </td>
@@ -260,7 +260,7 @@ export function createAdmin(store, auth, state, app) {
     }
     el.innerHTML = editorImages.map((url, i) => `
       <div class="relative group rounded-xl overflow-hidden border border-gray-200 dark:border-zinc-700 aspect-video bg-gray-100">
-        <img src="${h(url)}" alt="" class="w-full h-full object-cover" />
+        <img src="${h(safeUrl(url))}" alt="" class="w-full h-full object-cover" />
         <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
           ${i > 0 ? `<button type="button" data-action="img-up" data-i="${i}" class="w-8 h-8 bg-white rounded-full text-xs">↑</button>` : ''}
           <button type="button" data-action="img-remove" data-i="${i}" class="w-8 h-8 bg-red-500 text-white rounded-full text-xs">✕</button>
@@ -354,8 +354,8 @@ export function createAdmin(store, auth, state, app) {
     const id = getVal('formId') || genId();
     const titulo = getVal('formTitulo').trim();
     if (!titulo) { toast('El título es obligatorio.'); return; }
-    const urlLines = getVal('formImagenes').split('\n').map(s => s.trim()).filter(Boolean);
-    const imagenes = [...new Set([...editorImages, ...urlLines])];
+    const urlLines = filterImageUrls(getVal('formImagenes').split('\n').map(s => s.trim()).filter(Boolean));
+    const imagenes = filterImageUrls([...new Set([...editorImages, ...urlLines])]);
 
     const prop = {
       id, titulo, tipo: getVal('formTipo'), region: getVal('formRegion'),
@@ -372,21 +372,29 @@ export function createAdmin(store, auth, state, app) {
     };
 
     const existed = state.properties.some(x => x.id === id);
-    state.properties = await store.upsert(state.properties, prop);
-    await updateAdminStats();
-    app.applyFilters();
-    switchTab('propiedades');
-    renderAdminTable();
-    toast(existed ? 'Propiedad actualizada ✓' : 'Propiedad agregada ✓');
+    try {
+      state.properties = await store.upsert(state.properties, prop);
+      await updateAdminStats();
+      app.applyFilters();
+      switchTab('propiedades');
+      renderAdminTable();
+      toast(existed ? 'Propiedad actualizada ✓' : 'Propiedad agregada ✓');
+    } catch (err) {
+      toast(err.message || 'Error al guardar. ¿Sesión admin activa?');
+    }
   }
 
   async function deleteProperty(id) {
     if (!confirm('¿Eliminar esta propiedad?')) return;
-    state.properties = await store.remove(state.properties, id);
-    renderAdminTable();
-    await updateAdminStats();
-    app.applyFilters();
-    toast('Propiedad eliminada');
+    try {
+      state.properties = await store.remove(state.properties, id);
+      renderAdminTable();
+      await updateAdminStats();
+      app.applyFilters();
+      toast('Propiedad eliminada');
+    } catch (err) {
+      toast(err.message || 'Error al eliminar');
+    }
   }
 
   async function loadConfig() {
@@ -533,8 +541,8 @@ export function createAdmin(store, auth, state, app) {
     });
 
     document.getElementById('btnAddImageUrl')?.addEventListener('click', () => {
-      const url = getVal('formImageUrl').trim();
-      if (!url) return;
+      const url = safeUrl(getVal('formImageUrl').trim());
+      if (!url) { toast('URL inválida — usa http:// o https://'); return; }
       editorImages.push(url);
       setVal('formImageUrl', '');
       syncImagesToTextarea();

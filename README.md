@@ -2,6 +2,14 @@
 
 Sitio inmobiliario Chile — Vercel + Supabase.
 
+## Seguridad
+
+- Admin en producción: **Supabase Auth** (`admin@pewenche.cl`) — sin contraseña en el código JS.
+- Ejecuta `supabase/schema-v2-rls.sql` para RLS restringido al admin.
+- **Deshabilita sign-ups** en Supabase → Authentication → Providers → Email.
+- Formulario con honeypot anti-bots, validación de email y rate limit (60 s).
+- Headers CSP en Vercel (`vercel.json`).
+
 ## Desarrollo local
 
 ```powershell

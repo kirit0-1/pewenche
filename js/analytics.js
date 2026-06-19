@@ -4,10 +4,13 @@
 import { isSupabaseConfigured, getSupabase } from './supabase-client.js';
 import { hasApi, api, detectApi } from './api.js';
 import { isLocalDev } from './env.js';
+import { isValidEmail } from './utils.js';
 
 const CLICKS_KEY = 'pewenche_clicks';
 const LEADS_KEY = 'pewenche_leads';
 const LEADS_PING_KEY = 'pewenche_leads_ping';
+const LEAD_RATE_KEY = 'pewenche_last_lead_at';
+const MIN_LEAD_INTERVAL_MS = 60_000;
 
 function weekStart(d = new Date()) {
   const date = new Date(d);
@@ -110,8 +113,18 @@ export async function getTotalWeeklyClicks() {
 }
 
 export async function saveLead(payload) {
+  if (payload.website?.trim()) {
+    return { id: 'bot', propertyId: payload.propertyId, at: Date.now() };
+  }
   if (!payload.nombre?.trim() || !payload.email?.trim()) {
     throw new Error('Nombre y correo son obligatorios.');
+  }
+  if (!isValidEmail(payload.email)) {
+    throw new Error('Correo electrónico no válido.');
+  }
+  const last = parseInt(sessionStorage.getItem(LEAD_RATE_KEY) || '0', 10);
+  if (Date.now() - last < MIN_LEAD_INTERVAL_MS) {
+    throw new Error('Espera un momento antes de enviar otra consulta.');
   }
 
   if (isSupabaseConfigured()) {
@@ -127,6 +140,7 @@ export async function saveLead(payload) {
     };
     const { error } = await sb.from('leads').insert(lead);
     if (error) throw new Error(error.message);
+    sessionStorage.setItem(LEAD_RATE_KEY, String(Date.now()));
     notifyLeadsChanged();
     return { ...lead, propertyId: lead.property_id, propertyTitle: lead.property_title, at: Date.now() };
   }
