@@ -22,9 +22,16 @@ function loadExampleDefaults() {
   };
 }
 
+function normalizeSupabaseUrl(raw) {
+  return String(raw || '')
+    .trim()
+    .replace(/\/rest\/v1\/?$/i, '')
+    .replace(/\/+$/, '');
+}
+
 const defaults = loadExampleDefaults();
-const url = process.env.SUPABASE_URL || defaults.url;
-const key = process.env.SUPABASE_ANON_KEY || defaults.key;
+const url = normalizeSupabaseUrl(process.env.SUPABASE_URL || defaults.url);
+const key = (process.env.SUPABASE_ANON_KEY || defaults.key || '').trim();
 
 const configured = url && key && !url.includes('TU-PROYECTO') && key.length > 20;
 

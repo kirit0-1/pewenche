@@ -30,7 +30,10 @@
           colors: {
             verde: { 50:'#f0fdf4', 100:'#dcfce7', 400:'#4ade80', 500:'#22c55e', 600:'#16a34a', 700:'#15803d', 800:'#166534', 900:'#14532d' }
           },
-          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+          fontFamily: {
+            sans: ['Inter','system-ui','sans-serif'],
+            display: ['Playfair Display','Georgia','serif']
+          }
         }
       }
     }
@@ -38,7 +41,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
   <link rel="stylesheet" href="css/styles.css" />
 
@@ -279,85 +282,104 @@
 <!-- ═══ PÁGINA PRINCIPAL ═══ -->
 <div id="mainPage">
 
-  <header class="fixed top-0 left-0 right-0 z-50 bg-verde-600 text-white shadow-md">
-    <div class="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between gap-4">
-      <a href="#" data-action="reset-filters" class="flex items-center gap-2.5 shrink-0">
-        <svg width="30" height="30" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 4 L26 14 L32 10 L28 20 L36 18 L28 28 L30 24 L22 32 L22 38 L18 38 L18 32 L10 24 L12 28 L4 18 L12 20 L8 10 L14 14 Z" fill="#bbf7d0" stroke="#4ade80" stroke-width="1"/></svg>
-        <span class="font-bold text-xl tracking-tight">Pewenche</span>
-        <span class="text-green-200 text-xs font-light hidden sm:inline">Propiedades</span>
+  <header id="siteHeader" class="site-header site-header--hero fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-7xl mx-auto px-5 h-[4.25rem] flex items-center justify-between gap-4">
+      <a href="#" data-action="reset-filters" class="brand-link flex items-center gap-3 shrink-0">
+        <svg class="brand-mark" width="38" height="38" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <rect width="48" height="48" rx="11" fill="url(#pewGrad)"/>
+          <path d="M24 11 L35 22 H31 V35 H17 V22 H13 Z" fill="white" fill-opacity="0.96"/>
+          <rect x="21" y="26" width="6" height="9" rx="1" fill="#166534" fill-opacity="0.35"/>
+          <path d="M32 13 C34 10 37 11 38 14" stroke="#bbf7d0" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="38" cy="14" r="2" fill="#86efac"/>
+          <defs><linearGradient id="pewGrad" x1="4" y1="4" x2="44" y2="44"><stop stop-color="#14532d"/><stop offset="1" stop-color="#16a34a"/></linearGradient></defs>
+        </svg>
+        <span class="brand-text leading-tight">
+          <span class="brand-name block font-display text-lg tracking-tight">Pewenche</span>
+          <span class="brand-sub block text-[10px] uppercase tracking-[0.22em] font-medium opacity-80">Propiedades</span>
+        </span>
       </a>
 
-      <nav class="hidden md:flex items-center gap-1 text-sm font-medium" aria-label="Principal">
-        <a href="#" data-action="show-section" data-section="todas" class="nav-link px-4 py-2 rounded-full hover:bg-white/10 transition">Propiedades</a>
-        <a href="#" data-action="show-section" data-section="arriendo" class="nav-link px-4 py-2 rounded-full hover:bg-white/10 transition">Arriendos</a>
-        <a href="#" data-action="show-section" data-section="hostales" class="nav-link px-4 py-2 rounded-full hover:bg-white/10 transition">Hostales &amp; Campings</a>
-        <a href="#nosotros" class="px-4 py-2 rounded-full hover:bg-white/10 transition">Nosotros</a>
-        <a href="#contacto" class="px-4 py-2 rounded-full hover:bg-white/10 transition">Contacto</a>
+      <nav class="hidden md:flex items-center gap-0.5 text-sm font-medium" aria-label="Principal">
+        <a href="#" data-action="show-section" data-section="todas" class="nav-link px-4 py-2 rounded-lg transition">Propiedades</a>
+        <a href="#" data-action="show-section" data-section="arriendo" class="nav-link px-4 py-2 rounded-lg transition">Arriendos</a>
+        <a href="#" data-action="show-section" data-section="hostales" class="nav-link px-4 py-2 rounded-lg transition">Hostales &amp; Campings</a>
+        <a href="#nosotros" class="nav-link px-4 py-2 rounded-lg transition">Nosotros</a>
+        <a href="#contacto" data-action="show-contact" class="nav-link px-4 py-2 rounded-lg transition">Contacto</a>
       </nav>
 
       <div class="flex items-center gap-2">
-        <span id="ufIndicator" class="hidden sm:block text-xs text-green-200 bg-white/10 px-3 py-1 rounded-full" title="Valor UF actualizado cada 5 min"></span>
-        <button type="button" data-action="toggle-theme" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition" aria-label="Cambiar tema">
+        <span id="ufIndicator" class="header-uf hidden sm:block text-[11px] px-3 py-1 rounded-full font-medium" title="Valor UF actualizado cada 5 min"></span>
+        <button type="button" data-action="toggle-theme" class="header-icon-btn w-9 h-9 flex items-center justify-center rounded-lg transition" aria-label="Cambiar tema">
           <i id="themeIcon" class="fa-solid fa-moon"></i>
         </button>
-        <button type="button" data-action="toggle-menu" class="md:hidden w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+        <button type="button" data-action="toggle-menu" class="header-icon-btn md:hidden w-9 h-9 flex items-center justify-center rounded-lg transition" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
           <i id="menuIcon" class="fa-solid fa-bars"></i>
         </button>
       </div>
     </div>
 
-    <div id="mobileMenu" class="hidden md:hidden bg-verde-700 border-t border-verde-500 px-4 pb-4 space-y-1" aria-hidden="true">
-      <a href="#" data-action="show-section" data-section="todas" class="block px-4 py-2.5 rounded-xl hover:bg-white/10 text-sm font-medium">Propiedades</a>
-      <a href="#" data-action="show-section" data-section="arriendo" class="block px-4 py-2.5 rounded-xl hover:bg-white/10 text-sm font-medium">Arriendos</a>
-      <a href="#" data-action="show-section" data-section="hostales" class="block px-4 py-2.5 rounded-xl hover:bg-white/10 text-sm font-medium">Hostales &amp; Campings</a>
-      <a href="#nosotros" data-action="toggle-menu" class="block px-4 py-2.5 rounded-xl hover:bg-white/10 text-sm font-medium">Nosotros</a>
-      <a href="#contacto" data-action="toggle-menu" class="block px-4 py-2.5 rounded-xl hover:bg-white/10 text-sm font-medium">Contacto</a>
+    <div id="mobileMenu" class="hidden md:hidden mobile-menu-panel px-4 pb-4 space-y-0.5" aria-hidden="true">
+      <a href="#" data-action="show-section" data-section="todas" class="block px-4 py-2.5 rounded-lg text-sm font-medium">Propiedades</a>
+      <a href="#" data-action="show-section" data-section="arriendo" class="block px-4 py-2.5 rounded-lg text-sm font-medium">Arriendos</a>
+      <a href="#" data-action="show-section" data-section="hostales" class="block px-4 py-2.5 rounded-lg text-sm font-medium">Hostales &amp; Campings</a>
+      <a href="#nosotros" data-action="toggle-menu" class="block px-4 py-2.5 rounded-lg text-sm font-medium">Nosotros</a>
+      <a href="#contacto" data-action="show-contact" class="block px-4 py-2.5 rounded-lg text-sm font-medium">Contacto</a>
     </div>
   </header>
 
-  <section class="hero-bg pt-16">
-    <div class="max-w-4xl mx-auto px-5 pt-16 pb-14 text-center text-white">
-      <p class="text-green-200 text-sm font-semibold uppercase tracking-widest mb-3">Propiedades en Chile</p>
-      <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight mb-4">Encuentra tu lugar<br class="hidden sm:block"/> en la naturaleza.</h1>
-      <p class="text-green-100 text-lg mb-8 max-w-xl mx-auto leading-relaxed">Casas, departamentos, terrenos, hostales y campings en todo Chile.</p>
+  <section class="hero-bg pt-[4.25rem]">
+    <div class="max-w-5xl mx-auto px-5 pt-20 pb-16 sm:pt-24 sm:pb-20 text-center text-white">
+      <p class="hero-eyebrow text-xs sm:text-sm font-semibold uppercase tracking-[0.28em] mb-5 opacity-90">Corretaje inmobiliario · Chile</p>
+      <h1 class="font-display text-4xl sm:text-5xl lg:text-[3.35rem] font-bold leading-[1.12] mb-5 max-w-3xl mx-auto">El lugar correcto, con la confianza que mereces</h1>
+      <p class="hero-lead text-base sm:text-lg mb-10 max-w-2xl mx-auto leading-relaxed font-light opacity-95">Explora viviendas en venta, arriendos y alojamiento turístico con asesoría clara, información verificada y acompañamiento profesional en todo el territorio nacional.</p>
 
-      <div class="flex flex-wrap justify-center gap-6 mb-10 text-sm text-green-100">
-        <span><i class="fa-solid fa-house mr-1"></i> 50+ propiedades</span>
-        <span><i class="fa-solid fa-map mr-1"></i> 16 regiones</span>
-        <span><i class="fa-solid fa-clock mr-1"></i> Respuesta en 24h</span>
+      <div class="hero-trust flex flex-wrap justify-center gap-x-8 gap-y-3 mb-12 text-sm">
+        <span class="inline-flex items-center gap-2"><i class="fa-solid fa-shield-halved opacity-80"></i> Propiedades verificadas</span>
+        <span class="inline-flex items-center gap-2"><i class="fa-solid fa-map-location-dot opacity-80"></i> Cobertura nacional</span>
+        <span class="inline-flex items-center gap-2"><i class="fa-solid fa-user-tie opacity-80"></i> Asesoría personalizada</span>
       </div>
 
-      <div class="hero-search-box bg-white dark:bg-zinc-900 rounded-2xl p-3 shadow-2xl max-w-3xl mx-auto">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-          <label class="sr-only" for="heroTipo">Tipo</label>
-          <select id="heroTipo" class="form-select w-full bg-gray-50 dark:bg-zinc-800 dark:text-white border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-verde-700 focus:outline-none">
-            <option value="">Todos los tipos</option>
-            <option value="venta">En Venta</option>
-            <option value="arriendo">En Arriendo</option>
-            <option value="hostal">Hostal</option>
-            <option value="camping">Camping</option>
-            <option value="terreno">Terreno / Sitio</option>
-          </select>
-          <label class="sr-only" for="heroRegion">Región</label>
-          <select id="heroRegion" class="form-select w-full bg-gray-50 dark:bg-zinc-800 dark:text-white border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-verde-700 focus:outline-none">
-            <option value="">Todas las regiones</option>
-          </select>
-          <label class="sr-only" for="searchQuery">Buscar</label>
-          <input id="searchQuery" type="search" placeholder="Buscar comuna, título…" class="w-full bg-gray-50 dark:bg-zinc-800 dark:text-white border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-verde-700 focus:outline-none" />
-          <button type="button" data-action="apply-filters" class="btn-verde w-full py-3 text-sm flex items-center justify-center gap-2">
-            <i class="fa-solid fa-magnifying-glass"></i> Buscar
-          </button>
+      <form id="heroSearchForm" class="formal-search max-w-4xl mx-auto text-left" role="search">
+        <p class="formal-search-title text-center text-[11px] uppercase tracking-[0.2em] font-semibold mb-4 opacity-90">Buscar propiedad</p>
+        <div class="formal-search-grid">
+          <div class="formal-search-field">
+            <label for="heroTipo">Tipo</label>
+            <select id="heroTipo" class="form-select formal-search-input">
+              <option value="">Todos los tipos</option>
+              <option value="venta">En venta</option>
+              <option value="arriendo">En arriendo</option>
+              <option value="hostal">Hostal</option>
+              <option value="camping">Camping</option>
+              <option value="terreno">Terreno / sitio</option>
+            </select>
+          </div>
+          <div class="formal-search-field">
+            <label for="heroRegion">Región</label>
+            <select id="heroRegion" class="form-select formal-search-input">
+              <option value="">Todas las regiones</option>
+            </select>
+          </div>
+          <div class="formal-search-field formal-search-field--grow">
+            <label for="searchQuery">Ubicación o palabra clave</label>
+            <input id="searchQuery" type="search" placeholder="Comuna, título o referencia…" class="formal-search-input" />
+          </div>
+          <div class="formal-search-field formal-search-field--btn">
+            <span class="formal-search-label-spacer" aria-hidden="true"></span>
+            <button type="submit" class="formal-search-btn">
+              <i class="fa-solid fa-magnifying-glass"></i> Buscar
+            </button>
+          </div>
         </div>
-        <button type="button" data-action="clear-hero-filters" class="mt-2 w-full text-xs text-gray-400 hover:text-verde-600 dark:hover:text-green-400 py-1 transition">
-          <i class="fa-solid fa-rotate-left mr-1"></i>Limpiar búsqueda
+        <button type="button" data-action="clear-hero-filters" class="formal-search-clear">
+          <i class="fa-solid fa-rotate-left mr-1"></i>Restablecer criterios de búsqueda
         </button>
-      </div>
+      </form>
     </div>
   </section>
 
-  <div class="max-w-7xl mx-auto px-5 pt-10 pb-2 flex flex-wrap items-center justify-between gap-4 mobile-filter-bar">
+  <div id="listado" class="max-w-7xl mx-auto px-5 pt-10 pb-2 flex flex-wrap items-center justify-between gap-4 mobile-filter-bar">
     <div class="min-w-0 flex-1">
-      <h2 id="sectionTitle" class="text-xl sm:text-2xl font-bold">Todas las propiedades</h2>
+      <h2 id="sectionTitle" class="font-serif text-xl sm:text-2xl font-bold">Todas las propiedades</h2>
       <p id="resultCount" class="text-gray-400 text-sm mt-0.5">Cargando…</p>
     </div>
     <div class="flex items-center gap-2 w-full sm:w-auto">
@@ -378,6 +400,8 @@
       </select>
     </div>
   </div>
+
+  <div id="activeFilters" class="max-w-7xl mx-auto px-5 pb-3 hidden" aria-live="polite"></div>
 
   <div class="max-w-7xl mx-auto px-5 py-6 flex gap-8 items-start">
     <aside class="hidden lg:block w-60 shrink-0 sticky top-24 space-y-5" aria-label="Filtros">
@@ -423,68 +447,150 @@
         <p class="text-gray-400 text-sm mb-6">No hay propiedades que coincidan con tu búsqueda.</p>
         <button type="button" data-action="reset-filters" class="btn-verde px-6 py-2.5 text-sm">Ver todas las propiedades</button>
       </div>
+      <div id="loadMoreWrap" class="hidden text-center mt-10">
+        <p id="loadMoreHint" class="text-xs text-gray-400 mb-3"></p>
+        <button type="button" id="loadMoreBtn" data-action="load-more" class="load-more-btn">
+          <i class="fa-solid fa-chevron-down mr-2"></i>Ver más propiedades
+        </button>
+      </div>
     </section>
   </div>
 
   <!-- Nosotros -->
-  <section id="nosotros" class="bg-verde-50 dark:bg-zinc-900/50 border-t border-gray-100 dark:border-zinc-800 py-16">
-    <div class="max-w-4xl mx-auto px-5 text-center">
-      <p class="text-verde-700 dark:text-green-400 text-sm font-semibold uppercase tracking-widest mb-2">Quiénes somos</p>
-      <h2 class="text-3xl font-bold mb-4">Tu aliado inmobiliario en Chile</h2>
-      <p class="text-gray-600 dark:text-zinc-400 leading-relaxed max-w-2xl mx-auto mb-10">
-        En Pewenche conectamos personas con propiedades únicas: desde departamentos urbanos hasta terrenos en la Patagonia,
-        hostales con vista al mar y campings junto a ríos de aguas cristalinas. Asesoría personalizada y respuesta rápida.
+  <section id="nosotros" class="about-section py-20 sm:py-24 border-t border-gray-100 dark:border-zinc-800">
+    <div class="max-w-5xl mx-auto px-5 text-center">
+      <p class="section-eyebrow">Quiénes somos</p>
+      <h2 class="font-display text-3xl sm:text-4xl font-bold mb-5">Inmobiliaria con respaldo y transparencia</h2>
+      <p class="text-gray-600 dark:text-zinc-400 leading-relaxed max-w-2xl mx-auto mb-12 text-base sm:text-lg">
+        Pewenche Propiedades conecta a familias, inversionistas y viajeros con oportunidades reales en venta, arriendo y turismo.
+        Cada publicación es revisada con criterios profesionales para que explores, compares y decidas con tranquilidad.
       </p>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
-        <div class="bg-white dark:bg-zinc-800 rounded-2xl p-6 border border-gray-100 dark:border-zinc-700">
+        <div class="about-card">
           <i class="fa-solid fa-handshake text-verde-700 dark:text-green-400 text-2xl mb-3"></i>
-          <h3 class="font-bold mb-1">Asesoría directa</h3>
-          <p class="text-gray-500 dark:text-zinc-400 text-sm">Te acompañamos en cada paso, sin intermediarios innecesarios.</p>
+          <h3 class="font-semibold mb-2">Asesoría directa</h3>
+          <p class="text-gray-500 dark:text-zinc-400 text-sm leading-relaxed">Acompañamiento en cada etapa, con información clara y sin intermediación innecesaria.</p>
         </div>
-        <div class="bg-white dark:bg-zinc-800 rounded-2xl p-6 border border-gray-100 dark:border-zinc-700">
-          <i class="fa-solid fa-mountain-sun text-verde-700 dark:text-green-400 text-2xl mb-3"></i>
-          <h3 class="font-bold mb-1">Cobertura nacional</h3>
-          <p class="text-gray-500 dark:text-zinc-400 text-sm">Propiedades en las 16 regiones de Chile, urbanas y rurales.</p>
+        <div class="about-card">
+          <i class="fa-solid fa-building-shield text-verde-700 dark:text-green-400 text-2xl mb-3"></i>
+          <h3 class="font-semibold mb-2">Portafolio verificado</h3>
+          <p class="text-gray-500 dark:text-zinc-400 text-sm leading-relaxed">Viviendas, arriendos, hostales y campings seleccionados en las 16 regiones del país.</p>
         </div>
-        <div class="bg-white dark:bg-zinc-800 rounded-2xl p-6 border border-gray-100 dark:border-zinc-700">
-          <i class="fa-solid fa-bolt text-verde-700 dark:text-green-400 text-2xl mb-3"></i>
-          <h3 class="font-bold mb-1">Respuesta rápida</h3>
-          <p class="text-gray-500 dark:text-zinc-400 text-sm">Respondemos por WhatsApp en <span data-contact="response">menos de 24 horas</span>.</p>
+        <div class="about-card">
+          <i class="fa-solid fa-clock text-verde-700 dark:text-green-400 text-2xl mb-3"></i>
+          <h3 class="font-semibold mb-2">Respuesta oportuna</h3>
+          <p class="text-gray-500 dark:text-zinc-400 text-sm leading-relaxed">Atención personalizada con respuesta en <span data-contact="response">menos de 24 horas</span>.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Contacto -->
-  <section id="contacto" class="contact-section py-16 sm:py-20">
-    <div class="max-w-4xl mx-auto px-5 text-center">
-      <p class="text-verde-600 dark:text-green-400 text-sm font-bold uppercase tracking-widest mb-2">¿Tienes dudas?</p>
-      <h2 class="text-3xl sm:text-4xl font-extrabold mb-3 text-zinc-900 dark:text-white">Contáctanos</h2>
-      <p class="text-zinc-600 dark:text-zinc-300 mb-10 max-w-lg mx-auto text-base">Escríbenos por WhatsApp, correo o redes. Te respondemos en <span data-contact="response">menos de 24 horas</span>.</p>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <a data-contact="whatsapp" data-wa-text="Hola, quiero más información" target="_blank" rel="noopener" class="contact-card rounded-2xl p-6 transition flex flex-col items-center gap-3">
-          <div class="w-14 h-14 bg-[#25D366]/15 rounded-2xl flex items-center justify-center ring-2 ring-[#25D366]/30"><i class="fa-brands fa-whatsapp text-3xl text-[#25D366]"></i></div>
-          <div><p class="font-bold text-lg">WhatsApp</p><p class="text-zinc-500 dark:text-zinc-300 text-sm font-medium" data-contact="whatsapp-display"></p></div>
-        </a>
-        <a data-contact="email" data-fill="true" class="contact-card rounded-2xl p-6 transition flex flex-col items-center gap-3">
-          <div class="w-14 h-14 bg-verde-100 dark:bg-verde-900/40 rounded-2xl flex items-center justify-center ring-2 ring-verde-400/40"><i class="fa-solid fa-envelope text-3xl text-verde-600 dark:text-green-400"></i></div>
-          <div><p class="font-bold text-lg">Correo</p><p class="text-zinc-500 dark:text-zinc-300 text-sm font-medium"></p></div>
-        </a>
-        <a data-contact="instagram" data-fill="true" target="_blank" rel="noopener" class="contact-card rounded-2xl p-6 transition flex flex-col items-center gap-3">
-          <div class="w-14 h-14 bg-gradient-to-br from-purple-500/15 to-pink-500/15 rounded-2xl flex items-center justify-center ring-2 ring-pink-400/30"><i class="fa-brands fa-instagram text-3xl text-pink-500"></i></div>
-          <div><p class="font-bold text-lg">Instagram</p><p class="text-zinc-500 dark:text-zinc-300 text-sm font-medium"></p></div>
-        </a>
+  <section id="contacto" class="contact-section py-16 sm:py-24">
+    <div class="max-w-6xl mx-auto px-5">
+      <div class="text-center mb-12 sm:mb-14">
+        <p class="section-eyebrow">Atención al cliente</p>
+        <h2 class="font-display text-3xl sm:text-4xl font-bold mb-4 text-zinc-900 dark:text-white">Contáctanos</h2>
+        <p class="text-zinc-600 dark:text-zinc-300 max-w-xl mx-auto text-base leading-relaxed">
+          Canales oficiales de Pewenche Propiedades. Escríbenos, déjanos tu consulta o contáctanos directamente por WhatsApp.
+        </p>
+      </div>
+
+      <div class="contact-layout grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+        <div class="contact-channels-panel">
+          <h3 class="contact-panel-title">Canales de contacto</h3>
+          <div class="contact-table-wrap overflow-x-auto">
+            <table class="contact-table w-full text-sm">
+              <thead>
+                <tr>
+                  <th scope="col">Canal</th>
+                  <th scope="col">Detalle</th>
+                  <th scope="col" class="text-right">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="contact-channel"><i class="fa-brands fa-whatsapp text-[#25D366]"></i> WhatsApp</span></td>
+                  <td class="font-medium" data-contact="whatsapp-display"></td>
+                  <td class="text-right"><a data-contact="whatsapp" data-wa-text="Hola, quiero información sobre Pewenche Propiedades" target="_blank" rel="noopener" class="contact-table-link">Escribir</a></td>
+                </tr>
+                <tr>
+                  <td><span class="contact-channel"><i class="fa-solid fa-envelope text-verde-700"></i> Correo</span></td>
+                  <td class="font-medium" data-contact="email-display"></td>
+                  <td class="text-right"><a data-contact="email" class="contact-table-link">Enviar</a></td>
+                </tr>
+                <tr>
+                  <td><span class="contact-channel"><i class="fa-brands fa-instagram text-pink-500"></i> Instagram</span></td>
+                  <td class="font-medium" data-contact="instagramHandle"></td>
+                  <td class="text-right"><a data-contact="instagram" target="_blank" rel="noopener" class="contact-table-link">Seguir</a></td>
+                </tr>
+                <tr>
+                  <td><span class="contact-channel"><i class="fa-brands fa-facebook-f text-[#1877F2]"></i> Facebook</span></td>
+                  <td class="font-medium">Pewenche Propiedades</td>
+                  <td class="text-right"><a data-contact="facebook" target="_blank" rel="noopener" class="contact-table-link">Visitar</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="contact-note text-xs text-zinc-500 dark:text-zinc-400 mt-4 leading-relaxed">
+            Horario de respuesta: <span data-contact="response">menos de 24 horas</span> en días hábiles.
+          </p>
+        </div>
+
+        <div class="contact-form-panel">
+          <h3 class="contact-panel-title">Envíanos un mensaje</h3>
+          <form id="contactForm" class="contact-form space-y-4" novalidate>
+            <div class="hidden" aria-hidden="true">
+              <label for="contactWebsite">Sitio web</label>
+              <input id="contactWebsite" name="website" type="text" tabindex="-1" autocomplete="off" />
+            </div>
+            <div>
+              <label for="contactNombre" class="contact-label">Nombre completo</label>
+              <input id="contactNombre" name="nombre" type="text" required autocomplete="name" class="contact-input" placeholder="Tu nombre" />
+            </div>
+            <div>
+              <label for="contactEmail" class="contact-label">Correo electrónico</label>
+              <input id="contactEmail" name="email" type="email" required autocomplete="email" class="contact-input" placeholder="tu@correo.cl" />
+            </div>
+            <div>
+              <label for="contactMensaje" class="contact-label">Mensaje o consulta</label>
+              <textarea id="contactMensaje" name="mensaje" rows="4" class="contact-input resize-none" placeholder="Cuéntanos qué tipo de propiedad buscas o en qué podemos ayudarte…"></textarea>
+            </div>
+            <button type="submit" class="contact-submit-btn">
+              <i class="fa-solid fa-paper-plane mr-2"></i>Enviar consulta
+            </button>
+            <p id="contactFormStatus" class="text-xs text-center min-h-[1rem]" role="status"></p>
+          </form>
+        </div>
+      </div>
+
+      <div class="contact-wa-strip mt-10 sm:mt-12">
+        <div class="contact-wa-inner">
+          <div class="flex-1 min-w-0">
+            <p class="text-xs uppercase tracking-[0.18em] font-semibold opacity-80 mb-1">Atención inmediata</p>
+            <p class="font-serif text-xl sm:text-2xl font-bold mb-1">¿Prefieres hablar ahora?</p>
+            <p class="text-sm opacity-90">Escríbenos por WhatsApp y te orientamos sobre arriendos, ventas o alojamiento.</p>
+          </div>
+          <a data-contact="whatsapp" data-wa-text="Hola, me gustaría recibir asesoría de Pewenche Propiedades" target="_blank" rel="noopener" class="contact-wa-btn shrink-0">
+            <i class="fa-brands fa-whatsapp text-2xl"></i>
+            <span>Abrir WhatsApp</span>
+          </a>
+        </div>
       </div>
     </div>
   </section>
 
   <footer class="bg-zinc-900 text-white py-12">
     <div class="max-w-7xl mx-auto px-5 flex flex-col sm:flex-row items-center justify-between gap-6">
-      <div class="flex items-center gap-2.5">
-        <svg width="24" height="24" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 4 L26 14 L32 10 L28 20 L36 18 L28 28 L30 24 L22 32 L22 38 L18 38 L18 32 L10 24 L12 28 L4 18 L12 20 L8 10 L14 14 Z" fill="#bbf7d0"/></svg>
-        <span class="font-bold text-lg">Pewenche Propiedades</span>
+      <div class="flex items-center gap-3">
+        <svg class="brand-mark brand-mark--sm" width="28" height="28" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <rect width="48" height="48" rx="11" fill="url(#pewGradFoot)"/>
+          <path d="M24 11 L35 22 H31 V35 H17 V22 H13 Z" fill="white" fill-opacity="0.96"/>
+          <defs><linearGradient id="pewGradFoot" x1="4" y1="4" x2="44" y2="44"><stop stop-color="#14532d"/><stop offset="1" stop-color="#16a34a"/></linearGradient></defs>
+        </svg>
+        <span class="font-serif font-semibold text-lg">Pewenche Propiedades</span>
       </div>
-      <p class="text-zinc-400 text-sm text-center">Propiedades, arriendos, terrenos, hostales y campings en Chile.</p>
+      <p class="text-zinc-400 text-sm text-center max-w-md">Corretaje inmobiliario · venta, arriendo y alojamiento en Chile.</p>
       <div class="flex items-center gap-5">
         <a data-contact="whatsapp" data-wa-text="Hola" target="_blank" rel="noopener" class="text-zinc-400 hover:text-[#25D366] transition text-2xl" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
         <a data-contact="instagram" target="_blank" rel="noopener" class="text-zinc-400 hover:text-pink-400 transition text-2xl" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
@@ -499,6 +605,10 @@
     </p>
   </footer>
 </div>
+
+<button type="button" id="scrollTopBtn" data-action="scroll-top" class="scroll-top-btn hidden" aria-label="Volver arriba">
+  <i class="fa-solid fa-chevron-up"></i>
+</button>
 
 <a data-contact="whatsapp" data-wa-text="Hola, me interesa una propiedad de Pewenche" target="_blank" rel="noopener" id="waFloat"
    class="fixed bottom-6 right-6 z-40 w-14 h-14 bg-[#25D366] hover:bg-[#1ebe5d] rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all"

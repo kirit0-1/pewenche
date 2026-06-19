@@ -1,19 +1,32 @@
 import {
-  BADGE, CONTACT, FALLBACK_IMAGE, REGIONES, SECTION_MAP,
+  BADGE, CONTACT, FALLBACK_IMAGE, LIST_PAGE_SIZE, REGIONES, SECTION_MAP,
 } from './config.js';
 import {
-  debounce, filterBySearch, getVal, h, setVal, sortProperties, waLink,
+  debounce, filterBySearch, getVal, h, setVal, sortProperties, toast, waLink,
 } from './utils.js';
-import { trackClick } from './analytics.js';
+import { trackClick, saveLead } from './analytics.js';
 import { clpFromUF, getUF, getUFDate, onUFChange } from './uf.js';
 
 const cardIdx = {};
 let mIdx = 0;
 let mImgs = [];
 let currentSection = 'todas';
+let filteredList = [];
+let visibleCount = LIST_PAGE_SIZE;
+
+const TIPO_LABELS = {
+  venta: 'En venta',
+  arriendo: 'En arriendo',
+  hostal: 'Hostal',
+  camping: 'Camping',
+  terreno: 'Terreno',
+};
 
 export function createApp(store, state) {
-  const debouncedApply = debounce(() => applyFilters(state), 280);
+  const debouncedApply = debounce(() => {
+    syncAllFilterFields();
+    applyFilters(state);
+  }, 280);
 
   function populateRegionSelects() {
     ['heroRegion', 'sideRegion', 'formRegion'].forEach(id => {
@@ -37,17 +50,15 @@ export function createApp(store, state) {
     });
     document.querySelectorAll('[data-contact="email"]').forEach(el => {
       el.href = `mailto:${CONTACT.email}`;
-      if (el.dataset.fill) {
-        const p = el.querySelector('p.text-gray-400, p.text-sm, p.text-zinc-500');
-        if (p) p.textContent = CONTACT.email;
-      }
+    });
+    document.querySelectorAll('[data-contact="email-display"]').forEach(el => {
+      el.textContent = CONTACT.email;
     });
     document.querySelectorAll('[data-contact="instagram"]').forEach(el => {
       el.href = CONTACT.instagram;
-      if (el.dataset.fill) {
-        const p = el.querySelector('p.text-gray-400, p.text-sm, p.text-zinc-500');
-        if (p) p.textContent = CONTACT.instagramHandle;
-      }
+    });
+    document.querySelectorAll('[data-contact="instagramHandle"]').forEach(el => {
+      el.textContent = CONTACT.instagramHandle;
     });
     document.querySelectorAll('[data-contact="facebook"]').forEach(el => {
       el.href = CONTACT.facebook;
@@ -57,6 +68,148 @@ export function createApp(store, state) {
     });
   }
 
+  function showContact() {
+    document.querySelectorAll('.nav-link').forEach(a => {
+      a.classList.toggle('active-nav', a.dataset.action === 'show-contact');
+    });
+    const section = document.getElementById('contacto');
+    if (!section) return;
+    section.classList.remove('contact-section--highlight');
+    void section.offsetWidth;
+    section.classList.add('contact-section--highlight');
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => document.getElementById('contactNombre')?.focus(), 450);
+  }
+
+  function initHeaderScroll() {
+    const header = document.getElementById('siteHeader');
+    if (!header) return;
+    const onScroll = () => {
+      const scrolled = window.scrollY > 48;
+      header.classList.toggle('site-header--scrolled', scrolled);
+      header.classList.toggle('site-header--hero', !scrolled);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  async function submitContactForm(e) {
+    e.preventDefault();
+    const form = e.target;
+    const status = document.getElementById('contactFormStatus');
+    const btn = form.querySelector('button[type="submit"]');
+    const fd = new FormData(form);
+    btn.disabled = true;
+    if (status) {
+      status.textContent = 'Enviando…';
+      status.className = 'text-xs text-center min-h-[1rem] text-zinc-500';
+    }
+    try {
+      await saveLead({
+        propertyId: 'general',
+        propertyTitle: 'Consulta desde contacto',
+        nombre: fd.get('nombre'),
+        email: fd.get('email'),
+        mensaje: fd.get('mensaje'),
+        website: fd.get('website'),
+      });
+      form.reset();
+      if (status) {
+        status.textContent = 'Consulta enviada. Te responderemos pronto.';
+        status.className = 'text-xs text-center min-h-[1rem] text-verde-700 dark:text-green-400';
+      }
+      toast('Consulta enviada correctamente.');
+    } catch (err) {
+      if (status) {
+        status.textContent = err.message || 'No se pudo enviar.';
+        status.className = 'text-xs text-center min-h-[1rem] text-red-600';
+      }
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function syncAllFilterFields() {
+    setVal('mobileFilterTipo', getVal('heroTipo'));
+    setVal('sideRegion', getVal('heroRegion'));
+  }
+
+  function updateActiveFilters() {
+    const wrap = document.getElementById('activeFilters');
+    if (!wrap) return;
+    const chips = [];
+    const tipo = getVal('heroTipo');
+    const region = getVal('heroRegion');
+    const search = getVal('searchQuery').trim();
+    const maxUF = parseFloat(getVal('sidePrecioMax')) || 0;
+    const sectionTipos = SECTION_MAP[currentSection] || [];
+
+    if (sectionTipos.length) {
+      const label = currentSection === 'arriendo' ? 'Arriendos' : 'Hostales & Campings';
+      chips.push({ key: 'section', label });
+    }
+    if (tipo) chips.push({ key: 'tipo', label: TIPO_LABELS[tipo] || tipo });
+    if (region) chips.push({ key: 'region', label: region });
+    if (search) chips.push({ key: 'search', label: `"${search}"` });
+    if (maxUF) chips.push({ key: 'precio', label: `≤ ${maxUF.toLocaleString('es-CL')} UF` });
+
+    if (!chips.length) {
+      wrap.classList.add('hidden');
+      wrap.innerHTML = '';
+      return;
+    }
+
+    wrap.classList.remove('hidden');
+    wrap.innerHTML = `
+      <div class="active-filters-inner">
+        <span class="active-filters-label"><i class="fa-solid fa-filter mr-1"></i>Filtros activos:</span>
+        ${chips.map(c => `
+          <button type="button" class="filter-chip" data-action="clear-filter" data-filter="${c.key}">
+            ${h(c.label)} <i class="fa-solid fa-xmark ml-1 text-[10px]"></i>
+          </button>
+        `).join('')}
+        <button type="button" class="filter-chip filter-chip--clear" data-action="reset-filters">Limpiar todo</button>
+      </div>`;
+  }
+
+  function clearFilter(key) {
+    switch (key) {
+      case 'section':
+        currentSection = 'todas';
+        state.currentSection = 'todas';
+        document.getElementById('sectionTitle').textContent = 'Todas las propiedades';
+        setActiveNav('todas');
+        break;
+      case 'tipo':
+        setVal('heroTipo', '');
+        setVal('mobileFilterTipo', '');
+        break;
+      case 'region':
+        setVal('heroRegion', '');
+        setVal('sideRegion', '');
+        break;
+      case 'search':
+        setVal('searchQuery', '');
+        break;
+      case 'precio':
+        setVal('sidePrecioMax', '');
+        break;
+      default:
+        break;
+    }
+    applyFilters(state);
+  }
+
+  function searchAndScroll() {
+    syncAllFilterFields();
+    applyFilters(state);
+    document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function loadMore() {
+    visibleCount += LIST_PAGE_SIZE;
+    renderGrid();
+  }
   function showSection(name) {
     currentSection = name;
     state.currentSection = name;
@@ -74,11 +227,15 @@ export function createApp(store, state) {
     setVal('searchQuery', '');
     setActiveNav(name);
     applyFilters(state);
-    document.getElementById('propertiesGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function setActiveNav(name) {
     document.querySelectorAll('.nav-link').forEach(a => {
+      if (a.dataset.action === 'show-contact') {
+        a.classList.remove('active-nav');
+        return;
+      }
       a.classList.toggle('active-nav', a.dataset.section === name);
     });
   }
@@ -113,7 +270,10 @@ export function createApp(store, state) {
       btn.classList.toggle('active', btn.dataset.tipo === tipo);
     });
 
-    renderGrid(list);
+    filteredList = list;
+    visibleCount = LIST_PAGE_SIZE;
+    updateActiveFilters();
+    renderGrid();
   }
 
   function setSidebarTipo(tipo) {
@@ -126,7 +286,7 @@ export function createApp(store, state) {
   }
 
   function clearHeroFilters() {
-    ['heroTipo', 'heroRegion', 'searchQuery', 'mobileFilterTipo'].forEach(id => setVal(id, ''));
+    ['heroTipo', 'heroRegion', 'sideRegion', 'sidePrecioMax', 'searchQuery', 'mobileFilterTipo'].forEach(id => setVal(id, ''));
     applyFilters(state);
   }
 
@@ -217,19 +377,46 @@ export function createApp(store, state) {
   }
 
   function renderGrid(list) {
+    if (Array.isArray(list)) {
+      filteredList = list;
+      visibleCount = LIST_PAGE_SIZE;
+    }
+
     const grid = document.getElementById('propertiesGrid');
     const empty = document.getElementById('emptyState');
     const count = document.getElementById('resultCount');
+    const loadWrap = document.getElementById('loadMoreWrap');
+    const loadHint = document.getElementById('loadMoreHint');
+    const loadBtn = document.getElementById('loadMoreBtn');
     grid.innerHTML = '';
 
-    if (!list.length) {
+    if (!filteredList.length) {
       empty.classList.remove('hidden');
+      loadWrap?.classList.add('hidden');
       count.textContent = 'Sin resultados';
       return;
     }
+
     empty.classList.add('hidden');
-    count.textContent = `${list.length} propiedad${list.length !== 1 ? 'es' : ''} encontrada${list.length !== 1 ? 's' : ''}`;
-    list.forEach((p, i) => grid.appendChild(buildCard(p, i)));
+    const shown = filteredList.slice(0, visibleCount);
+    const total = filteredList.length;
+    const remaining = total - shown.length;
+
+    count.textContent = total === shown.length
+      ? `${total} propiedad${total !== 1 ? 'es' : ''} encontrada${total !== 1 ? 's' : ''}`
+      : `Mostrando ${shown.length} de ${total} propiedades`;
+
+    shown.forEach((p, i) => grid.appendChild(buildCard(p, i)));
+
+    if (loadWrap && loadBtn) {
+      if (remaining > 0) {
+        loadWrap.classList.remove('hidden');
+        loadHint.textContent = `${remaining} publicación${remaining !== 1 ? 'es' : ''} más disponible${remaining !== 1 ? 's' : ''}`;
+        loadBtn.innerHTML = `<i class="fa-solid fa-chevron-down mr-2"></i>Ver más (${remaining})`;
+      } else {
+        loadWrap.classList.add('hidden');
+      }
+    }
   }
 
   function setCI(id, i) {
@@ -295,6 +482,14 @@ export function createApp(store, state) {
     updateUFIndicator();
   }
 
+  function initScrollTop() {
+    const btn = document.getElementById('scrollTopBtn');
+    if (!btn) return;
+    const toggle = () => btn.classList.toggle('hidden', window.scrollY < 400);
+    window.addEventListener('scroll', toggle, { passive: true });
+    toggle();
+  }
+
   function bindEvents(st) {
     document.getElementById('propertiesGrid').addEventListener('click', e => {
       const btn = e.target.closest('[data-action]');
@@ -315,6 +510,11 @@ export function createApp(store, state) {
       if (e.target.id === 'detailModal') closeDetail();
     });
 
+    document.getElementById('heroSearchForm')?.addEventListener('submit', e => {
+      e.preventDefault();
+      searchAndScroll();
+    });
+
     document.getElementById('searchQuery')?.addEventListener('input', () => debouncedApply());
     document.getElementById('searchQuery')?.addEventListener('search', () => applyFilters(st));
     ['heroTipo', 'heroRegion', 'sideRegion', 'sidePrecioMax', 'mobileFilterTipo', 'sortBy'].forEach(id => {
@@ -330,13 +530,28 @@ export function createApp(store, state) {
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') closeDetail();
     });
+
+    document.getElementById('contactForm')?.addEventListener('submit', submitContactForm);
+    initHeaderScroll();
+    initScrollTop();
+
+    if (location.hash === '#contacto') {
+      setTimeout(() => showContact(), 300);
+    }
+    window.addEventListener('hashchange', () => {
+      if (location.hash === '#contacto') showContact();
+    });
   }
 
   return {
     populateRegionSelects,
     injectContactLinks,
     showSection,
-    applyFilters: () => applyFilters(state),
+    showContact,
+    searchAndScroll,
+    loadMore,
+    clearFilter,
+    applyFilters: () => { syncAllFilterFields(); applyFilters(state); },
     setSidebarTipo,
     resetFilters: () => resetFilters(state),
     clearHeroFilters: () => clearHeroFilters(),

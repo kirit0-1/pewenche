@@ -61,8 +61,7 @@ async function init() {
     admin.bindEvents();
 
     document.getElementById('siteYear').textContent = SITE.year;
-    document.getElementById('resultCount').textContent = `${state.properties.length} propiedades disponibles`;
-    app.renderGrid(state.properties);
+    app.applyFilters();
     app.setActiveNav('todas');
 
     if (auth.isAuthenticated()) admin.showPanel();
@@ -104,7 +103,10 @@ document.addEventListener('click', e => {
     'toggle-theme': () => app?.toggleTheme(),
     'toggle-menu': () => app?.toggleMobileMenu(),
     'toggle-admin-menu': () => admin?.toggleMobileSidebar?.(),
-    'apply-filters': () => app?.applyFilters(),
+    'apply-filters': () => app?.searchAndScroll(),
+    'load-more': () => app?.loadMore(),
+    'clear-filter': () => app?.clearFilter(el.dataset.filter),
+    'scroll-top': () => window.scrollTo({ top: 0, behavior: 'smooth' }),
     'clear-hero-filters': () => app?.clearHeroFilters(),
     'reset-filters': () => { e.preventDefault(); app?.resetFilters(); },
     'sidebar-tipo': () => app?.setSidebarTipo(el.dataset.tipo),
@@ -117,11 +119,12 @@ document.addEventListener('click', e => {
     'close-detail': () => app?.closeDetail(),
     'logout-admin': () => admin?.logoutAdmin(),
     'show-section': () => { e.preventDefault(); app?.showSection(el.dataset.section); },
+    'show-contact': () => { e.preventDefault(); app?.showContact(); if (el.closest('#mobileMenu')) app?.toggleMobileMenu(); },
   };
 
   const fn = handlers[action];
   if (fn) {
-    if (!['reset-filters', 'show-section'].includes(action)) e.preventDefault();
+    if (!['reset-filters', 'show-section', 'show-contact'].includes(action)) e.preventDefault();
     fn();
     if (action === 'show-section' && el.closest('#mobileMenu')) app?.toggleMobileMenu();
   }

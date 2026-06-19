@@ -36,6 +36,9 @@ export const ADMIN = {
 
 export const STORAGE_KEY = 'pewenche_props';
 
+/** Propiedades visibles por página en el listado público */
+export const LIST_PAGE_SIZE = 6;
+
 export const REGIONES = [
   'Arica y Parinacota', 'Tarapacá', 'Antofagasta', 'Atacama',
   'Coquimbo', 'Valparaíso', 'Metropolitana de Santiago',
