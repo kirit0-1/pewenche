@@ -52,26 +52,35 @@ export function createAdmin(store, auth, state, app) {
   async function openLogin() {
     const hint = document.getElementById('loginHint');
     const userEl = document.getElementById('loginUser');
+    const passEl = document.getElementById('loginPass');
+    document.getElementById('loginError')?.classList.add('hidden');
+
     if (isSupabaseConfigured()) {
-      userEl.placeholder = ADMIN.email;
+      userEl.value = ADMIN.email;
       userEl.type = 'email';
-      if (hint) {
-        hint.textContent = 'Email y contraseña de Supabase Auth';
-        hint.classList.remove('hidden');
-      }
+      userEl.readOnly = true;
+      userEl.classList.add('opacity-80');
     } else {
+      userEl.value = '';
       userEl.placeholder = 'Usuario';
       userEl.type = 'text';
+      userEl.readOnly = false;
+      userEl.classList.remove('opacity-80');
       hint?.classList.add('hidden');
     }
+
     if (auth.refreshSession) await auth.refreshSession();
-    if (auth.isAuthenticated()) {
-      history.replaceState(null, '', '#admin');
-      showPanel();
-    } else {
-      document.getElementById('loginModal').classList.remove('hidden');
-      setTimeout(() => document.getElementById('loginUser').focus(), 50);
+
+    if (isSupabaseConfigured() && hint) {
+      hint.textContent = auth.isAuthenticated()
+        ? 'Por seguridad, confirma tu contraseña para entrar'
+        : 'Email y contraseña de Supabase Auth';
+      hint.classList.remove('hidden');
     }
+
+    if (passEl) passEl.value = '';
+    document.getElementById('loginModal').classList.remove('hidden');
+    setTimeout(() => passEl?.focus(), 50);
   }
 
   async function attemptLogin() {

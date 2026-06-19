@@ -64,9 +64,9 @@ async function init() {
     app.applyFilters();
     app.setActiveNav('todas');
 
-    // Sitio público por defecto — admin solo con clic o #admin si ya hay sesión
-    if (location.hash === '#admin' && auth.isAuthenticated()) {
-      admin.showPanel();
+    // Sitio público siempre — admin solo tras ingresar contraseña
+    if (location.hash === '#admin') {
+      admin.openLogin();
     }
 
     onDataChange(async key => {
