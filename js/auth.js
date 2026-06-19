@@ -123,7 +123,15 @@ export class SupabaseAuthService {
     const sb = getSupabase();
     const { data } = await sb.auth.getSession();
     this.#valid = !!data.session;
-    if (!data.session) sessionStorage.removeItem(ADMIN.sessionKey);
+    if (data.session) {
+      sessionStorage.setItem(ADMIN.sessionKey, JSON.stringify({
+        at: Date.now(),
+        user: data.session.user.email,
+        mode: 'supabase',
+      }));
+    } else {
+      sessionStorage.removeItem(ADMIN.sessionKey);
+    }
     return this.#valid;
   }
 

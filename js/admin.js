@@ -5,7 +5,7 @@ import {
 } from './analytics.js';
 import { clpFromUF } from './uf.js';
 import { hasApi, uploadImages, api, getToken } from './api.js';
-import { isSupabaseConfigured } from './supabase-client.js';
+import { isSupabaseConfigured, hasAdminSession } from './supabase-client.js';
 import { createCloudBackup, listBackups } from './backup.js';
 import { uploadPropertyImage } from './supabase-store.js';
 import { isLocalDev, getBackendLabel } from './env.js';
@@ -22,7 +22,7 @@ export function createAdmin(store, auth, state, app) {
     const label = getBackendLabel(mode);
     if (mode === 'supabase') {
       el.className = 'mb-4 p-3 rounded-xl text-sm border border-verde-200 dark:border-verde-800 bg-verde-50 dark:bg-verde-900/20 text-verde-800 dark:text-green-300';
-      el.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> Datos en <strong>Supabase</strong> — las consultas de cualquier dispositivo aparecen aquí.`;
+      el.innerHTML = '<i class="fa-solid fa-cloud mr-1"></i> Los cambios se guardan <strong>permanentemente en Supabase</strong> (nube). Visibles desde cualquier dispositivo.';
       el.classList.remove('hidden');
     } else if (!isLocalDev()) {
       el.className = 'mb-4 p-3 rounded-xl text-sm border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300';
@@ -351,6 +351,11 @@ export function createAdmin(store, auth, state, app) {
   }
 
   async function saveProperty() {
+    if (isSupabaseConfigured() && !(await hasAdminSession())) {
+      toast('Debes iniciar sesión como admin para guardar en la nube.');
+      openLogin();
+      return;
+    }
     const id = getVal('formId') || genId();
     const titulo = getVal('formTitulo').trim();
     if (!titulo) { toast('El título es obligatorio.'); return; }
@@ -378,7 +383,12 @@ export function createAdmin(store, auth, state, app) {
       app.applyFilters();
       switchTab('propiedades');
       renderAdminTable();
-      toast(existed ? 'Propiedad actualizada ✓' : 'Propiedad agregada ✓');
+      if (isSupabaseConfigured()) {
+        createCloudBackup('auto-propiedad').catch(() => {});
+        toast(existed ? 'Propiedad actualizada — guardada permanentemente en la nube ✓' : 'Propiedad agregada — guardada permanentemente en la nube ✓');
+      } else {
+        toast(existed ? 'Propiedad actualizada ✓' : 'Propiedad agregada ✓');
+      }
     } catch (err) {
       toast(err.message || 'Error al guardar. ¿Sesión admin activa?');
     }
@@ -391,7 +401,12 @@ export function createAdmin(store, auth, state, app) {
       renderAdminTable();
       await updateAdminStats();
       app.applyFilters();
-      toast('Propiedad eliminada');
+      if (isSupabaseConfigured()) {
+        createCloudBackup('auto-eliminar').catch(() => {});
+        toast('Propiedad eliminada de la nube ✓');
+      } else {
+        toast('Propiedad eliminada');
+      }
     } catch (err) {
       toast(err.message || 'Error al eliminar');
     }

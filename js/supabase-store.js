@@ -1,5 +1,5 @@
 import { enrichProperty } from './config.js';
-import { getSupabase } from './supabase-client.js';
+import { getSupabase, hasAdminSession } from './supabase-client.js';
 
 function rowToProp(row) {
   if (!row) return null;
@@ -50,6 +50,12 @@ function propToRow(p) {
   };
 }
 
+async function requireAdminForWrite() {
+  if (!await hasAdminSession()) {
+    throw new Error('Inicia sesión como admin (admin@pewenche.cl) para guardar cambios permanentes en la nube.');
+  }
+}
+
 export class SupabasePropertyStore {
   async getAll() {
     const sb = getSupabase();
@@ -59,14 +65,16 @@ export class SupabasePropertyStore {
   }
 
   async upsert(_properties, property) {
+    await requireAdminForWrite();
     const sb = getSupabase();
     const row = propToRow(property);
-    const { error } = await sb.from('properties').upsert(row);
+    const { error } = await sb.from('properties').upsert(row, { onConflict: 'id' });
     if (error) throw error;
     return this.getAll();
   }
 
   async remove(_properties, id) {
+    await requireAdminForWrite();
     const sb = getSupabase();
     const { error } = await sb.from('properties').delete().eq('id', id);
     if (error) throw error;
@@ -75,6 +83,7 @@ export class SupabasePropertyStore {
 }
 
 export async function uploadPropertyImage(file) {
+  await requireAdminForWrite();
   if (!file || !/^image\/(jpeg|png|webp|gif)$/i.test(file.type)) {
     throw new Error('Solo imágenes JPG, PNG, WEBP o GIF');
   }

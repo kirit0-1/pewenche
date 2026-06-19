@@ -79,6 +79,16 @@ async function init() {
         if (key === 'leads') await admin.refreshLeads?.();
       }
     });
+
+    document.addEventListener('visibilitychange', async () => {
+      if (document.visibilityState !== 'visible' || backend.mode !== 'supabase') return;
+      if (auth.refreshSession) await auth.refreshSession();
+      try {
+        state.properties = await store.getAll();
+        await app.reloadProperties();
+        if (auth.isAuthenticated()) await admin.refreshFromStore();
+      } catch { /* ignore */ }
+    });
   } catch (err) {
     console.error('[Pewenche] init failed:', err);
     toast('Error al iniciar la aplicación.');
