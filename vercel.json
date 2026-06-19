@@ -3,6 +3,9 @@
   "outputDirectory": ".",
   "cleanUrls": true,
   "trailingSlash": false,
+  "env": {
+    "SUPABASE_URL": "https://kiatnwjnvuutrwfivlzx.supabase.co"
+  },
   "rewrites": [
     { "source": "/propiedad", "destination": "/propiedad.html" }
   ],
