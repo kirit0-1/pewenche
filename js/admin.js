@@ -120,7 +120,9 @@ export function createAdmin(store, auth, state, app) {
     }
     activeTab = tab;
     document.querySelectorAll('[data-admin-tab]').forEach(btn => {
-      btn.classList.toggle('admin-sidebar-active', btn.dataset.adminTab === tab);
+      const isActive = btn.dataset.adminTab === tab;
+      btn.classList.toggle('admin-sidebar-active', isActive);
+      btn.classList.toggle('admin-bottom-nav-active', isActive);
     });
     document.querySelectorAll('[data-admin-panel]').forEach(panel => {
       panel.classList.toggle('hidden', panel.dataset.adminPanel !== tab);
@@ -159,33 +161,64 @@ export function createAdmin(store, auth, state, app) {
 
   function renderAdminTable() {
     const tbody = document.getElementById('adminTableBody');
+    const cards = document.getElementById('adminPropCards');
     const list = filteredProperties();
-    tbody.innerHTML = '';
+    if (tbody) tbody.innerHTML = '';
+    if (cards) cards.innerHTML = '';
+
     if (!list.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="text-center py-12 text-gray-400 text-sm">No hay propiedades con esos filtros.</td></tr>';
+      const empty = '<p class="text-center py-12 text-gray-400 text-sm">No hay propiedades con esos filtros.</p>';
+      if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-gray-400 text-sm">No hay propiedades con esos filtros.</td></tr>`;
+      if (cards) cards.innerHTML = empty;
       return;
     }
+
     list.forEach(p => {
       const badge = BADGE[p.tipo] || { cls: 'bg-gray-600', label: p.tipo };
       const clp = clpFromUF(p.precioUF, p.precioNota || '') || p.precioCLP || '';
-      const tr = document.createElement('tr');
-      tr.className = 'hover:bg-gray-50 dark:hover:bg-zinc-700/30 transition';
-      tr.innerHTML = `
-        <td class="px-4 py-3">
-          <div class="flex items-center gap-3">
-            <img src="${h(safeUrl(p.imagenes?.[0]) || '')}" alt="" class="w-12 h-12 rounded-xl object-cover shrink-0 border border-gray-100 dark:border-zinc-700" onerror="this.style.display='none'" />
-            <div><p class="font-medium text-sm">${h(p.titulo)}</p><p class="text-xs text-gray-400">${h(p.comuna || '')}${p.region ? ', ' + h(p.region) : ''}</p></div>
+      const img = h(safeUrl(p.imagenes?.[0]) || '');
+
+      if (tbody) {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-50 dark:hover:bg-zinc-700/30 transition';
+        tr.innerHTML = `
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-3">
+              <img src="${img}" alt="" class="w-12 h-12 rounded-xl object-cover shrink-0 border border-gray-100 dark:border-zinc-700" onerror="this.style.display='none'" />
+              <div><p class="font-medium text-sm">${h(p.titulo)}</p><p class="text-xs text-gray-400">${h(p.comuna || '')}${p.region ? ', ' + h(p.region) : ''}</p></div>
+            </div>
+          </td>
+          <td class="px-4 py-3 hidden sm:table-cell"><span class="text-xs font-semibold px-2.5 py-1 rounded-full text-white ${badge.cls}">${badge.label}</span></td>
+          <td class="px-4 py-3 hidden md:table-cell text-sm text-gray-500">${h(p.region || '—')}</td>
+          <td class="px-4 py-3 text-sm"><span class="font-semibold text-verde-700 dark:text-green-400">${p.precioUF ? p.precioUF.toLocaleString('es-CL') + ' UF' : '—'}</span>${clp ? `<br><span class="text-xs text-gray-400">${h(clp)}</span>` : ''}</td>
+          <td class="px-4 py-3 text-right whitespace-nowrap">
+            <a href="propiedad.html?id=${p.id}" target="_blank" rel="noopener" class="text-xs text-blue-600 hover:underline px-2"><i class="fa-solid fa-eye"></i></a>
+            <button type="button" data-action="edit-prop" data-id="${p.id}" class="text-xs text-verde-700 hover:underline px-2"><i class="fa-solid fa-pen-to-square"></i> Editar</button>
+            <button type="button" data-action="delete-prop" data-id="${p.id}" class="text-xs text-red-500 hover:underline px-2"><i class="fa-solid fa-trash"></i></button>
+          </td>`;
+        tbody.appendChild(tr);
+      }
+
+      if (cards) {
+        const card = document.createElement('article');
+        card.className = 'admin-prop-card';
+        card.innerHTML = `
+          <div class="admin-prop-card-img">
+            <img src="${img}" alt="" loading="lazy" onerror="this.parentElement.classList.add('admin-prop-card-img--empty')" />
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-full text-white ${badge.cls}">${badge.label}</span>
           </div>
-        </td>
-        <td class="px-4 py-3 hidden sm:table-cell"><span class="text-xs font-semibold px-2.5 py-1 rounded-full text-white ${badge.cls}">${badge.label}</span></td>
-        <td class="px-4 py-3 hidden md:table-cell text-sm text-gray-500">${h(p.region || '—')}</td>
-        <td class="px-4 py-3 text-sm"><span class="font-semibold text-verde-700 dark:text-green-400">${p.precioUF ? p.precioUF.toLocaleString('es-CL') + ' UF' : '—'}</span>${clp ? `<br><span class="text-xs text-gray-400">${h(clp)}</span>` : ''}</td>
-        <td class="px-4 py-3 text-right whitespace-nowrap">
-          <a href="propiedad.html?id=${p.id}" target="_blank" rel="noopener" class="text-xs text-blue-600 hover:underline px-2"><i class="fa-solid fa-eye"></i></a>
-          <button type="button" data-action="edit-prop" data-id="${p.id}" class="text-xs text-verde-700 hover:underline px-2"><i class="fa-solid fa-pen-to-square"></i> Editar</button>
-          <button type="button" data-action="delete-prop" data-id="${p.id}" class="text-xs text-red-500 hover:underline px-2"><i class="fa-solid fa-trash"></i></button>
-        </td>`;
-      tbody.appendChild(tr);
+          <div class="admin-prop-card-body">
+            <p class="font-semibold text-sm leading-snug mb-1">${h(p.titulo)}</p>
+            <p class="text-xs text-gray-400 mb-2"><i class="fa-solid fa-location-dot mr-1"></i>${h(p.comuna || '')}${p.region ? ', ' + h(p.region) : ''}</p>
+            <p class="text-verde-700 dark:text-green-400 font-bold text-sm">${p.precioUF ? p.precioUF.toLocaleString('es-CL') + ' UF' : '—'}${clp ? `<span class="text-gray-400 font-normal ml-1">${h(clp)}</span>` : ''}</p>
+            <div class="admin-prop-card-actions">
+              <a href="propiedad.html?id=${p.id}" target="_blank" rel="noopener" class="admin-prop-card-btn"><i class="fa-solid fa-eye"></i> Ver</a>
+              <button type="button" data-action="edit-prop" data-id="${p.id}" class="admin-prop-card-btn admin-prop-card-btn--primary"><i class="fa-solid fa-pen"></i> Editar</button>
+              <button type="button" data-action="delete-prop" data-id="${p.id}" class="admin-prop-card-btn admin-prop-card-btn--danger"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>`;
+        cards.appendChild(card);
+      }
     });
   }
 
@@ -245,16 +278,16 @@ export function createAdmin(store, auth, state, app) {
       return;
     }
     container.innerHTML = leads.map(l => `
-      <div class="p-4 rounded-xl border border-gray-100 dark:border-zinc-700 ${l.contacted ? 'opacity-60' : 'bg-white dark:bg-zinc-800'}">
-        <div class="flex justify-between gap-2 mb-2">
-          <div><p class="font-semibold">${h(l.nombre)}</p><p class="text-sm text-gray-400">${h(l.email)}</p></div>
-          <span class="text-xs text-gray-400">${new Date(l.at).toLocaleString('es-CL')}</span>
+      <div class="admin-lead-card p-4 rounded-xl border border-gray-100 dark:border-zinc-700 ${l.contacted ? 'opacity-60' : 'bg-white dark:bg-zinc-800'}">
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-1 mb-2">
+          <div class="min-w-0"><p class="font-semibold truncate">${h(l.nombre)}</p><p class="text-sm text-gray-400 truncate">${h(l.email)}</p></div>
+          <span class="text-xs text-gray-400 shrink-0">${new Date(l.at).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}</span>
         </div>
-        <p class="text-sm text-verde-700 mb-1"><i class="fa-solid fa-house mr-1"></i>${h(l.propertyTitle)}</p>
-        ${l.mensaje ? `<p class="text-sm text-gray-500 mb-3">${h(l.mensaje)}</p>` : ''}
-        <div class="flex gap-2">
-          <a href="mailto:${h(l.email)}?subject=${encodeURIComponent('Re: ' + l.propertyTitle)}" class="text-xs btn-verde px-3 py-1.5"><i class="fa-solid fa-envelope mr-1"></i>Contactar</a>
-          ${!l.contacted ? `<button type="button" data-action="mark-contacted" data-id="${l.id}" class="text-xs px-3 py-1.5 border rounded-lg">Marcar contactado</button>` : '<span class="text-xs text-gray-400">✓ Contactado</span>'}
+        <p class="text-sm text-verde-700 dark:text-green-400 mb-1"><i class="fa-solid fa-house mr-1"></i>${h(l.propertyTitle)}</p>
+        ${l.mensaje ? `<p class="text-sm text-gray-500 mb-3 line-clamp-3">${h(l.mensaje)}</p>` : ''}
+        <div class="flex flex-col xs:flex-row gap-2">
+          <a href="mailto:${h(l.email)}?subject=${encodeURIComponent('Re: ' + l.propertyTitle)}" class="text-sm btn-verde px-4 py-2.5 text-center"><i class="fa-solid fa-envelope mr-1"></i>Contactar</a>
+          ${!l.contacted ? `<button type="button" data-action="mark-contacted" data-id="${l.id}" class="text-sm px-4 py-2.5 border border-gray-200 dark:border-zinc-600 rounded-xl">Marcar contactado</button>` : '<span class="text-sm text-gray-400 py-2.5">✓ Contactado</span>'}
         </div>
       </div>`).join('');
   }
@@ -536,12 +569,15 @@ export function createAdmin(store, auth, state, app) {
       document.getElementById(id)?.addEventListener('change', renderAdminTable);
     });
 
-    document.getElementById('adminTableBody')?.addEventListener('click', e => {
+    document.getElementById('adminTableBody')?.addEventListener('click', onAdminPropAction);
+    document.getElementById('adminPropCards')?.addEventListener('click', onAdminPropAction);
+
+    function onAdminPropAction(e) {
       const btn = e.target.closest('[data-action]');
       if (!btn) return;
       if (btn.dataset.action === 'edit-prop') openPropertyForm(btn.dataset.id);
       if (btn.dataset.action === 'delete-prop') deleteProperty(btn.dataset.id);
-    });
+    }
 
     document.getElementById('imageGallery')?.addEventListener('click', e => {
       const btn = e.target.closest('[data-action]');

@@ -29,7 +29,7 @@ export function createApp(store, state) {
   }, 280);
 
   function populateRegionSelects() {
-    ['heroRegion', 'sideRegion', 'formRegion'].forEach(id => {
+    ['heroRegion', 'sideRegion', 'mobileSideRegion', 'formRegion'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
       if (id !== 'formRegion') el.innerHTML = '<option value="">Todas las regiones</option>';
@@ -130,8 +130,16 @@ export function createApp(store, state) {
   }
 
   function syncAllFilterFields() {
-    setVal('mobileFilterTipo', getVal('heroTipo'));
-    setVal('sideRegion', getVal('heroRegion'));
+    const tipo = getVal('heroTipo') || getVal('mobileFilterTipo');
+    setVal('heroTipo', tipo);
+    setVal('mobileFilterTipo', tipo);
+    const region = getVal('heroRegion') || getVal('sideRegion') || getVal('mobileSideRegion');
+    setVal('heroRegion', region);
+    setVal('sideRegion', region);
+    setVal('mobileSideRegion', region);
+    const maxUF = getVal('sidePrecioMax') || getVal('mobileSidePrecioMax');
+    setVal('sidePrecioMax', maxUF);
+    setVal('mobileSidePrecioMax', maxUF);
   }
 
   function updateActiveFilters() {
@@ -241,10 +249,22 @@ export function createApp(store, state) {
   }
 
   function syncFilterFields(sourceId) {
-    if (sourceId === 'heroTipo') setVal('mobileFilterTipo', getVal('heroTipo'));
-    if (sourceId === 'mobileFilterTipo') setVal('heroTipo', getVal('mobileFilterTipo'));
-    if (sourceId === 'heroRegion') setVal('sideRegion', getVal('heroRegion'));
-    if (sourceId === 'sideRegion') setVal('heroRegion', getVal('sideRegion'));
+    if (sourceId === 'heroTipo' || sourceId === 'mobileFilterTipo') {
+      const v = getVal(sourceId);
+      setVal('heroTipo', v);
+      setVal('mobileFilterTipo', v);
+    }
+    if (['heroRegion', 'sideRegion', 'mobileSideRegion'].includes(sourceId)) {
+      const v = getVal(sourceId);
+      setVal('heroRegion', v);
+      setVal('sideRegion', v);
+      setVal('mobileSideRegion', v);
+    }
+    if (sourceId === 'sidePrecioMax' || sourceId === 'mobileSidePrecioMax') {
+      const v = getVal(sourceId);
+      setVal('sidePrecioMax', v);
+      setVal('mobileSidePrecioMax', v);
+    }
   }
 
   function applyFilters(st) {
@@ -286,14 +306,14 @@ export function createApp(store, state) {
   }
 
   function clearHeroFilters() {
-    ['heroTipo', 'heroRegion', 'sideRegion', 'sidePrecioMax', 'searchQuery', 'mobileFilterTipo'].forEach(id => setVal(id, ''));
+    ['heroTipo', 'heroRegion', 'sideRegion', 'sidePrecioMax', 'mobileSideRegion', 'mobileSidePrecioMax', 'searchQuery', 'mobileFilterTipo'].forEach(id => setVal(id, ''));
     applyFilters(state);
   }
 
   function resetFilters(st) {
     currentSection = 'todas';
     st.currentSection = 'todas';
-    ['heroTipo', 'heroRegion', 'sideRegion', 'sidePrecioMax', 'mobileFilterTipo', 'searchQuery'].forEach(id => setVal(id, ''));
+    ['heroTipo', 'heroRegion', 'sideRegion', 'sidePrecioMax', 'mobileSideRegion', 'mobileSidePrecioMax', 'mobileFilterTipo', 'searchQuery'].forEach(id => setVal(id, ''));
     setVal('sortBy', 'relevance');
     document.getElementById('sectionTitle').textContent = 'Todas las propiedades';
     document.querySelectorAll('.sidebar-link').forEach(b => b.classList.remove('active'));
@@ -517,10 +537,10 @@ export function createApp(store, state) {
 
     document.getElementById('searchQuery')?.addEventListener('input', () => debouncedApply());
     document.getElementById('searchQuery')?.addEventListener('search', () => applyFilters(st));
-    ['heroTipo', 'heroRegion', 'sideRegion', 'sidePrecioMax', 'mobileFilterTipo', 'sortBy'].forEach(id => {
+    ['heroTipo', 'heroRegion', 'sideRegion', 'sidePrecioMax', 'mobileSideRegion', 'mobileSidePrecioMax', 'mobileFilterTipo', 'sortBy'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
-      const evt = id === 'sidePrecioMax' ? 'input' : 'change';
+      const evt = (id === 'sidePrecioMax' || id === 'mobileSidePrecioMax') ? 'input' : 'change';
       el.addEventListener(evt, () => {
         syncFilterFields(id);
         applyFilters(st);
