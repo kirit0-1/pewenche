@@ -65,8 +65,10 @@ export function createAdmin(store, auth, state, app) {
       hint?.classList.add('hidden');
     }
     if (auth.refreshSession) await auth.refreshSession();
-    if (auth.isAuthenticated()) showPanel();
-    else {
+    if (auth.isAuthenticated()) {
+      history.replaceState(null, '', '#admin');
+      showPanel();
+    } else {
       document.getElementById('loginModal').classList.remove('hidden');
       setTimeout(() => document.getElementById('loginUser').focus(), 50);
     }
@@ -81,6 +83,7 @@ export function createAdmin(store, auth, state, app) {
       err.classList.add('hidden');
       document.getElementById('loginModal').classList.add('hidden');
       document.getElementById('loginPass').value = '';
+      history.replaceState(null, '', '#admin');
       showPanel();
     } else {
       err.textContent = result.error;
@@ -91,7 +94,12 @@ export function createAdmin(store, auth, state, app) {
   }
 
   function logoutAdmin() {
-    auth.logout().then(() => hidePanel());
+    auth.logout().then(() => {
+      hidePanel();
+      if (location.hash === '#admin') {
+        history.replaceState(null, '', location.pathname + location.search);
+      }
+    });
   }
 
   function closeMobileSidebar() {

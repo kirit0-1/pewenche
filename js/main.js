@@ -64,7 +64,10 @@ async function init() {
     app.applyFilters();
     app.setActiveNav('todas');
 
-    if (auth.isAuthenticated()) admin.showPanel();
+    // Sitio público por defecto — admin solo con clic o #admin si ya hay sesión
+    if (location.hash === '#admin' && auth.isAuthenticated()) {
+      admin.showPanel();
+    }
 
     onDataChange(async key => {
       if (key === STORAGE_KEY || key === 'leads' || key === 'clicks') {
