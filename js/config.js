@@ -12,8 +12,8 @@ export const SITE = {
 };
 
 export const CONTACT = {
-  whatsapp: '56912345678',
-  whatsappDisplay: '+56 9 1234 5678',
+  whatsapp: '56982891650',
+  whatsappDisplay: '+56 9 8289 1650',
   email: 'contacto@pewenche.cl',
   instagram: 'https://instagram.com/pewenche.propiedades',
   instagramHandle: '@pewenche.propiedades',
