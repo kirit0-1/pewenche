@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Pewenche Propiedades — Chile</title>
   <meta name="description" content="Propiedades en venta, arriendo, terrenos, hostales y campings en Chile. Encuentra tu próximo hogar con Pewenche." />
-  <meta name="theme-color" content="#22c55e" />
+  <meta name="theme-color" content="#839958" />
   <link rel="canonical" href="https://pewenche.cl" />
 
   <!-- Open Graph -->
@@ -13,7 +13,7 @@
   <meta property="og:title" content="Pewenche Propiedades — Chile" />
   <meta property="og:description" content="Casas, departamentos, terrenos, hostales y campings en todo Chile." />
   <meta property="og:url" content="https://pewenche.cl" />
-  <meta property="og:image" content="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80" />
+  <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Volcano_Llaima_with_Lake_Conguill%C3%ADo%2C_Conguill%C3%ADo_National_Park.jpg/1200px-Volcano_Llaima_with_Lake_Conguill%C3%ADo%2C_Conguill%C3%ADo_National_Park.jpg" />
   <meta property="og:locale" content="es_CL" />
 
   <!-- Twitter -->
@@ -23,12 +23,19 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
+    const pewMoss = {
+      50:'#F7F4D5', 100:'#ede9c4', 200:'#d4ddb8', 300:'#b5c48f',
+      400:'#9aad70', 500:'#839958', 600:'#6d8048', 700:'#5a6b3c',
+      800:'#4a5732', 900:'#3d4829'
+    };
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            verde: { 50:'#f0fdf4', 100:'#dcfce7', 400:'#4ade80', 500:'#22c55e', 600:'#16a34a', 700:'#15803d', 800:'#166534', 900:'#14532d' }
+            beige: { DEFAULT:'#F7F4D5', dark:'#ede9c4' },
+            verde: pewMoss,
+            green: pewMoss
           },
           fontFamily: {
             sans: ['Inter','system-ui','sans-serif'],
@@ -58,7 +65,7 @@
   </script>
 </head>
 
-<body class="bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 font-sans antialiased">
+<body class="site-body text-zinc-900 dark:text-zinc-100 font-sans antialiased">
 
 <!-- ═══ PANEL ADMIN (acceso: pie de página) ═══ -->
 <div id="adminPage" class="hidden min-h-screen bg-gray-100 dark:bg-zinc-950 flex flex-col md:flex-row">
@@ -66,7 +73,7 @@
   <aside id="adminSidebar" class="admin-sidebar w-64 shrink-0 bg-verde-700 text-white flex flex-col sticky top-0 h-screen md:translate-x-0">
     <div class="p-5 border-b border-verde-800">
       <p class="font-bold text-lg">Pewenche</p>
-      <p class="text-green-200 text-xs">Panel administrador</p>
+      <p class="text-verde-100 text-xs">Panel administrador</p>
     </div>
     <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
       <button type="button" data-admin-tab="inicio" class="admin-sidebar-btn admin-sidebar-active w-full text-left px-4 py-2.5 rounded-xl text-sm"><i class="fa-solid fa-gauge-high w-5"></i> Inicio</button>
@@ -316,14 +323,14 @@
         <svg class="brand-mark" width="38" height="38" viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <rect width="48" height="48" rx="11" fill="url(#pewGrad)"/>
           <path d="M24 11 L35 22 H31 V35 H17 V22 H13 Z" fill="white" fill-opacity="0.96"/>
-          <rect x="21" y="26" width="6" height="9" rx="1" fill="#166534" fill-opacity="0.35"/>
-          <path d="M32 13 C34 10 37 11 38 14" stroke="#bbf7d0" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="38" cy="14" r="2" fill="#86efac"/>
-          <defs><linearGradient id="pewGrad" x1="4" y1="4" x2="44" y2="44"><stop stop-color="#14532d"/><stop offset="1" stop-color="#16a34a"/></linearGradient></defs>
+          <rect x="21" y="26" width="6" height="9" rx="1" fill="#5a6b3c" fill-opacity="0.35"/>
+          <path d="M32 13 C34 10 37 11 38 14" stroke="#d4ddb8" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="38" cy="14" r="2" fill="#c5d4a0"/>
+          <defs><linearGradient id="pewGrad" x1="4" y1="4" x2="44" y2="44"><stop stop-color="#4a5732"/><stop offset="1" stop-color="#839958"/></linearGradient></defs>
         </svg>
         <span class="brand-text leading-tight">
           <span class="brand-name block font-display text-lg tracking-tight">Pewenche</span>
-          <span class="brand-sub block text-[10px] uppercase tracking-[0.22em] font-medium opacity-80">Propiedades</span>
+          <span class="brand-sub block text-[10px] uppercase tracking-[0.22em] font-semibold">Propiedades</span>
         </span>
       </a>
 
@@ -357,18 +364,18 @@
 
   <section class="hero-bg pt-[4.25rem]">
     <div class="max-w-5xl mx-auto px-5 pt-20 pb-16 sm:pt-24 sm:pb-20 text-center text-white">
-      <p class="hero-eyebrow text-xs sm:text-sm font-semibold uppercase tracking-[0.28em] mb-5 opacity-90">Corretaje inmobiliario · Chile</p>
+      <p class="hero-eyebrow text-xs sm:text-sm font-bold uppercase tracking-[0.28em] mb-5">Corretaje inmobiliario · Chile</p>
       <h1 class="font-display text-4xl sm:text-5xl lg:text-[3.35rem] font-bold leading-[1.12] mb-5 max-w-3xl mx-auto">El lugar correcto, con la confianza que mereces</h1>
-      <p class="hero-lead text-base sm:text-lg mb-10 max-w-2xl mx-auto leading-relaxed font-light opacity-95">Explora viviendas en venta, arriendos y alojamiento turístico con asesoría clara, información verificada y acompañamiento profesional en todo el territorio nacional.</p>
+      <p class="hero-lead text-base sm:text-lg mb-10 max-w-2xl mx-auto leading-relaxed font-medium">Explora viviendas en venta, arriendos y alojamiento turístico con asesoría clara, información verificada y acompañamiento profesional en todo el territorio nacional.</p>
 
-      <div class="hero-trust flex flex-wrap justify-center gap-x-8 gap-y-3 mb-12 text-sm">
-        <span class="inline-flex items-center gap-2"><i class="fa-solid fa-shield-halved opacity-80"></i> Propiedades verificadas</span>
-        <span class="inline-flex items-center gap-2"><i class="fa-solid fa-map-location-dot opacity-80"></i> Cobertura nacional</span>
-        <span class="inline-flex items-center gap-2"><i class="fa-solid fa-user-tie opacity-80"></i> Asesoría personalizada</span>
+      <div class="hero-trust flex flex-wrap justify-center gap-x-8 gap-y-3 mb-12 text-sm font-semibold">
+        <span class="inline-flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Propiedades verificadas</span>
+        <span class="inline-flex items-center gap-2"><i class="fa-solid fa-map-location-dot"></i> Cobertura nacional</span>
+        <span class="inline-flex items-center gap-2"><i class="fa-solid fa-user-tie"></i> Asesoría personalizada</span>
       </div>
 
       <form id="heroSearchForm" class="formal-search max-w-4xl mx-auto text-left" role="search">
-        <p class="formal-search-title text-center text-[11px] uppercase tracking-[0.2em] font-semibold mb-4 opacity-90">Buscar propiedad</p>
+        <p class="formal-search-title text-center text-[11px] uppercase tracking-[0.2em] font-bold mb-4">Buscar propiedad</p>
         <div class="formal-search-grid">
           <div class="formal-search-field">
             <label for="heroTipo">Tipo</label>
@@ -408,7 +415,7 @@
   <div id="listado" class="max-w-7xl mx-auto px-5 pt-10 pb-2 flex flex-wrap items-center justify-between gap-4 mobile-filter-bar">
     <div class="min-w-0 flex-1">
       <h2 id="sectionTitle" class="font-serif text-xl sm:text-2xl font-bold">Todas las propiedades</h2>
-      <p id="resultCount" class="text-gray-400 text-sm mt-0.5">Cargando…</p>
+      <p id="resultCount" class="text-zinc-600 dark:text-zinc-300 text-sm mt-0.5 font-medium">Cargando…</p>
     </div>
     <div class="flex items-center gap-2 w-full sm:w-auto flex-wrap">
       <label class="sr-only" for="sortBy">Ordenar</label>
@@ -440,10 +447,10 @@
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto px-5 py-4 sm:py-6 flex gap-8 items-start">
+  <div class="max-w-7xl mx-auto px-5 py-4 sm:py-6 flex gap-8 items-start rock-texture">
     <aside class="hidden lg:block w-60 shrink-0 sticky top-24 space-y-5" aria-label="Filtros">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-sm">
-        <h3 class="font-semibold text-xs uppercase tracking-widest text-gray-400 mb-3">Tipo</h3>
+        <h3 class="font-bold text-xs uppercase tracking-widest text-zinc-600 dark:text-zinc-300 mb-3">Tipo</h3>
         <ul class="space-y-0.5">
           <li><button type="button" data-action="sidebar-tipo" data-tipo="" class="sidebar-link w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-zinc-800 transition">Todos</button></li>
           <li><button type="button" data-action="sidebar-tipo" data-tipo="venta" class="sidebar-link w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-zinc-800 transition"><i class="fa-solid fa-house mr-2 text-verde-700 w-4 inline-block"></i>En Venta</button></li>
@@ -454,20 +461,20 @@
         </ul>
       </div>
       <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-sm">
-        <h3 class="font-semibold text-xs uppercase tracking-widest text-gray-400 mb-3">Región</h3>
+        <h3 class="font-bold text-xs uppercase tracking-widest text-zinc-600 dark:text-zinc-300 mb-3">Región</h3>
         <select id="sideRegion" class="form-select w-full bg-gray-50 dark:bg-zinc-800 dark:text-white border border-gray-200 dark:border-zinc-700 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-verde-700 focus:outline-none">
           <option value="">Todas</option>
         </select>
       </div>
       <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-sm">
-        <h3 class="font-semibold text-xs uppercase tracking-widest text-gray-400 mb-3">Precio máx. (UF)</h3>
+        <h3 class="font-bold text-xs uppercase tracking-widest text-zinc-600 dark:text-zinc-300 mb-3">Precio máx. (UF)</h3>
         <input id="sidePrecioMax" type="number" placeholder="Ej: 5000" class="adm-input" />
         <button type="button" data-action="reset-filters" class="mt-3 w-full text-xs text-gray-400 hover:text-verde-700 dark:hover:text-green-400 transition py-1">
           <i class="fa-solid fa-rotate-left mr-1"></i>Limpiar filtros
         </button>
       </div>
       <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-sm">
-        <h3 class="font-semibold text-xs uppercase tracking-widest text-gray-400 mb-3">Síguenos</h3>
+        <h3 class="font-bold text-xs uppercase tracking-widest text-zinc-600 dark:text-zinc-300 mb-3">Síguenos</h3>
         <div class="flex gap-3">
           <a data-contact="instagram" target="_blank" rel="noopener" class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center hover:scale-110 transition text-white" aria-label="Instagram"><i class="fa-brands fa-instagram text-sm"></i></a>
           <a data-contact="facebook" target="_blank" rel="noopener" class="w-9 h-9 rounded-xl bg-[#1877F2] flex items-center justify-center hover:scale-110 transition text-white" aria-label="Facebook"><i class="fa-brands fa-facebook-f text-sm"></i></a>
@@ -480,8 +487,8 @@
       <div id="propertiesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
       <div id="emptyState" class="hidden text-center py-24">
         <i class="fa-solid fa-house-circle-xmark text-6xl text-gray-200 dark:text-zinc-700 mb-5"></i>
-        <h3 class="text-xl font-semibold text-gray-400 mb-2">Sin resultados</h3>
-        <p class="text-gray-400 text-sm mb-6">No hay propiedades que coincidan con tu búsqueda.</p>
+        <h3 class="text-xl font-bold text-zinc-700 dark:text-zinc-200 mb-2">Sin resultados</h3>
+        <p class="text-zinc-600 dark:text-zinc-300 text-sm mb-6 font-medium">No hay propiedades que coincidan con tu búsqueda.</p>
         <button type="button" data-action="reset-filters" class="btn-verde px-6 py-2.5 text-sm">Ver todas las propiedades</button>
       </div>
       <div id="loadMoreWrap" class="hidden text-center mt-10">
@@ -494,11 +501,11 @@
   </div>
 
   <!-- Nosotros -->
-  <section id="nosotros" class="about-section py-20 sm:py-24 border-t border-gray-100 dark:border-zinc-800">
+  <section id="nosotros" class="about-section rock-texture py-20 sm:py-24 border-t border-gray-100 dark:border-zinc-800">
     <div class="max-w-5xl mx-auto px-5 text-center">
       <p class="section-eyebrow">Quiénes somos</p>
       <h2 class="font-display text-3xl sm:text-4xl font-bold mb-5">Inmobiliaria con respaldo y transparencia</h2>
-      <p class="text-gray-600 dark:text-zinc-400 leading-relaxed max-w-2xl mx-auto mb-12 text-base sm:text-lg">
+      <p class="text-zinc-800 dark:text-zinc-200 leading-relaxed max-w-2xl mx-auto mb-12 text-base sm:text-lg font-medium">
         Pewenche Propiedades conecta a familias, inversionistas y viajeros con oportunidades reales en venta, arriendo y turismo.
         Cada publicación es revisada con criterios profesionales para que explores, compares y decidas con tranquilidad.
       </p>
@@ -506,29 +513,29 @@
         <div class="about-card">
           <i class="fa-solid fa-handshake text-verde-700 dark:text-green-400 text-2xl mb-3"></i>
           <h3 class="font-semibold mb-2">Asesoría directa</h3>
-          <p class="text-gray-500 dark:text-zinc-400 text-sm leading-relaxed">Acompañamiento en cada etapa, con información clara y sin intermediación innecesaria.</p>
+          <p class="text-zinc-700 dark:text-zinc-200 text-sm leading-relaxed font-medium">Acompañamiento en cada etapa, con información clara y sin intermediación innecesaria.</p>
         </div>
         <div class="about-card">
           <i class="fa-solid fa-building-shield text-verde-700 dark:text-green-400 text-2xl mb-3"></i>
           <h3 class="font-semibold mb-2">Portafolio verificado</h3>
-          <p class="text-gray-500 dark:text-zinc-400 text-sm leading-relaxed">Viviendas, arriendos, hostales y campings seleccionados en las 16 regiones del país.</p>
+          <p class="text-zinc-700 dark:text-zinc-200 text-sm leading-relaxed font-medium">Viviendas, arriendos, hostales y campings seleccionados en las 16 regiones del país.</p>
         </div>
         <div class="about-card">
           <i class="fa-solid fa-clock text-verde-700 dark:text-green-400 text-2xl mb-3"></i>
           <h3 class="font-semibold mb-2">Respuesta oportuna</h3>
-          <p class="text-gray-500 dark:text-zinc-400 text-sm leading-relaxed">Atención personalizada con respuesta en <span data-contact="response">menos de 24 horas</span>.</p>
+          <p class="text-zinc-700 dark:text-zinc-200 text-sm leading-relaxed font-medium">Atención personalizada con respuesta en <span data-contact="response">menos de 24 horas</span>.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Contacto -->
-  <section id="contacto" class="contact-section py-16 sm:py-24">
+  <section id="contacto" class="contact-section rock-texture py-16 sm:py-24">
     <div class="max-w-6xl mx-auto px-5">
       <div class="text-center mb-12 sm:mb-14">
         <p class="section-eyebrow">Atención al cliente</p>
         <h2 class="font-display text-3xl sm:text-4xl font-bold mb-4 text-zinc-900 dark:text-white">Contáctanos</h2>
-        <p class="text-zinc-600 dark:text-zinc-300 max-w-xl mx-auto text-base leading-relaxed">
+        <p class="text-zinc-800 dark:text-zinc-200 max-w-xl mx-auto text-base leading-relaxed font-medium">
           Canales oficiales de Pewenche Propiedades. Escríbenos, déjanos tu consulta o contáctanos directamente por WhatsApp.
         </p>
       </div>
@@ -569,7 +576,7 @@
               </tbody>
             </table>
           </div>
-          <p class="contact-note text-xs text-zinc-500 dark:text-zinc-400 mt-4 leading-relaxed">
+          <p class="contact-note text-xs text-zinc-700 dark:text-zinc-300 mt-4 leading-relaxed font-medium">
             Horario de respuesta: <span data-contact="response">menos de 24 horas</span> en días hábiles.
           </p>
         </div>
@@ -604,9 +611,9 @@
       <div class="contact-wa-strip mt-10 sm:mt-12">
         <div class="contact-wa-inner">
           <div class="flex-1 min-w-0">
-            <p class="text-xs uppercase tracking-[0.18em] font-semibold opacity-80 mb-1">Atención inmediata</p>
+            <p class="text-xs uppercase tracking-[0.18em] font-bold mb-1">Atención inmediata</p>
             <p class="font-serif text-xl sm:text-2xl font-bold mb-1">¿Prefieres hablar ahora?</p>
-            <p class="text-sm opacity-90">Escríbenos por WhatsApp y te orientamos sobre arriendos, ventas o alojamiento.</p>
+            <p class="text-sm font-medium">Escríbenos por WhatsApp y te orientamos sobre arriendos, ventas o alojamiento.</p>
           </div>
           <a data-contact="whatsapp" data-wa-text="Hola, me gustaría recibir asesoría de Pewenche Propiedades" target="_blank" rel="noopener" class="contact-wa-btn shrink-0">
             <i class="fa-brands fa-whatsapp text-2xl"></i>
@@ -627,14 +634,14 @@
         </svg>
         <span class="font-serif font-semibold text-lg">Pewenche Propiedades</span>
       </div>
-      <p class="text-zinc-400 text-sm text-center max-w-md">Corretaje inmobiliario · venta, arriendo y alojamiento en Chile.</p>
+      <p class="text-zinc-700 dark:text-zinc-300 text-sm text-center max-w-md font-medium">Corretaje inmobiliario · venta, arriendo y alojamiento en Chile.</p>
       <div class="flex items-center gap-5">
         <a data-contact="whatsapp" data-wa-text="Hola" target="_blank" rel="noopener" class="text-zinc-400 hover:text-[#25D366] transition text-2xl" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
         <a data-contact="instagram" target="_blank" rel="noopener" class="text-zinc-400 hover:text-pink-400 transition text-2xl" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
         <a data-contact="facebook" target="_blank" rel="noopener" class="text-zinc-400 hover:text-[#1877F2] transition text-2xl" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
       </div>
     </div>
-    <p class="text-center text-zinc-600 text-xs mt-6">© <span id="siteYear">2026</span> Pewenche Propiedades · Chile · Todos los derechos reservados</p>
+    <p class="text-center text-zinc-800 dark:text-zinc-300 text-xs mt-6 font-medium">© <span id="siteYear">2026</span> Pewenche Propiedades · Chile · Todos los derechos reservados</p>
     <p class="text-center mt-3">
       <button type="button" data-action="open-admin-login" class="text-zinc-700 hover:text-zinc-400 text-[11px] transition underline-offset-2 hover:underline">
         Acceso administrador

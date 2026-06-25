@@ -9,14 +9,18 @@
   <script>
     tailwind.config = {
       darkMode: 'class',
-      theme: { extend: { colors: { verde: { 50:'#f0fdf4', 700:'#15803d', 800:'#166534' } } } }
+      theme: { extend: { colors: {
+        beige: { DEFAULT:'#F7F4D5', dark:'#ede9c4' },
+        verde: { 50:'#F7F4D5', 100:'#ede9c4', 200:'#d4ddb8', 300:'#b5c48f', 400:'#9aad70', 500:'#839958', 600:'#6d8048', 700:'#5a6b3c', 800:'#4a5732', 900:'#3d4829' },
+        green: { 50:'#F7F4D5', 100:'#ede9c4', 200:'#d4ddb8', 300:'#b5c48f', 400:'#9aad70', 500:'#839958', 600:'#6d8048', 700:'#5a6b3c', 800:'#4a5732', 900:'#3d4829' }
+      } } } }
     }
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body class="bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 font-sans antialiased">
+<body class="site-body text-zinc-900 dark:text-zinc-100 font-sans antialiased">
 
 <header class="bg-verde-800 text-white px-5 py-4 flex items-center justify-between sticky top-0 z-40 shadow">
   <a href="index.html" class="flex items-center gap-2 font-bold">

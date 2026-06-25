@@ -328,7 +328,7 @@ export function createApp(store, state) {
     if (p.banos) items.push(`<i class="fa-solid fa-shower"></i> ${p.banos}`);
     if (p.estac) items.push(`<i class="fa-solid fa-car"></i> ${p.estac}`);
     return items.map(c =>
-      `<span class="inline-flex items-center gap-1 bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 text-xs px-2.5 py-1 rounded-lg">${c}</span>`
+      `<span class="inline-flex items-center gap-1 bg-beige dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 text-xs px-2.5 py-1 rounded-lg font-medium">${c}</span>`
     ).join('');
   }
 
@@ -373,15 +373,15 @@ export function createApp(store, state) {
       <div class="p-5">
         <div class="mb-1">
           <span class="price-uf">${p.precioUF ? p.precioUF.toLocaleString('es-CL') + ' UF' : '—'}</span>
-          ${priceCLP(p) ? `<span class="text-gray-400 dark:text-zinc-400 text-xs ml-2">${h(priceCLP(p))}</span>` : ''}
+          ${priceCLP(p) ? `<span class="text-zinc-600 dark:text-zinc-300 text-xs ml-2 font-medium">${h(priceCLP(p))}</span>` : ''}
         </div>
-        <h3 class="font-bold text-base leading-snug mb-1">${h(p.titulo)}</h3>
-        <p class="text-gray-400 text-xs flex items-center gap-1 mb-3">
-          <i class="fa-solid fa-location-dot text-verde-700 dark:text-green-500 shrink-0"></i>
+        <h3 class="font-bold text-base leading-snug mb-1 text-zinc-900 dark:text-zinc-100">${h(p.titulo)}</h3>
+        <p class="text-zinc-600 dark:text-zinc-300 text-xs flex items-center gap-1 mb-3 font-medium">
+          <i class="fa-solid fa-location-dot text-verde-800 dark:text-green-300 shrink-0"></i>
           ${h(p.comuna || '')}${p.region ? ', ' + h(p.region) : ''}
         </p>
         <div class="flex flex-wrap gap-1.5 mb-3">${buildChips(p)}</div>
-        <p class="text-gray-500 dark:text-zinc-400 text-xs leading-relaxed line-clamp-2 mb-4">${h(p.desc || '')}</p>
+        <p class="text-zinc-700 dark:text-zinc-200 text-xs leading-relaxed line-clamp-2 mb-4 font-medium">${h(p.desc || '')}</p>
         <div class="flex gap-2">
           <a href="propiedad.html?id=${p.id}" target="_blank" rel="noopener" data-action="open-detail" data-id="${p.id}"
             class="btn-verde flex-1 py-2.5 text-sm text-center">
