@@ -3,6 +3,8 @@
  * Para producción: mueve credenciales admin a variables de entorno / Supabase Auth.
  */
 
+import { PUBLIC_CONTACT } from './contact-public.js';
+
 export const SITE = {
   name: 'Pewenche Propiedades',
   tagline: 'Propiedades en Chile',
@@ -14,9 +16,9 @@ export const SITE = {
 export const CONTACT = {
   whatsapp: '56982891650',
   whatsappDisplay: '+56 9 8289 1650',
-  email: 'pewenchepropiedades@gmail.com',
-  instagram: 'https://www.instagram.com/pewenchepropiedades/',
-  instagramHandle: '@pewenchepropiedades',
+  email: PUBLIC_CONTACT.email,
+  instagram: PUBLIC_CONTACT.instagram,
+  instagramHandle: PUBLIC_CONTACT.instagramHandle,
   facebook: 'https://facebook.com/pewenche',
   responseTime: 'menos de 24 horas',
 };

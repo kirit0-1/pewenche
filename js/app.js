@@ -1,6 +1,7 @@
 import {
   BADGE, CONTACT, FALLBACK_IMAGE, LIST_PAGE_SIZE, REGIONES, SECTION_MAP,
 } from './config.js';
+import { resolvePublicContact } from './contact-public.js';
 import {
   debounce, filterBySearch, getVal, h, setVal, sortProperties, toast, waLink,
 } from './utils.js';
@@ -42,29 +43,30 @@ export function createApp(store, state) {
   }
 
   function injectContactLinks() {
+    const c = resolvePublicContact(CONTACT);
     document.querySelectorAll('[data-contact="whatsapp"]').forEach(el => {
-      el.href = waLink(CONTACT.whatsapp, el.dataset.waText || 'Hola, me interesa una propiedad de Pewenche');
+      el.href = waLink(c.whatsapp, el.dataset.waText || 'Hola, me interesa una propiedad de Pewenche');
     });
     document.querySelectorAll('[data-contact="whatsapp-display"]').forEach(el => {
-      el.textContent = CONTACT.whatsappDisplay;
+      el.textContent = c.whatsappDisplay;
     });
     document.querySelectorAll('[data-contact="email"]').forEach(el => {
-      el.href = `mailto:${CONTACT.email}`;
+      el.href = `mailto:${c.email}`;
     });
     document.querySelectorAll('[data-contact="email-display"]').forEach(el => {
-      el.textContent = CONTACT.email;
+      el.textContent = c.email;
     });
     document.querySelectorAll('[data-contact="instagram"]').forEach(el => {
-      el.href = CONTACT.instagram;
+      el.href = c.instagram;
     });
     document.querySelectorAll('[data-contact="instagramHandle"]').forEach(el => {
-      el.textContent = CONTACT.instagramHandle;
+      el.textContent = c.instagramHandle;
     });
     document.querySelectorAll('[data-contact="facebook"]').forEach(el => {
-      el.href = CONTACT.facebook;
+      el.href = c.facebook;
     });
     document.querySelectorAll('[data-contact="response"]').forEach(el => {
-      el.textContent = CONTACT.responseTime;
+      el.textContent = c.responseTime;
     });
   }
 

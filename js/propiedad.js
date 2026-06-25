@@ -1,4 +1,5 @@
 import { BADGE, CONTACT, FALLBACK_IMAGE } from './config.js';
+import { resolvePublicContact } from './contact-public.js';
 import { LocalPropertyStore } from './storage.js';
 import { ApiPropertyStore } from './api-store.js';
 import { SupabasePropertyStore } from './supabase-store.js';
@@ -45,12 +46,13 @@ function updatePrices() {
 }
 
 function renderContacts() {
+  const c = resolvePublicContact(CONTACT);
   const links = [
-    { href: waLink(CONTACT.whatsapp, `Hola, me interesa: ${property.titulo}`), iconClass: 'fa-brands fa-whatsapp', color: 'bg-[#25D366]', label: 'WhatsApp', sub: CONTACT.whatsappDisplay },
-    { href: `mailto:${CONTACT.email}?subject=${encodeURIComponent('Consulta: ' + property.titulo)}`, iconClass: 'fa-solid fa-envelope', color: 'bg-verde-700', label: 'Correo', sub: CONTACT.email },
-    { href: CONTACT.instagram, iconClass: 'fa-brands fa-instagram', color: 'bg-gradient-to-br from-purple-500 to-pink-500', label: 'Instagram', sub: CONTACT.instagramHandle, external: true },
-    { href: CONTACT.facebook, iconClass: 'fa-brands fa-facebook-f', color: 'bg-[#1877F2]', label: 'Facebook', sub: 'Facebook', external: true },
-    { href: `tel:+${CONTACT.whatsapp}`, iconClass: 'fa-solid fa-phone', color: 'bg-zinc-700', label: 'Llamar', sub: CONTACT.whatsappDisplay },
+    { href: waLink(c.whatsapp, `Hola, me interesa: ${property.titulo}`), iconClass: 'fa-brands fa-whatsapp', color: 'bg-[#25D366]', label: 'WhatsApp', sub: c.whatsappDisplay },
+    { href: `mailto:${c.email}?subject=${encodeURIComponent('Consulta: ' + property.titulo)}`, iconClass: 'fa-solid fa-envelope', color: 'bg-verde-700', label: 'Correo', sub: c.email },
+    { href: c.instagram, iconClass: 'fa-brands fa-instagram', color: 'bg-gradient-to-br from-purple-500 to-pink-500', label: 'Instagram', sub: c.instagramHandle, external: true },
+    { href: c.facebook, iconClass: 'fa-brands fa-facebook-f', color: 'bg-[#1877F2]', label: 'Facebook', sub: 'Facebook', external: true },
+    { href: `tel:+${c.whatsapp}`, iconClass: 'fa-solid fa-phone', color: 'bg-zinc-700', label: 'Llamar', sub: c.whatsappDisplay },
   ];
 
   document.getElementById('contactLinks').innerHTML = links.map(l => `
