@@ -30,40 +30,82 @@ body.site-body {
   color: #f4f4f5;
 }
 
-/* Texto más oscuro y legible en todo el sitio */
-.site-body .text-zinc-800 { color: var(--text-primary) !important; }
-.site-body .text-zinc-700 { color: var(--text-secondary) !important; }
-.site-body .text-zinc-600 { color: var(--text-muted) !important; }
-.site-body .text-zinc-500 { color: var(--text-muted) !important; }
-.site-body .text-zinc-400 { color: var(--text-soft) !important; }
-.site-body .text-gray-600 { color: var(--text-muted) !important; }
-.site-body .text-gray-500 { color: var(--text-muted) !important; }
-.site-body .text-gray-400 { color: var(--text-soft) !important; }
-.dark .site-body .text-zinc-300 { color: #e4e4e7 !important; }
-.dark .site-body .text-zinc-400 { color: #d4d4d8 !important; }
-.dark .site-body .text-zinc-500 { color: #d4d4d8 !important; }
-.dark .site-body .text-zinc-600 { color: #e4e4e7 !important; }
-.dark .site-body .text-zinc-700 { color: #f4f4f5 !important; }
+/* ── Tipografía por tema (sin !important global en títulos) ── */
+html:not(.dark) body.site-body {
+  color: var(--text-primary);
+}
+html:not(.dark) #mainPage h1,
+html:not(.dark) #mainPage h2,
+html:not(.dark) #mainPage h3 {
+  color: var(--text-primary);
+}
+html:not(.dark) #mainPage .text-muted,
+html:not(.dark) #mainPage .about-card p,
+html:not(.dark) #mainPage .contact-note,
+html:not(.dark) #mainPage #resultCount,
+html:not(.dark) #mainPage .prop-card p {
+  color: var(--text-muted);
+}
+html:not(.dark) #mainPage .prop-card h3 {
+  color: var(--text-primary);
+}
+
+.dark body.site-body #mainPage h1,
+.dark body.site-body #mainPage h2,
+.dark body.site-body #mainPage h3 {
+  color: #fafafa;
+}
+.dark body.site-body #mainPage .prop-card {
+  color: #f4f4f5;
+}
+.dark body.site-body #mainPage .prop-card p {
+  color: #d4d4d8;
+}
+
+/* Hero: siempre texto claro (modo claro y oscuro) */
+.hero-bg,
+.hero-bg h1,
+.hero-bg h2,
+.hero-bg p,
+.hero-bg span,
+.hero-bg .font-bold,
+.hero-bg .font-semibold {
+  color: #fff;
+}
+.hero-bg .formal-search,
+.hero-bg .formal-search label,
+.hero-bg .formal-search-input,
+.hero-bg .formal-search-title {
+  color: #18181b;
+}
+.hero-bg .formal-search-field label {
+  color: #3f3f46;
+}
+
+/* Ajustes Tailwind en modo claro */
+html:not(.dark) .site-body .text-zinc-900 { color: #18181b; }
+html:not(.dark) .site-body .text-zinc-800 { color: #18181b; }
+html:not(.dark) .site-body .text-zinc-700 { color: #27272a; }
+html:not(.dark) .site-body .text-zinc-600 { color: #3f3f46; }
+html:not(.dark) .site-body .text-zinc-500 { color: #3f3f46; }
+html:not(.dark) .site-body .text-zinc-400 { color: #52525b; }
+html:not(.dark) .site-body .text-gray-600 { color: #3f3f46; }
+html:not(.dark) .site-body .text-gray-500 { color: #3f3f46; }
+html:not(.dark) .site-body .text-gray-400 { color: #52525b; }
+
+/* Ajustes Tailwind en modo oscuro */
+.dark .site-body .text-zinc-900 { color: #fafafa !important; }
 .dark .site-body .text-zinc-800 { color: #fafafa !important; }
+.dark .site-body .text-zinc-700 { color: #f4f4f5 !important; }
+.dark .site-body .text-zinc-600 { color: #e4e4e7 !important; }
+.dark .site-body .text-zinc-500 { color: #d4d4d8 !important; }
+.dark .site-body .text-zinc-400 { color: #d4d4d8 !important; }
+.dark .site-body .text-zinc-300 { color: #e4e4e7 !important; }
 .dark .site-body .text-zinc-200 { color: #f4f4f5 !important; }
+.dark .site-body .text-zinc-100 { color: #fafafa !important; }
 .dark .site-body .text-gray-400 { color: #d4d4d8 !important; }
 .dark .site-body .text-gray-500 { color: #e4e4e7 !important; }
 .dark .site-body .text-gray-600 { color: #f4f4f5 !important; }
-
-.site-body h1,
-.site-body h2,
-.site-body h3,
-.site-body .font-bold,
-.site-body .font-semibold {
-  color: var(--text-primary);
-}
-.dark .site-body h1,
-.dark .site-body h2,
-.dark .site-body h3,
-.dark .site-body .font-bold,
-.dark .site-body .font-semibold {
-  color: #fafafa;
-}
 
 .hero-bg .hero-eyebrow,
 .hero-bg .hero-lead,
@@ -420,6 +462,31 @@ body, header, footer, .prop-card, .modal-backdrop, .adm-input, .btn-verde, .side
 .dark .adm-input { color: #f4f4f5; }
 .dark select,
 .dark .form-select { color: #f4f4f5; background-color: #27272a; }
+
+/* Modo claro — paneles y listado */
+html:not(.dark) #listado h2,
+html:not(.dark) #sectionTitle {
+  color: var(--text-primary);
+}
+html:not(.dark) .about-card h3 {
+  color: var(--text-primary);
+}
+html:not(.dark) .contact-panel-title {
+  color: var(--text-primary);
+}
+html:not(.dark) .sidebar-link {
+  color: var(--text-muted);
+}
+html:not(.dark) .bg-white {
+  color: var(--text-primary);
+}
+html:not(.dark) .formal-search-input,
+html:not(.dark) .contact-input,
+html:not(.dark) .adm-input,
+html:not(.dark) select,
+html:not(.dark) .form-select {
+  color: var(--text-primary);
+}
 .contact-label {
   display: block;
   font-size: .68rem;
@@ -460,6 +527,11 @@ body, header, footer, .prop-card, .modal-backdrop, .adm-input, .btn-verde, .side
   overflow: hidden;
   color: #fff;
   box-shadow: 0 12px 32px -12px rgba(74, 87, 50, .45);
+}
+.contact-wa-strip p,
+.contact-wa-strip .font-bold,
+.contact-wa-strip .font-semibold {
+  color: #fff;
 }
 .contact-wa-inner {
   display: flex;
