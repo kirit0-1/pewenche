@@ -1,14 +1,47 @@
 /**
- * Build Vercel: config Supabase + bundle del cliente.
+ * Build Vercel: config Supabase + bundle + carpeta public/ para deploy.
  * Prioridad: env vars → supabase-config.example.js
  */
-import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'fs';
+import { writeFileSync, mkdirSync, readFileSync, existsSync, rmSync, cpSync, readdirSync, statSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import esbuild from 'esbuild';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
+const publicDir = join(root, 'public');
+
+const STATIC_COPY = ['index.html', 'propiedad.html', 'css', 'js', 'uploads'];
+
+function copyDir(src, dest) {
+  mkdirSync(dest, { recursive: true });
+  for (const name of readdirSync(src)) {
+    const from = join(src, name);
+    const to = join(dest, name);
+    if (statSync(from).isDirectory()) copyDir(from, to);
+    else cpSync(from, to);
+  }
+}
+
+function copyStaticToPublic() {
+  if (existsSync(publicDir)) rmSync(publicDir, { recursive: true, force: true });
+  mkdirSync(publicDir, { recursive: true });
+
+  let copied = 0;
+  for (const item of STATIC_COPY) {
+    const src = join(root, item);
+    if (!existsSync(src)) continue;
+    const dest = join(publicDir, item);
+    if (statSync(src).isDirectory()) copyDir(src, dest);
+    else cpSync(src, dest);
+    copied += 1;
+  }
+
+  if (!existsSync(join(publicDir, 'index.html'))) {
+    throw new Error('Build incompleto: falta public/index.html');
+  }
+  console.log(`✓ public/ listo (${copied} elementos)`);
+}
 
 function loadExampleDefaults() {
   const examplePath = join(root, 'js', 'supabase-config.example.js');
@@ -66,3 +99,5 @@ await esbuild.build({
   minify: true,
 });
 console.log('✓ js/vendor/supabase.js empaquetado');
+
+copyStaticToPublic();

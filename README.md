@@ -62,7 +62,9 @@ Variables de entorno (**obligatorias**):
 | `SUPABASE_URL` | `https://kiatnwjnvuutrwfivlzx.supabase.co` |
 | `SUPABASE_ANON_KEY` | clave anon `eyJ...` |
 
-Build: `npm run build` (automático). **Redeploy** después de cambiar variables.
+Build: `npm run build` → carpeta `public/` (automático en Vercel). **Redeploy** después de cambiar variables.
+
+**Vercel → Settings → Build:** Framework **Other**, Build Command `npm run build`, Output Directory `public`.
 
 ### 3. Dominio nic.cl
 
@@ -94,7 +96,7 @@ Admin     → Supabase Auth → lee/escribe con sesión autenticada
 
 | Comando | Uso |
 |---------|-----|
-| `npm run build` | Genera config + bundle Supabase |
+| `npm run build` | Genera `public/` + bundle Supabase (Vercel) |
 | `npm run seed:supabase` | Sube propiedades demo |
 | `npm run schema:supabase` | Aplica schema (requiere DB password) |
 

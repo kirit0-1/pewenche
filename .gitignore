@@ -5,6 +5,7 @@ Thumbs.db
 .env.*
 node_modules/
 dist-hosting/
+public/
 pewenche-donhost.zip
 js/supabase-config.js
 js/vendor/
