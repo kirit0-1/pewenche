@@ -1,7 +1,7 @@
 import { BADGE, REGIONES, ADMIN } from './config.js';
 import { getVal, genId, h, setVal, toast, mapEmbedUrl, safeUrl, filterImageUrls } from './utils.js';
 import {
-  getWeeklyClickStats, getTotalWeeklyClicks, getLeads, markLeadContacted, onDataChange,
+  getWeeklyClickStats, getTotalWeeklyClicks, getLeads, markLeadContacted, purgeOldLeads, LEAD_RETENTION_DAYS, onDataChange,
 } from './analytics.js';
 import { clpFromUF } from './uf.js';
 import { hasApi, uploadImages, api, getToken } from './api.js';
@@ -272,8 +272,9 @@ export function createAdmin(store, auth, state, app) {
       return;
     }
     if (hint) {
+      const retention = `Las consultas de más de ${LEAD_RETENTION_DAYS} días se pueden borrar con el botón «Borrar consultas +14 días» o automáticamente en Supabase.`;
       if (isSupabaseConfigured()) {
-        hint.textContent = 'Consultas en Supabase (cualquier red/dispositivo). Se actualiza cada 30 s.';
+        hint.textContent = `Consultas en Supabase (cualquier red/dispositivo). Se actualiza cada 30 s. ${retention}`;
       } else if (hasApi() && !getToken()) {
         hint.innerHTML = '<span class="text-amber-600">Cierra sesión y vuelve a entrar (con npm start activo) para ver consultas del servidor.</span>';
       } else if (hasApi()) {
@@ -637,6 +638,17 @@ export function createAdmin(store, auth, state, app) {
 
     document.getElementById('btnSaveConfig')?.addEventListener('click', saveConfig);
     document.getElementById('btnRefreshLeads')?.addEventListener('click', () => renderLeads());
+    document.getElementById('btnPurgeOldLeads')?.addEventListener('click', async () => {
+      if (!confirm(`¿Borrar consultas con más de ${LEAD_RETENTION_DAYS} días? Esta acción no se puede deshacer.`)) return;
+      try {
+        const n = await purgeOldLeads(LEAD_RETENTION_DAYS);
+        toast(n ? `Se eliminaron ${n} consulta(s) antigua(s).` : 'No había consultas antiguas para borrar.');
+        await renderLeads();
+        await updateAdminStats();
+      } catch (err) {
+        toast(err.message || 'No se pudieron borrar las consultas.');
+      }
+    });
     document.getElementById('loginPass')?.addEventListener('keydown', e => { if (e.key === 'Enter') attemptLogin(); });
     document.getElementById('loginModal')?.addEventListener('click', e => { if (e.target.id === 'loginModal') e.target.classList.add('hidden'); });
   }

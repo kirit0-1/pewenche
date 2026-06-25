@@ -192,6 +192,9 @@
       <div data-admin-panel="leads" class="hidden">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h2 class="text-lg font-bold">Consultas de clientes</h2>
+          <button type="button" id="btnPurgeOldLeads" class="text-sm px-4 py-2 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-900/20">
+            <i class="fa-solid fa-broom mr-1"></i> Borrar consultas +14 días
+          </button>
           <button type="button" id="btnRefreshLeads" class="text-sm px-4 py-2 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-800">
             <i class="fa-solid fa-rotate-right mr-1"></i> Actualizar
           </button>
@@ -486,8 +489,8 @@
     <section class="flex-1 min-w-0" aria-label="Listado de propiedades">
       <div id="propertiesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
       <div id="emptyState" class="hidden text-center py-24">
-        <i class="fa-solid fa-house-circle-xmark text-6xl text-gray-200 dark:text-zinc-700 mb-5"></i>
-        <h3 class="text-xl font-bold text-zinc-700 dark:text-zinc-200 mb-2">Sin resultados</h3>
+        <i class="fa-solid fa-house-circle-xmark text-6xl text-gray-300 dark:text-zinc-500 mb-5"></i>
+        <h3 class="text-xl font-bold text-zinc-800 dark:text-zinc-100 mb-2">Sin resultados</h3>
         <p class="text-zinc-600 dark:text-zinc-300 text-sm mb-6 font-medium">No hay propiedades que coincidan con tu búsqueda.</p>
         <button type="button" data-action="reset-filters" class="btn-verde px-6 py-2.5 text-sm">Ver todas las propiedades</button>
       </div>
@@ -589,16 +592,12 @@
               <input id="contactWebsite" name="website" type="text" tabindex="-1" autocomplete="off" />
             </div>
             <div>
-              <label for="contactNombre" class="contact-label">Nombre completo</label>
-              <input id="contactNombre" name="nombre" type="text" required autocomplete="name" class="contact-input" placeholder="Tu nombre" />
-            </div>
-            <div>
               <label for="contactEmail" class="contact-label">Correo electrónico</label>
-              <input id="contactEmail" name="email" type="email" required autocomplete="email" class="contact-input" placeholder="tu@correo.cl" />
+              <input id="contactEmail" name="email" type="email" required autocomplete="email" maxlength="254" inputmode="email" class="contact-input" placeholder="tu@correo.cl" />
             </div>
             <div>
-              <label for="contactMensaje" class="contact-label">Mensaje o consulta</label>
-              <textarea id="contactMensaje" name="mensaje" rows="4" class="contact-input resize-none" placeholder="Cuéntanos qué tipo de propiedad buscas o en qué podemos ayudarte…"></textarea>
+              <label for="contactMensaje" class="contact-label">Mensaje (opcional)</label>
+              <textarea id="contactMensaje" name="mensaje" rows="4" maxlength="1000" class="contact-input resize-none" placeholder="Cuéntanos qué buscas (solo texto, sin enlaces ni código)…"></textarea>
             </div>
             <button type="submit" class="contact-submit-btn">
               <i class="fa-solid fa-paper-plane mr-2"></i>Enviar consulta
@@ -624,7 +623,7 @@
     </div>
   </section>
 
-  <footer class="bg-zinc-900 text-white py-12">
+  <footer class="site-footer bg-zinc-900 text-white py-12">
     <div class="max-w-7xl mx-auto px-5 flex flex-col sm:flex-row items-center justify-between gap-6">
       <div class="flex items-center gap-3">
         <svg class="brand-mark brand-mark--sm" width="28" height="28" viewBox="0 0 48 48" fill="none" aria-hidden="true">
@@ -634,16 +633,16 @@
         </svg>
         <span class="font-serif font-semibold text-lg">Pewenche Propiedades</span>
       </div>
-      <p class="text-zinc-700 dark:text-zinc-300 text-sm text-center max-w-md font-medium">Corretaje inmobiliario · venta, arriendo y alojamiento en Chile.</p>
+      <p class="footer-muted text-sm text-center max-w-md font-medium">Corretaje inmobiliario · venta, arriendo y alojamiento en Chile.</p>
       <div class="flex items-center gap-5">
         <a data-contact="whatsapp" data-wa-text="Hola" target="_blank" rel="noopener" class="text-zinc-400 hover:text-[#25D366] transition text-2xl" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
         <a data-contact="instagram" target="_blank" rel="noopener" class="text-zinc-400 hover:text-pink-400 transition text-2xl" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
         <a data-contact="facebook" target="_blank" rel="noopener" class="text-zinc-400 hover:text-[#1877F2] transition text-2xl" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
       </div>
     </div>
-    <p class="text-center text-zinc-800 dark:text-zinc-300 text-xs mt-6 font-medium">© <span id="siteYear">2026</span> Pewenche Propiedades · Chile · Todos los derechos reservados</p>
+    <p class="footer-muted text-center text-xs mt-6 font-medium">© <span id="siteYear">2026</span> Pewenche Propiedades · Chile · Todos los derechos reservados</p>
     <p class="text-center mt-3">
-      <button type="button" data-action="open-admin-login" class="text-zinc-700 hover:text-zinc-400 text-[11px] transition underline-offset-2 hover:underline">
+      <button type="button" data-action="open-admin-login" class="text-[11px] transition underline-offset-2 hover:underline">
         Acceso administrador
       </button>
     </p>

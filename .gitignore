@@ -4,6 +4,8 @@ Thumbs.db
 .env
 .env.*
 node_modules/
+dist-hosting/
+pewenche-donhost.zip
 js/supabase-config.js
 js/vendor/
 data/properties.json

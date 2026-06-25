@@ -4,13 +4,45 @@
 import { isSupabaseConfigured, getSupabase } from './supabase-client.js';
 import { hasApi, api, detectApi } from './api.js';
 import { isLocalDev } from './env.js';
-import { isValidEmail } from './utils.js';
+import { isValidEmail, sanitizeLeadText, sanitizeLeadEmail, LEAD_LIMITS } from './utils.js';
 
 const CLICKS_KEY = 'pewenche_clicks';
 const LEADS_KEY = 'pewenche_leads';
 const LEADS_PING_KEY = 'pewenche_leads_ping';
 const LEAD_RATE_KEY = 'pewenche_last_lead_at';
 const MIN_LEAD_INTERVAL_MS = 60_000;
+const LEAD_RETENTION_DAYS = 14;
+
+function normalizeLeadPayload(payload) {
+  const email = sanitizeLeadEmail(payload.email);
+  const mensaje = sanitizeLeadText(payload.mensaje, LEAD_LIMITS.mensaje);
+  const nombreRaw = sanitizeLeadText(payload.nombre, LEAD_LIMITS.nombre);
+  const nombre = nombreRaw || email.split('@')[0] || 'Visitante';
+  const propertyId = sanitizeLeadText(payload.propertyId || 'general', 80);
+  const propertyTitle = sanitizeLeadText(payload.propertyTitle || 'Consulta web', 200);
+  return { email, mensaje, nombre, propertyId, propertyTitle };
+}
+
+function validateLeadPayload(payload) {
+  if (payload.website?.trim()) {
+    return { bot: true };
+  }
+  const data = normalizeLeadPayload(payload);
+  if (!data.email) {
+    throw new Error('El correo electrónico es obligatorio.');
+  }
+  if (!isValidEmail(data.email)) {
+    throw new Error('Correo electrónico no válido.');
+  }
+  if (/[<>"'`]/.test(data.mensaje)) {
+    throw new Error('El mensaje contiene caracteres no permitidos.');
+  }
+  const last = parseInt(sessionStorage.getItem(LEAD_RATE_KEY) || '0', 10);
+  if (Date.now() - last < MIN_LEAD_INTERVAL_MS) {
+    throw new Error('Espera un momento antes de enviar otra consulta.');
+  }
+  return { data };
+}
 
 function weekStart(d = new Date()) {
   const date = new Date(d);
@@ -113,29 +145,21 @@ export async function getTotalWeeklyClicks() {
 }
 
 export async function saveLead(payload) {
-  if (payload.website?.trim()) {
+  const check = validateLeadPayload(payload);
+  if (check.bot) {
     return { id: 'bot', propertyId: payload.propertyId, at: Date.now() };
   }
-  if (!payload.nombre?.trim() || !payload.email?.trim()) {
-    throw new Error('Nombre y correo son obligatorios.');
-  }
-  if (!isValidEmail(payload.email)) {
-    throw new Error('Correo electrónico no válido.');
-  }
-  const last = parseInt(sessionStorage.getItem(LEAD_RATE_KEY) || '0', 10);
-  if (Date.now() - last < MIN_LEAD_INTERVAL_MS) {
-    throw new Error('Espera un momento antes de enviar otra consulta.');
-  }
+  const { data } = check;
 
   if (isSupabaseConfigured()) {
     const sb = getSupabase();
     const lead = {
       id: 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      property_id: payload.propertyId,
-      property_title: payload.propertyTitle,
-      nombre: payload.nombre.trim(),
-      email: payload.email.trim(),
-      mensaje: (payload.mensaje || '').trim(),
+      property_id: data.propertyId,
+      property_title: data.propertyTitle,
+      nombre: data.nombre,
+      email: data.email,
+      mensaje: data.mensaje,
       contacted: false,
     };
     const { error } = await sb.from('leads').insert(lead);
@@ -152,14 +176,14 @@ export async function saveLead(payload) {
   await detectApi(true);
   if (hasApi()) {
     try {
-      const lead = await api('/api/leads', { method: 'POST', body: payload });
+      const lead = await api('/api/leads', { method: 'POST', body: data });
       notifyLeadsChanged();
       return lead;
     } catch (err) {
       console.warn('API leads falló, guardando local:', err.message);
     }
   }
-  return saveLeadLocal(payload);
+  return saveLeadLocal(data);
 }
 
 function mapLead(row) {
@@ -222,6 +246,25 @@ export async function markLeadContacted(id) {
   notifyLeadsChanged();
   return leads;
 }
+
+export async function purgeOldLeads(days = LEAD_RETENTION_DAYS) {
+  const cutoff = new Date(Date.now() - days * 86400000).toISOString();
+  if (isSupabaseConfigured()) {
+    const sb = getSupabase();
+    const { error, count } = await sb.from('leads').delete({ count: 'exact' }).lt('created_at', cutoff);
+    if (error) throw new Error(error.message);
+    notifyLeadsChanged();
+    return count ?? 0;
+  }
+  const leads = read(LEADS_KEY, []);
+  const kept = leads.filter(l => (l.at || 0) >= Date.now() - days * 86400000);
+  const removed = leads.length - kept.length;
+  write(LEADS_KEY, kept);
+  notifyLeadsChanged();
+  return removed;
+}
+
+export { LEAD_RETENTION_DAYS };
 
 export function onDataChange(fn) {
   const handler = e => fn(e.detail?.key);

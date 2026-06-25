@@ -43,6 +43,9 @@ body.site-body {
 .dark .site-body .text-zinc-400 { color: #d4d4d8 !important; }
 .dark .site-body .text-zinc-500 { color: #d4d4d8 !important; }
 .dark .site-body .text-zinc-600 { color: #e4e4e7 !important; }
+.dark .site-body .text-zinc-700 { color: #f4f4f5 !important; }
+.dark .site-body .text-zinc-800 { color: #fafafa !important; }
+.dark .site-body .text-zinc-200 { color: #f4f4f5 !important; }
 .dark .site-body .text-gray-400 { color: #d4d4d8 !important; }
 .dark .site-body .text-gray-500 { color: #e4e4e7 !important; }
 .dark .site-body .text-gray-600 { color: #f4f4f5 !important; }
@@ -249,6 +252,7 @@ body, header, footer, .prop-card, .modal-backdrop, .adm-input, .btn-verde, .side
 .dark .formal-search-input {
   background: #18181b;
   border-color: #3f3f46;
+  color: #f4f4f5;
 }
 .formal-search-input:focus {
   outline: 2px solid #6d8048;
@@ -309,7 +313,10 @@ body, header, footer, .prop-card, .modal-backdrop, .adm-input, .btn-verde, .side
 .dark .about-card {
   background: #18181b;
   border-color: #27272a;
+  color: #e4e4e7;
 }
+.dark .about-card h3 { color: #fafafa; }
+.dark .about-card p { color: #e4e4e7; }
 
 /* Contacto */
 .contact-section {
@@ -380,8 +387,39 @@ body, header, footer, .prop-card, .modal-backdrop, .adm-input, .btn-verde, .side
   transition: background .15s, color .15s;
 }
 .contact-table-link:hover { background: #F7F4D5; color: #27272a; }
-.dark .contact-table-link { color: #c5d4a0; border-color: #5a6b3c; }
-.dark .contact-table-link:hover { background: #4a5732; }
+.dark .contact-table-link { color: #d4ddb8; border-color: #5a6b3c; }
+.dark .contact-table-link:hover { background: #4a5732; color: #fafafa; }
+
+/* Footer siempre oscuro — texto claro fijo */
+.site-footer,
+.site-footer p,
+.site-footer button {
+  color: rgba(255, 255, 255, 0.88);
+}
+.site-footer .footer-muted {
+  color: rgba(255, 255, 255, 0.65);
+}
+.site-footer a.text-zinc-400 {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+.site-footer button[data-action="open-admin-login"] {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+.site-footer button[data-action="open-admin-login"]:hover {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Modo oscuro — tarjetas y paneles */
+.dark .prop-card { color: #f4f4f5; }
+.dark .prop-card p { color: #d4d4d8; }
+.dark .bg-white.dark\:bg-zinc-900 { color: #f4f4f5; }
+.dark #listado h2 { color: #fafafa; }
+.dark .formal-search { color: #f4f4f5; }
+.dark .formal-search-field label { color: #d4d4d8; }
+.dark .sidebar-link { color: #d4d4d8; }
+.dark .adm-input { color: #f4f4f5; }
+.dark select,
+.dark .form-select { color: #f4f4f5; background-color: #27272a; }
 .contact-label {
   display: block;
   font-size: .68rem;
@@ -402,7 +440,7 @@ body, header, footer, .prop-card, .modal-backdrop, .adm-input, .btn-verde, .side
   background: #faf8ef;
   color: #18181b;
 }
-.dark .contact-input { background: #09090b; border-color: #3f3f46; }
+.dark .contact-input { background: #09090b; border-color: #3f3f46; color: #f4f4f5; }
 .contact-input:focus { outline: 2px solid #6d8048; outline-offset: 1px; }
 .contact-submit-btn {
   width: 100%;

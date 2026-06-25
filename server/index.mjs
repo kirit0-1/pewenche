@@ -194,15 +194,25 @@ app.get('/api/leads', authMiddleware, (_req, res) => {
 });
 
 app.post('/api/leads', (req, res) => {
-  const { propertyId, propertyTitle, nombre, email, mensaje } = req.body || {};
-  if (!email?.trim() || !nombre?.trim()) {
-    return res.status(400).json({ error: 'Nombre y correo obligatorios' });
+  const { propertyId, propertyTitle, nombre, email, mensaje, website } = req.body || {};
+  if (website?.trim()) return res.json({ id: 'bot', ok: true });
+  const cleanEmail = String(email || '').trim().toLowerCase().slice(0, 254);
+  const cleanMensaje = String(mensaje || '').replace(/<[^>]*>/g, '').trim().slice(0, 1000);
+  const cleanNombre = String(nombre || '').replace(/<[^>]*>/g, '').trim().slice(0, 120)
+    || cleanEmail.split('@')[0] || 'Visitante';
+  if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(cleanEmail)) {
+    return res.status(400).json({ error: 'Correo obligatorio y válido' });
+  }
+  if (/[<>"'`]/.test(cleanMensaje)) {
+    return res.status(400).json({ error: 'Mensaje con caracteres no permitidos' });
   }
   const leads = readJson('leads.json', []);
   const lead = {
     id: 'l' + Date.now().toString(36),
-    propertyId, propertyTitle, nombre: nombre.trim(), email: email.trim(),
-    mensaje: (mensaje || '').trim(), at: Date.now(), contacted: false,
+    propertyId: String(propertyId || 'general').slice(0, 80),
+    propertyTitle: String(propertyTitle || 'Consulta').slice(0, 200),
+    nombre: cleanNombre, email: cleanEmail,
+    mensaje: cleanMensaje, at: Date.now(), contacted: false,
   };
   leads.unshift(lead);
   writeJson('leads.json', leads);

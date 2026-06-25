@@ -34,6 +34,7 @@ create policy "properties_delete" on public.properties for delete to authenticat
 create policy "leads_insert" on public.leads for insert to anon, authenticated with check (true);
 create policy "leads_select" on public.leads for select to authenticated using (public.is_pewenche_admin());
 create policy "leads_update" on public.leads for update to authenticated using (public.is_pewenche_admin());
+create policy "leads_delete" on public.leads for delete to authenticated using (public.is_pewenche_admin());
 
 -- Clics
 create policy "clicks_insert" on public.clicks for insert to anon, authenticated with check (true);

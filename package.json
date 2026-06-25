@@ -10,6 +10,7 @@
     "static": "node scripts/start.mjs",
     "prestart": "node scripts/ensure-config.mjs && node scripts/vercel-build.mjs",
     "build": "node scripts/ensure-config.mjs && node scripts/vercel-build.mjs",
+    "pack:donhost": "node scripts/pack-donhost.mjs",
     "seed:supabase": "node scripts/seed-supabase.mjs",
     "schema:supabase": "node scripts/apply-schema.mjs"
   },

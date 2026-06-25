@@ -22,7 +22,30 @@ export function safeUrl(url) {
 }
 
 export function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(String(email || '').trim());
+  const e = String(email || '').trim().toLowerCase();
+  if (e.length > 254) return false;
+  return /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(e);
+}
+
+/** Límites de formularios públicos */
+export const LEAD_LIMITS = {
+  email: 254,
+  mensaje: 1000,
+  nombre: 120,
+};
+
+/** Texto seguro para guardar: sin HTML ni caracteres de control */
+export function sanitizeLeadText(str, maxLen = 1000) {
+  return String(str ?? '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, maxLen);
+}
+
+export function sanitizeLeadEmail(email) {
+  return String(email || '').trim().toLowerCase().slice(0, LEAD_LIMITS.email);
 }
 
 export function filterImageUrls(urls) {

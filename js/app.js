@@ -108,7 +108,6 @@ export function createApp(store, state) {
       await saveLead({
         propertyId: 'general',
         propertyTitle: 'Consulta desde contacto',
-        nombre: fd.get('nombre'),
         email: fd.get('email'),
         mensaje: fd.get('mensaje'),
         website: fd.get('website'),
@@ -328,7 +327,7 @@ export function createApp(store, state) {
     if (p.banos) items.push(`<i class="fa-solid fa-shower"></i> ${p.banos}`);
     if (p.estac) items.push(`<i class="fa-solid fa-car"></i> ${p.estac}`);
     return items.map(c =>
-      `<span class="inline-flex items-center gap-1 bg-beige dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 text-xs px-2.5 py-1 rounded-lg font-medium">${c}</span>`
+      `<span class="inline-flex items-center gap-1 bg-beige dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs px-2.5 py-1 rounded-lg font-medium">${c}</span>`
     ).join('');
   }
 

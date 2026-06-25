@@ -81,12 +81,11 @@
 
       <div class="bg-verde-50 dark:bg-verde-900/20 border border-verde-100 dark:border-verde-800 rounded-2xl p-5">
         <h2 class="font-bold mb-1">¿Quieres más información?</h2>
-        <p class="text-sm text-gray-500 dark:text-zinc-400 mb-4">Déjanos tu correo y te contactamos automáticamente.</p>
+        <p class="text-sm text-gray-500 dark:text-zinc-300 mb-4">Déjanos tu correo y te contactamos.</p>
         <form id="leadForm" class="space-y-3 relative">
           <input type="text" id="leadWebsite" name="website" tabindex="-1" autocomplete="off" class="absolute left-[-9999px] w-0 h-0 opacity-0" aria-hidden="true" />
-          <input id="leadNombre" type="text" placeholder="Tu nombre" required maxlength="120" class="adm-input" />
-          <input id="leadEmail" type="email" placeholder="tu@correo.cl" required maxlength="254" class="adm-input" />
-          <textarea id="leadMensaje" rows="3" placeholder="¿Qué te gustaría saber?" maxlength="2000" class="adm-input resize-none"></textarea>
+          <input id="leadEmail" type="email" placeholder="tu@correo.cl" required maxlength="254" inputmode="email" class="adm-input" />
+          <textarea id="leadMensaje" rows="3" placeholder="¿Qué te gustaría saber? (opcional, solo texto)" maxlength="1000" class="adm-input resize-none"></textarea>
           <button type="submit" class="btn-verde w-full py-3 text-sm">
             <i class="fa-solid fa-paper-plane mr-2"></i>Solicitar información
           </button>

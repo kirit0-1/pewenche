@@ -132,7 +132,6 @@ document.getElementById('leadForm').addEventListener('submit', async e => {
     await saveLead({
       propertyId: property.id,
       propertyTitle: property.titulo,
-      nombre: document.getElementById('leadNombre').value,
       email: document.getElementById('leadEmail').value,
       mensaje: document.getElementById('leadMensaje').value,
       website: document.getElementById('leadWebsite')?.value || '',
