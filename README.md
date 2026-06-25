@@ -2,6 +2,16 @@
 
 Sitio inmobiliario Chile — Vercel + Supabase.
 
+## Contacto público
+
+| Canal | Valor |
+|-------|--------|
+| Correo | pewenchepropiedades@gmail.com |
+| Instagram | [@pewenchepropiedades](https://www.instagram.com/pewenchepropiedades/) |
+| WhatsApp | +56 9 8289 1650 |
+
+Editar en `js/config.js` → `CONTACT`. Ver **MAINTENANCE.md** para rutinas de mantenimiento.
+
 ## Seguridad
 
 - Admin en producción: **Supabase Auth** (`admin@pewenche.cl`) — sin contraseña en el código JS.
