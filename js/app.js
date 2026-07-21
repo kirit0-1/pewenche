@@ -6,7 +6,7 @@ import {
   debounce, filterBySearch, getVal, h, setVal, sortProperties, toast, waLink,
 } from './utils.js';
 import { trackClick, saveLead } from './analytics.js';
-import { clpFromUF, getUF, getUFDate, onUFChange } from './uf.js';
+import { formatPropertyPrice, getUF, getUFDate, onUFChange } from './uf.js';
 
 const cardIdx = {};
 let mIdx = 0;
@@ -117,7 +117,7 @@ export function createApp(store, state) {
       form.reset();
       if (status) {
         status.textContent = 'Consulta enviada. Te responderemos pronto.';
-        status.className = 'text-xs text-center min-h-[1rem] text-verde-700 dark:text-green-400';
+        status.className = 'text-xs text-center min-h-[1rem] text-verde-700';
       }
       toast('Consulta enviada correctamente.');
     } catch (err) {
@@ -329,17 +329,14 @@ export function createApp(store, state) {
     if (p.banos) items.push(`<i class="fa-solid fa-shower"></i> ${p.banos}`);
     if (p.estac) items.push(`<i class="fa-solid fa-car"></i> ${p.estac}`);
     return items.map(c =>
-      `<span class="inline-flex items-center gap-1 bg-beige dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs px-2.5 py-1 rounded-lg font-medium">${c}</span>`
+      `<span class="inline-flex items-center gap-1 bg-beige text-zinc-800 text-xs px-2.5 py-1 rounded-lg font-medium">${c}</span>`
     ).join('');
-  }
-
-  function priceCLP(p) {
-    return clpFromUF(p.precioUF, p.precioNota || '') || p.precioCLP || '';
   }
 
   function buildCard(p, animIdx) {
     const imgs = p.imagenes?.length ? p.imagenes : [FALLBACK_IMAGE];
     const badge = BADGE[p.tipo] || { cls: 'bg-gray-600', label: p.tipo };
+    const price = formatPropertyPrice(p);
     const slides = imgs.map(url =>
       `<div class="carousel-slide shrink-0 w-full h-full">
          <img src="${h(url)}" alt="${h(p.titulo)}" class="w-full h-full object-cover" loading="lazy" width="400" height="220"
@@ -353,43 +350,43 @@ export function createApp(store, state) {
     ).join('') : '';
 
     const div = document.createElement('article');
-    div.className = 'prop-card bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm fade-in';
+    div.className = 'prop-card bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm fade-in';
     div.style.animationDelay = `${animIdx * 55}ms`;
 
     div.innerHTML = `
-      <div class="relative overflow-hidden" style="height:220px">
+      <div class="relative overflow-hidden card-media">
         <div id="ci-${p.id}" class="carousel-inner h-full w-full">${slides}</div>
         ${imgs.length > 1 ? `
         <button type="button" data-action="card-prev" data-id="${p.id}" data-total="${imgs.length}" aria-label="Imagen anterior"
-          class="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 dark:bg-zinc-900/80 rounded-full flex items-center justify-center shadow hover:bg-white transition z-10">
+          class="absolute left-2.5 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-8 sm:h-8 bg-white/85 rounded-full flex items-center justify-center shadow hover:bg-white transition z-10">
           <i class="fa-solid fa-chevron-left text-xs"></i>
         </button>
         <button type="button" data-action="card-next" data-id="${p.id}" data-total="${imgs.length}" aria-label="Imagen siguiente"
-          class="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 dark:bg-zinc-900/80 rounded-full flex items-center justify-center shadow hover:bg-white transition z-10">
+          class="absolute right-2.5 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-8 sm:h-8 bg-white/85 rounded-full flex items-center justify-center shadow hover:bg-white transition z-10">
           <i class="fa-solid fa-chevron-right text-xs"></i>
         </button>
         <div class="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">${dots}</div>` : ''}
         <span class="absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full ${badge.cls} text-white uppercase tracking-wide z-10">${badge.label}</span>
       </div>
-      <div class="p-5">
-        <div class="mb-1">
-          <span class="price-uf">${p.precioUF ? p.precioUF.toLocaleString('es-CL') + ' UF' : '—'}</span>
-          ${priceCLP(p) ? `<span class="text-zinc-600 dark:text-zinc-300 text-xs ml-2 font-medium">${h(priceCLP(p))}</span>` : ''}
+      <div class="p-4 sm:p-5">
+        <div class="mb-1.5">
+          <span class="${price.showUF ? 'price-uf' : 'price-clp'}">${h(price.primary)}</span>
+          ${price.secondary ? `<span class="text-zinc-600 text-xs ml-2 font-medium block sm:inline mt-0.5 sm:mt-0">${h(price.secondary)}</span>` : ''}
         </div>
-        <h3 class="font-bold text-base leading-snug mb-1 text-zinc-900 dark:text-zinc-100">${h(p.titulo)}</h3>
-        <p class="text-zinc-600 dark:text-zinc-300 text-xs flex items-center gap-1 mb-3 font-medium">
-          <i class="fa-solid fa-location-dot text-verde-800 dark:text-green-300 shrink-0"></i>
+        <h3 class="font-bold text-base leading-snug mb-1 text-zinc-900">${h(p.titulo)}</h3>
+        <p class="text-zinc-600 text-xs flex items-center gap-1 mb-3 font-medium">
+          <i class="fa-solid fa-location-dot text-verde-800 shrink-0"></i>
           ${h(p.comuna || '')}${p.region ? ', ' + h(p.region) : ''}
         </p>
         <div class="flex flex-wrap gap-1.5 mb-3">${buildChips(p)}</div>
-        <p class="text-zinc-700 dark:text-zinc-200 text-xs leading-relaxed line-clamp-2 mb-4 font-medium">${h(p.desc || '')}</p>
+        <p class="text-zinc-700 text-xs leading-relaxed line-clamp-2 mb-4 font-medium">${h(p.desc || '')}</p>
         <div class="flex gap-2">
           <a href="propiedad.html?id=${p.id}" target="_blank" rel="noopener" data-action="open-detail" data-id="${p.id}"
             class="btn-verde flex-1 py-2.5 text-sm text-center">
             <i class="fa-solid fa-up-right-from-square mr-1.5"></i>Ver detalles
           </a>
           <a href="${waLink(CONTACT.whatsapp, `Hola, me interesa ${p.titulo}`)}" target="_blank" rel="noopener"
-            class="w-10 h-10 flex items-center justify-center bg-[#25D366] hover:bg-[#1ebe5d] rounded-xl transition shrink-0" aria-label="Consultar por WhatsApp">
+            class="w-11 h-11 sm:w-10 sm:h-10 flex items-center justify-center bg-[#25D366] hover:bg-[#1ebe5d] rounded-xl transition shrink-0" aria-label="Consultar por WhatsApp">
             <i class="fa-brands fa-whatsapp text-white"></i>
           </a>
         </div>
@@ -466,18 +463,14 @@ export function createApp(store, state) {
     });
   }
 
-  function toggleTheme() {
-    const isDark = document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    document.getElementById('themeIcon').className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-  }
-
   function toggleMobileMenu() {
     const menu = document.getElementById('mobileMenu');
     const icon = document.getElementById('menuIcon');
+    const btn = document.querySelector('[data-action="toggle-menu"]');
     const hidden = menu.classList.toggle('hidden');
     icon.className = hidden ? 'fa-solid fa-bars' : 'fa-solid fa-xmark';
     menu.setAttribute('aria-hidden', hidden ? 'true' : 'false');
+    if (btn) btn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
   }
 
   function updateUFIndicator() {
@@ -490,12 +483,8 @@ export function createApp(store, state) {
   }
 
   function initTheme() {
-    const saved = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (saved === 'dark' || (!saved && prefersDark)) {
-      document.documentElement.classList.add('dark');
-      document.getElementById('themeIcon').className = 'fa-solid fa-sun';
-    }
+    document.documentElement.classList.remove('dark');
+    try { localStorage.removeItem('theme'); } catch { /* ignore */ }
     onUFChange(() => {
       updateUFIndicator();
       applyFilters(state);
@@ -579,7 +568,6 @@ export function createApp(store, state) {
     renderGrid,
     openDetail,
     closeDetail,
-    toggleTheme,
     toggleMobileMenu,
     initTheme,
     bindEvents,

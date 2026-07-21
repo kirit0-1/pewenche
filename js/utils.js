@@ -68,7 +68,7 @@ export function genId() {
 
 export function toast(msg) {
   const t = document.createElement('div');
-  t.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-sm font-semibold px-5 py-3 rounded-2xl shadow-xl z-[9999] fade-in';
+  t.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-sm font-semibold px-5 py-3 rounded-2xl shadow-xl z-[9999] fade-in';
   t.setAttribute('role', 'status');
   t.textContent = msg;
   document.body.appendChild(t);

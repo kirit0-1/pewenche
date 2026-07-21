@@ -195,6 +195,9 @@ export function enrichProperty(p) {
     const m = p.precioCLP.match(/(\/mes|\/noche)$/i);
     if (m) precioNota = m[1].toLowerCase();
   }
+  if (!precioNota && String(p.tipo || '').toLowerCase() === 'arriendo') {
+    precioNota = '/mes';
+  }
   return {
     ...p,
     precioNota,

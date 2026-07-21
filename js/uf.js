@@ -46,13 +46,53 @@ export function startUFService() {
   setInterval(fetchUF, REFRESH_MS);
 }
 
-export function clpFromUF(ufAmount, nota = '') {
-  if (!ufValue || !ufAmount) return null;
-  const clp = Math.round(ufAmount * ufValue);
+export function formatCLP(amount, nota = '') {
+  if (amount == null || Number.isNaN(Number(amount))) return null;
   const formatted = new Intl.NumberFormat('es-CL', {
     style: 'currency',
     currency: 'CLP',
     maximumFractionDigits: 0,
-  }).format(clp);
+  }).format(Math.round(Number(amount)));
   return nota ? `${formatted}${nota}` : formatted;
+}
+
+export function clpFromUF(ufAmount, nota = '') {
+  if (!ufValue || !ufAmount) return null;
+  return formatCLP(ufAmount * ufValue, nota);
+}
+
+/** Arriendos: solo pesos. Ventas/otros: UF principal + CLP secundario. */
+export function formatPropertyPrice(p) {
+  const tipo = String(p?.tipo || '').toLowerCase();
+  const isArriendo = tipo === 'arriendo';
+  const nota = p?.precioNota
+    || (isArriendo ? '/mes' : '')
+    || '';
+
+  const storedCLP = String(p?.precioCLP || '').trim();
+  const liveCLP = clpFromUF(p?.precioUF, nota);
+  const clpText = liveCLP
+    || (storedCLP
+      ? (nota && !/(\/mes|\/noche)$/i.test(storedCLP) ? `${storedCLP}${nota}` : storedCLP)
+      : '');
+
+  if (isArriendo) {
+    return {
+      primary: clpText || 'Consultar',
+      secondary: '',
+      showUF: false,
+      clp: clpText,
+    };
+  }
+
+  const ufText = p?.precioUF
+    ? `${Number(p.precioUF).toLocaleString('es-CL')} UF`
+    : '';
+
+  return {
+    primary: ufText || clpText || '—',
+    secondary: ufText ? clpText : '',
+    showUF: Boolean(ufText),
+    clp: clpText,
+  };
 }

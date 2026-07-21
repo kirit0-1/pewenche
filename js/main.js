@@ -103,7 +103,6 @@ document.addEventListener('click', e => {
 
   const action = el.dataset.action;
   const handlers = {
-    'toggle-theme': () => app?.toggleTheme(),
     'toggle-menu': () => app?.toggleMobileMenu(),
     'toggle-admin-menu': () => admin?.toggleMobileSidebar?.(),
     'apply-filters': () => app?.searchAndScroll(),

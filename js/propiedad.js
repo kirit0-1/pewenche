@@ -7,7 +7,7 @@ import { isSupabaseConfigured } from './supabase-client.js';
 import { detectApi } from './api.js';
 import { trackClick, saveLead } from './analytics.js';
 import { toast } from './utils.js';
-import { fetchUF, getUF, getUFDate, onUFChange, clpFromUF } from './uf.js';
+import { fetchUF, getUF, getUFDate, onUFChange, formatPropertyPrice } from './uf.js';
 import { h, mapsUrl, waLink, mapEmbedUrl } from './utils.js';
 
 let store = new LocalPropertyStore();
@@ -16,32 +16,31 @@ const propertyId = params.get('id');
 
 let property = null;
 
-function initTheme() {
-  const saved = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const dark = saved === 'dark' || (!saved && prefersDark);
-  document.documentElement.classList.toggle('dark', dark);
-  document.getElementById('themeIcon').className = dark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+function forceLightTheme() {
+  document.documentElement.classList.remove('dark');
+  try { localStorage.removeItem('theme'); } catch { /* ignore */ }
 }
-
-document.getElementById('themeToggle').addEventListener('click', () => {
-  const dark = document.documentElement.classList.toggle('dark');
-  localStorage.setItem('theme', dark ? 'dark' : 'light');
-  document.getElementById('themeIcon').className = dark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-});
 
 function updatePrices() {
   if (!property) return;
-  document.getElementById('priceUF').textContent = property.precioUF
-    ? `${property.precioUF.toLocaleString('es-CL')} UF`
-    : '—';
-  const clp = clpFromUF(property.precioUF, property.precioNota || '');
-  document.getElementById('priceCLP').textContent = clp || property.precioCLP || '';
+  const price = formatPropertyPrice(property);
+  const primary = document.getElementById('priceUF');
+  const secondary = document.getElementById('priceCLP');
+  primary.className = price.showUF ? 'price-uf' : 'price-clp';
+  primary.textContent = price.primary;
+  secondary.textContent = price.secondary || '';
+  secondary.classList.toggle('hidden', !price.secondary);
+
   const uf = getUF();
   const date = getUFDate();
-  if (uf) {
-    document.getElementById('ufIndicator').textContent =
-      `CLP calculado con UF $${uf.toLocaleString('es-CL')}${date ? ` · ${date.split('T')[0]}` : ''}`;
+  const tip = document.getElementById('ufIndicator');
+  if (!tip) return;
+  if (String(property.tipo || '').toLowerCase() === 'arriendo') {
+    tip.textContent = uf
+      ? `Precio en pesos · UF referencial $${uf.toLocaleString('es-CL')}`
+      : 'Precio en pesos chilenos';
+  } else if (uf) {
+    tip.textContent = `CLP calculado con UF $${uf.toLocaleString('es-CL')}${date ? ` · ${date.split('T')[0]}` : ''}`;
   }
 }
 
@@ -57,13 +56,13 @@ function renderContacts() {
 
   document.getElementById('contactLinks').innerHTML = links.map(l => `
     <a href="${l.href}" ${l.external ? 'target="_blank" rel="noopener"' : ''}
-       class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
+       class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition">
       <span class="w-10 h-10 ${l.color} rounded-xl flex items-center justify-center text-white shrink-0">
         <i class="${l.iconClass}"></i>
       </span>
       <span>
         <span class="font-semibold text-sm block">${l.label}</span>
-        <span class="text-xs text-gray-400">${h(l.sub)}</span>
+        <span class="text-xs text-gray-500">${h(l.sub)}</span>
       </span>
     </a>`).join('');
 }
@@ -82,7 +81,7 @@ function renderProperty(p) {
 
   const imgs = p.imagenes?.length ? p.imagenes : [FALLBACK_IMAGE];
   document.getElementById('gallery').innerHTML = imgs.map((url, i) => `
-    <div class="${i === 0 ? 'sm:col-span-2 sm:row-span-2' : ''} relative overflow-hidden bg-gray-100 dark:bg-zinc-800" style="min-height:${i === 0 ? '320px' : '150px'}">
+    <div class="${i === 0 ? 'sm:col-span-2 sm:row-span-2' : ''} relative overflow-hidden bg-gray-100" style="min-height:${i === 0 ? '280px' : '140px'}">
       <img src="${h(url)}" alt="${h(p.titulo)}" class="w-full h-full object-cover" loading="${i < 2 ? 'eager' : 'lazy'}"
         onerror="this.src='${FALLBACK_IMAGE}'" />
     </div>`).join('');
@@ -95,10 +94,10 @@ function renderProperty(p) {
   ].filter(s => s.val);
 
   document.getElementById('stats').innerHTML = statDefs.map(s => `
-    <div class="bg-gray-50 dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl p-4 text-center">
-      <i class="fa-solid ${s.icon} text-verde-700 dark:text-green-400 text-lg mb-1 block"></i>
+    <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 text-center">
+      <i class="fa-solid ${s.icon} text-verde-700 text-lg mb-1 block"></i>
       <span class="font-bold block">${s.val}</span>
-      <span class="text-xs text-gray-400">${s.label}</span>
+      <span class="text-xs text-gray-500">${s.label}</span>
     </div>`).join('');
 
   document.getElementById('descShort').textContent = p.desc || '';
@@ -108,7 +107,7 @@ function renderProperty(p) {
   document.getElementById('extrasSection').innerHTML = p.extras?.length ? `
     <h2 class="text-lg font-bold mb-3">Características</h2>
     <div class="flex flex-wrap gap-2">
-      ${p.extras.map(e => `<span class="bg-verde-50 dark:bg-verde-900/20 text-verde-700 dark:text-green-300 text-xs font-medium px-3 py-1.5 rounded-full">${h(e)}</span>`).join('')}
+      ${p.extras.map(e => `<span class="bg-verde-50 text-verde-700 text-xs font-medium px-3 py-1.5 rounded-full">${h(e)}</span>`).join('')}
     </div>` : '';
 
   const mapUrl = mapsUrl(p);
@@ -147,7 +146,7 @@ document.getElementById('leadForm').addEventListener('submit', async e => {
 });
 
 async function init() {
-  initTheme();
+  forceLightTheme();
   if (isSupabaseConfigured()) store = new SupabasePropertyStore();
   else if (await detectApi()) store = new ApiPropertyStore();
   await fetchUF();

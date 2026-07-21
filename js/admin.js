@@ -3,7 +3,7 @@ import { getVal, genId, h, setVal, toast, mapEmbedUrl, safeUrl, filterImageUrls 
 import {
   getWeeklyClickStats, getTotalWeeklyClicks, getLeads, markLeadContacted, purgeOldLeads, LEAD_RETENTION_DAYS, onDataChange,
 } from './analytics.js';
-import { clpFromUF } from './uf.js';
+import { formatPropertyPrice } from './uf.js';
 import { hasApi, uploadImages, api, getToken } from './api.js';
 import { isSupabaseConfigured, hasAdminSession } from './supabase-client.js';
 import { createCloudBackup, listBackups } from './backup.js';
@@ -21,15 +21,15 @@ export function createAdmin(store, auth, state, app) {
     const mode = window.__PEWENCHE_BACKEND__ || (isSupabaseConfigured() ? 'supabase' : hasApi() ? 'api' : 'local');
     const label = getBackendLabel(mode);
     if (mode === 'supabase') {
-      el.className = 'mb-4 p-3 rounded-xl text-sm border border-verde-200 dark:border-verde-800 bg-verde-50 dark:bg-verde-900/20 text-verde-800 dark:text-green-300';
+      el.className = 'mb-4 p-3 rounded-xl text-sm border border-verde-200 bg-verde-50 text-verde-800';
       el.innerHTML = '<i class="fa-solid fa-cloud mr-1"></i> Los cambios se guardan <strong>permanentemente en Supabase</strong> (nube). Visibles desde cualquier dispositivo.';
       el.classList.remove('hidden');
     } else if (!isLocalDev()) {
-      el.className = 'mb-4 p-3 rounded-xl text-sm border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300';
+      el.className = 'mb-4 p-3 rounded-xl text-sm border border-red-300 bg-red-50 text-red-800';
       el.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> <strong>Problema:</strong> el sitio está en modo «${label}». Las consultas de visitantes <strong>no llegan al admin</strong>. Configura <code>SUPABASE_URL</code> y <code>SUPABASE_ANON_KEY</code> en Vercel y redeploy.`;
       el.classList.remove('hidden');
     } else {
-      el.className = 'mb-4 p-3 rounded-xl text-sm border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-200';
+      el.className = 'mb-4 p-3 rounded-xl text-sm border border-amber-200 bg-amber-50 text-amber-900';
       el.innerHTML = `<i class="fa-solid fa-laptop mr-1"></i> Modo local: <strong>${label}</strong>. En producción (Vercel) debe decir Supabase.`;
       el.classList.remove('hidden');
     }
@@ -184,22 +184,22 @@ export function createAdmin(store, auth, state, app) {
 
     list.forEach(p => {
       const badge = BADGE[p.tipo] || { cls: 'bg-gray-600', label: p.tipo };
-      const clp = clpFromUF(p.precioUF, p.precioNota || '') || p.precioCLP || '';
+      const price = formatPropertyPrice(p);
       const img = h(safeUrl(p.imagenes?.[0]) || '');
 
       if (tbody) {
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-gray-50 dark:hover:bg-zinc-700/30 transition';
+        tr.className = 'hover:bg-gray-50 transition';
         tr.innerHTML = `
           <td class="px-4 py-3">
             <div class="flex items-center gap-3">
-              <img src="${img}" alt="" class="w-12 h-12 rounded-xl object-cover shrink-0 border border-gray-100 dark:border-zinc-700" onerror="this.style.display='none'" />
-              <div><p class="font-medium text-sm">${h(p.titulo)}</p><p class="text-xs text-gray-400">${h(p.comuna || '')}${p.region ? ', ' + h(p.region) : ''}</p></div>
+              <img src="${img}" alt="" class="w-12 h-12 rounded-xl object-cover shrink-0 border border-gray-100" onerror="this.style.display='none'" />
+              <div><p class="font-medium text-sm">${h(p.titulo)}</p><p class="text-xs text-gray-500">${h(p.comuna || '')}${p.region ? ', ' + h(p.region) : ''}</p></div>
             </div>
           </td>
           <td class="px-4 py-3 hidden sm:table-cell"><span class="text-xs font-semibold px-2.5 py-1 rounded-full text-white ${badge.cls}">${badge.label}</span></td>
           <td class="px-4 py-3 hidden md:table-cell text-sm text-gray-500">${h(p.region || '—')}</td>
-          <td class="px-4 py-3 text-sm"><span class="font-semibold text-verde-700 dark:text-green-400">${p.precioUF ? p.precioUF.toLocaleString('es-CL') + ' UF' : '—'}</span>${clp ? `<br><span class="text-xs text-gray-400">${h(clp)}</span>` : ''}</td>
+          <td class="px-4 py-3 text-sm"><span class="font-semibold text-verde-700">${h(price.primary)}</span>${price.secondary ? `<br><span class="text-xs text-gray-500">${h(price.secondary)}</span>` : ''}</td>
           <td class="px-4 py-3 text-right whitespace-nowrap">
             <a href="propiedad.html?id=${p.id}" target="_blank" rel="noopener" class="text-xs text-blue-600 hover:underline px-2"><i class="fa-solid fa-eye"></i></a>
             <button type="button" data-action="edit-prop" data-id="${p.id}" class="text-xs text-verde-700 hover:underline px-2"><i class="fa-solid fa-pen-to-square"></i> Editar</button>
@@ -218,8 +218,8 @@ export function createAdmin(store, auth, state, app) {
           </div>
           <div class="admin-prop-card-body">
             <p class="font-semibold text-sm leading-snug mb-1">${h(p.titulo)}</p>
-            <p class="text-xs text-gray-400 mb-2"><i class="fa-solid fa-location-dot mr-1"></i>${h(p.comuna || '')}${p.region ? ', ' + h(p.region) : ''}</p>
-            <p class="text-verde-700 dark:text-green-400 font-bold text-sm">${p.precioUF ? p.precioUF.toLocaleString('es-CL') + ' UF' : '—'}${clp ? `<span class="text-gray-400 font-normal ml-1">${h(clp)}</span>` : ''}</p>
+            <p class="text-xs text-gray-500 mb-2"><i class="fa-solid fa-location-dot mr-1"></i>${h(p.comuna || '')}${p.region ? ', ' + h(p.region) : ''}</p>
+            <p class="text-verde-700 font-bold text-sm">${h(price.primary)}${price.secondary ? `<span class="text-gray-500 font-normal ml-1">${h(price.secondary)}</span>` : ''}</p>
             <div class="admin-prop-card-actions">
               <a href="propiedad.html?id=${p.id}" target="_blank" rel="noopener" class="admin-prop-card-btn"><i class="fa-solid fa-eye"></i> Ver</a>
               <button type="button" data-action="edit-prop" data-id="${p.id}" class="admin-prop-card-btn admin-prop-card-btn--primary"><i class="fa-solid fa-pen"></i> Editar</button>
@@ -251,10 +251,10 @@ export function createAdmin(store, auth, state, app) {
     }
     const max = stats[0].count;
     container.innerHTML = stats.map((s, i) => `
-      <div class="flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-zinc-700 ${i === 0 ? 'bg-verde-50 dark:bg-verde-900/20' : ''}">
+      <div class="flex items-center gap-4 p-4 rounded-xl border border-gray-100 ${i === 0 ? 'bg-verde-50' : ''}">
         <span class="w-8 h-8 rounded-full bg-verde-800 text-white text-sm font-bold flex items-center justify-center">${i + 1}</span>
         <div class="flex-1"><p class="font-semibold text-sm">${h(s.titulo)}</p>
-          <div class="mt-2 h-2 bg-gray-100 dark:bg-zinc-700 rounded-full"><div class="h-full bg-verde-600 rounded-full" style="width:${Math.round((s.count / max) * 100)}%"></div></div>
+          <div class="mt-2 h-2 bg-gray-100 rounded-full"><div class="h-full bg-verde-600 rounded-full" style="width:${Math.round((s.count / max) * 100)}%"></div></div>
         </div>
         <span class="text-lg font-bold text-verde-700">${s.count}</span>
       </div>`).join('');
@@ -288,16 +288,16 @@ export function createAdmin(store, auth, state, app) {
       return;
     }
     container.innerHTML = leads.map(l => `
-      <div class="admin-lead-card p-4 rounded-xl border border-gray-100 dark:border-zinc-700 ${l.contacted ? 'opacity-60' : 'bg-white dark:bg-zinc-800'}">
+      <div class="admin-lead-card p-4 rounded-xl border border-gray-100 ${l.contacted ? 'opacity-60' : 'bg-white'}">
         <div class="flex flex-col sm:flex-row sm:justify-between gap-1 mb-2">
           <div class="min-w-0"><p class="font-semibold truncate">${h(l.nombre)}</p><p class="text-sm text-gray-400 truncate">${h(l.email)}</p></div>
           <span class="text-xs text-gray-400 shrink-0">${new Date(l.at).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}</span>
         </div>
-        <p class="text-sm text-verde-700 dark:text-green-400 mb-1"><i class="fa-solid fa-house mr-1"></i>${h(l.propertyTitle)}</p>
+        <p class="text-sm text-verde-700 mb-1"><i class="fa-solid fa-house mr-1"></i>${h(l.propertyTitle)}</p>
         ${l.mensaje ? `<p class="text-sm text-gray-500 mb-3 line-clamp-3">${h(l.mensaje)}</p>` : ''}
         <div class="flex flex-col xs:flex-row gap-2">
           <a href="mailto:${h(l.email)}?subject=${encodeURIComponent('Re: ' + l.propertyTitle)}" class="text-sm btn-verde px-4 py-2.5 text-center"><i class="fa-solid fa-envelope mr-1"></i>Contactar</a>
-          ${!l.contacted ? `<button type="button" data-action="mark-contacted" data-id="${l.id}" class="text-sm px-4 py-2.5 border border-gray-200 dark:border-zinc-600 rounded-xl">Marcar contactado</button>` : '<span class="text-sm text-gray-400 py-2.5">✓ Contactado</span>'}
+          ${!l.contacted ? `<button type="button" data-action="mark-contacted" data-id="${l.id}" class="text-sm px-4 py-2.5 border border-gray-200 rounded-xl">Marcar contactado</button>` : '<span class="text-sm text-gray-400 py-2.5">✓ Contactado</span>'}
         </div>
       </div>`).join('');
   }
@@ -310,7 +310,7 @@ export function createAdmin(store, auth, state, app) {
       return;
     }
     el.innerHTML = editorImages.map((url, i) => `
-      <div class="relative group rounded-xl overflow-hidden border border-gray-200 dark:border-zinc-700 aspect-video bg-gray-100">
+      <div class="relative group rounded-xl overflow-hidden border border-gray-200 aspect-video bg-gray-100">
         <img src="${h(safeUrl(url))}" alt="" class="w-full h-full object-cover" />
         <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
           ${i > 0 ? `<button type="button" data-action="img-up" data-i="${i}" class="w-8 h-8 bg-white rounded-full text-xs">↑</button>` : ''}
@@ -335,6 +335,21 @@ export function createAdmin(store, auth, state, app) {
       lng: parseFloat(getVal('formLng')) || undefined,
     };
     frame.src = mapEmbedUrl(prop);
+  }
+
+  function syncPriceFormLabels() {
+    const tipo = getVal('formTipo');
+    const ufLabel = document.getElementById('formPrecioUFLabel');
+    const clpLabel = document.getElementById('formPrecioCLPLabel');
+    const nota = getVal('formPrecioNota');
+    if (tipo === 'arriendo') {
+      if (ufLabel) ufLabel.textContent = 'Base UF (solo cálculo)';
+      if (clpLabel) clpLabel.textContent = 'Precio público en pesos';
+      if (!nota) setVal('formPrecioNota', '/mes');
+    } else {
+      if (ufLabel) ufLabel.textContent = 'Precio UF';
+      if (clpLabel) clpLabel.textContent = 'CLP (respaldo / referencia)';
+    }
   }
 
   function openPropertyForm(id) {
@@ -368,6 +383,7 @@ export function createAdmin(store, auth, state, app) {
       setVal('formRegion', 'Metropolitana de Santiago');
       editorImages = [];
     }
+    syncPriceFormLabels();
     syncImagesToTextarea();
     renderImageGallery();
     switchTab('editor');
@@ -413,11 +429,15 @@ export function createAdmin(store, auth, state, app) {
     const urlLines = filterImageUrls(getVal('formImagenes').split('\n').map(s => s.trim()).filter(Boolean));
     const imagenes = filterImageUrls([...new Set([...editorImages, ...urlLines])]);
 
+    const tipo = getVal('formTipo');
+    let precioNota = getVal('formPrecioNota').trim();
+    if (tipo === 'arriendo' && !precioNota) precioNota = '/mes';
+
     const prop = {
-      id, titulo, tipo: getVal('formTipo'), region: getVal('formRegion'),
+      id, titulo, tipo, region: getVal('formRegion'),
       comuna: getVal('formComuna').trim(), direccion: getVal('formDireccion').trim(),
       lat: parseFloat(getVal('formLat')) || undefined, lng: parseFloat(getVal('formLng')) || undefined,
-      precioUF: parseFloat(getVal('formPrecioUF')) || 0, precioNota: getVal('formPrecioNota').trim(),
+      precioUF: parseFloat(getVal('formPrecioUF')) || 0, precioNota,
       precioCLP: getVal('formPrecioCLP').trim(),
       superficie: parseInt(getVal('formSuperficie'), 10) || 0,
       dorms: parseInt(getVal('formDorms'), 10) || 0,
@@ -573,6 +593,7 @@ export function createAdmin(store, auth, state, app) {
     document.getElementById('adminQuickNew')?.addEventListener('click', () => openPropertyForm(null));
     document.getElementById('adminQuickList')?.addEventListener('click', () => switchTab('propiedades'));
     document.getElementById('adminQuickLeads')?.addEventListener('click', () => switchTab('leads'));
+    document.getElementById('formTipo')?.addEventListener('change', syncPriceFormLabels);
 
     ['adminFilterSearch', 'adminFilterTipo', 'adminFilterRegion'].forEach(id => {
       document.getElementById(id)?.addEventListener('input', renderAdminTable);
