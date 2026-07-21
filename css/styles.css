@@ -175,20 +175,38 @@ body, header, footer, .prop-card, .modal-backdrop, .adm-input, .btn-verde, .side
 
 .hero-bg {
   position: relative;
-  background:
-    linear-gradient(180deg, rgba(10, 51, 35, .52) 0%, rgba(61, 72, 41, .68) 45%, rgba(10, 51, 35, .8) 100%),
-    var(--hero-image) center/cover no-repeat;
+  overflow: hidden;
+  background: #0A3323;
+}
+.hero-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+  z-index: 0;
+}
+.hero-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(10, 51, 35, .52) 0%, rgba(61, 72, 41, .68) 45%, rgba(10, 51, 35, .8) 100%);
+  pointer-events: none;
 }
 .hero-bg::after {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
+  z-index: 1;
   background: var(--rock-texture) center/cover no-repeat;
   opacity: 0.14;
   mix-blend-mode: overlay;
 }
-.hero-bg > * { position: relative; z-index: 1; }
+.hero-bg > * { position: relative; z-index: 2; }
+.hero-bg > .hero-photo { z-index: 0; }
 
 /* Header transparente → sólido al scroll */
 .site-header {
