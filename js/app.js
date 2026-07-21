@@ -80,7 +80,7 @@ export function createApp(store, state) {
     void section.offsetWidth;
     section.classList.add('contact-section--highlight');
     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    setTimeout(() => document.getElementById('contactNombre')?.focus(), 450);
+    setTimeout(() => document.getElementById('contactEmail')?.focus(), 450);
   }
 
   function initHeaderScroll() {

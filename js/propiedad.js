@@ -81,8 +81,8 @@ function renderProperty(p) {
 
   const imgs = p.imagenes?.length ? p.imagenes : [FALLBACK_IMAGE];
   document.getElementById('gallery').innerHTML = imgs.map((url, i) => `
-    <div class="${i === 0 ? 'sm:col-span-2 sm:row-span-2' : ''} relative overflow-hidden bg-gray-100" style="min-height:${i === 0 ? '280px' : '140px'}">
-      <img src="${h(url)}" alt="${h(p.titulo)}" class="w-full h-full object-cover" loading="${i < 2 ? 'eager' : 'lazy'}"
+    <div class="${i === 0 ? 'sm:col-span-2 sm:row-span-2' : ''} relative overflow-hidden bg-[#faf8ef] aspect-[4/3] sm:aspect-auto" style="min-height:${i === 0 ? '280px' : '140px'}">
+      <img src="${h(url)}" alt="${h(p.titulo)}" class="w-full h-full object-cover absolute inset-0 sm:static" loading="${i < 2 ? 'eager' : 'lazy'}"
         onerror="this.src='${FALLBACK_IMAGE}'" />
     </div>`).join('');
 

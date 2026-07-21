@@ -295,7 +295,7 @@ export function createAdmin(store, auth, state, app) {
         </div>
         <p class="text-sm text-verde-700 mb-1"><i class="fa-solid fa-house mr-1"></i>${h(l.propertyTitle)}</p>
         ${l.mensaje ? `<p class="text-sm text-gray-500 mb-3 line-clamp-3">${h(l.mensaje)}</p>` : ''}
-        <div class="flex flex-col xs:flex-row gap-2">
+        <div class="flex flex-col sm:flex-row gap-2">
           <a href="mailto:${h(l.email)}?subject=${encodeURIComponent('Re: ' + l.propertyTitle)}" class="text-sm btn-verde px-4 py-2.5 text-center"><i class="fa-solid fa-envelope mr-1"></i>Contactar</a>
           ${!l.contacted ? `<button type="button" data-action="mark-contacted" data-id="${l.id}" class="text-sm px-4 py-2.5 border border-gray-200 rounded-xl">Marcar contactado</button>` : '<span class="text-sm text-gray-400 py-2.5">✓ Contactado</span>'}
         </div>
