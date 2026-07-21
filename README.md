@@ -66,16 +66,25 @@ Build: `npm run build` → carpeta `public/` (automático en Vercel). **Redeploy
 
 **Vercel → Settings → Build:** Framework **Other**, Build Command `npm run build`, Output Directory `public`.
 
-### 3. Dominio nic.cl
+### 3. Dominio nic.cl → DonHost
 
-En Vercel → Domains → añade `pewenche.cl` y `www.pewenche.cl`.
+El sitio de producción va a **DonHost** (no Vercel). En [nic.cl](https://nic.cl) → tu dominio `pewenche.cl` → **Servidores de nombre autorizados**, deja **solo** estos:
 
-En nic.cl DNS:
+```
+ns1.donhost.cl
+ns2.donhost.cl
+ns3.donhost.cl
+ns4.donhost.cl
+```
 
-| Tipo | Nombre | Valor |
-|------|--------|--------|
-| A | `@` | `76.76.21.21` |
-| CNAME | `www` | `cname.vercel-dns.com` |
+Fuente oficial: [DNS DonHost](https://www.clientes.donhost.cl/index.php/knowledgebase/1/Cuales-don-los-dns-de-donhost.html).
+
+1. Guarda en NIC Chile (propagación: minutos a 24–48 h).
+2. En DonHost / cPanel → **Dominios** / **Addon** asegúrate de que `pewenche.cl` y `www` apunten a `public_html`.
+3. Activa **SSL** (Let’s Encrypt) cuando el DNS ya resuelva a DonHost.
+4. Sube el contenido de `dist-hosting/` (o `pewenche-donhost.zip`) a `public_html`.
+
+Mientras tanto puedes usar: https://pewenche.vercel.app y https://kirit0-1.github.io/pewenche/
 
 ### 4. Verificar consultas (leads)
 

@@ -26,7 +26,7 @@ Fuente única en código: `js/config.js` → `CONTACT`.
   - `supabase/schema-leads-retention.sql` (requiere extensión `pg_cron`)
 - [ ] **Variables Vercel** — `SUPABASE_URL` y `SUPABASE_ANON_KEY` configuradas
 - [ ] **Auth** — sign-ups deshabilitados; usuario `admin@pewenche.cl` activo
-- [ ] **Dominio** — cuando esté listo: apuntar `pewenche.cl` en Vercel + DNS en NIC
+- [ ] **Dominio** — en nic.cl apuntar servidores a DonHost (`ns1`–`ns4.donhost.cl`); subir `dist-hosting/` a `public_html`
 - [ ] **Instagram / Gmail** — bio y firma de correo con enlace a la web
 
 ---
@@ -80,7 +80,7 @@ Fuente única en código: `js/config.js` → `CONTACT`.
 | Admin producción      | OK                  | Supabase Auth, no contraseña en JS                     |
 | Leads en nube         | OK                  | Supabase + validación + rate limit                     |
 | Retención leads       | Pendiente verificar | SQL + botón admin 14 días                              |
-| Dominio pewenche.cl   | Pendiente           | Vercel + NIC cuando cliente confirme                   |
+| Dominio pewenche.cl   | Listo para DonHost  | NIC: ns1–ns4.donhost.cl · quitar DNS Vercel ✓                   |
 | Facebook              | Revisar             | URL genérica en config — actualizar si hay página real |
 | CSP / headers         | OK                  | `vercel.json`                                          |
 | Modo claro / oscuro   | OK                  | Corregido en `css/styles.css`                          |
