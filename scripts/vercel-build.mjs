@@ -11,7 +11,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const publicDir = join(root, 'public');
 
-const STATIC_COPY = ['index.html', 'propiedad.html', 'css', 'js', 'uploads'];
+const STATIC_COPY = ['index.html', 'propiedad.html', 'css', 'js', 'img', 'uploads'];
 
 function copyDir(src, dest) {
   mkdirSync(dest, { recursive: true });

@@ -13,7 +13,8 @@
   <meta property="og:title" content="Pewenche Propiedades — Chile" />
   <meta property="og:description" content="Casas, departamentos, terrenos, hostales y campings en todo Chile." />
   <meta property="og:url" content="https://pewenche.cl" />
-  <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Volcano_Llaima_with_Lake_Conguill%C3%ADo%2C_Conguill%C3%ADo_National_Park.jpg/1200px-Volcano_Llaima_with_Lake_Conguill%C3%ADo%2C_Conguill%C3%ADo_National_Park.jpg" />
+  <meta property="og:image" content="https://pewenche.vercel.app/img/og-pewenche.jpg" />
+  <meta name="twitter:image" content="https://pewenche.vercel.app/img/og-pewenche.jpg" />
   <meta property="og:locale" content="es_CL" />
 
   <!-- Twitter -->
@@ -367,9 +368,12 @@
   </header>
 
   <section class="hero-bg pt-[4.25rem]">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Volcano_Llaima_with_Lake_Conguill%C3%ADo%2C_Conguill%C3%ADo_National_Park.jpg/1600px-Volcano_Llaima_with_Lake_Conguill%C3%ADo%2C_Conguill%C3%ADo_National_Park.jpg"
-         alt="Parque Nacional Conguillío — volcán Llaima, araucarias y lago en el sur de Chile"
-         class="hero-photo" width="1600" height="900" fetchpriority="high" />
+    <picture>
+      <source type="image/webp" srcset="img/hero-pewenche-md.webp 1280w, img/hero-pewenche.webp 1920w" sizes="100vw" />
+      <img src="img/hero-pewenche.jpg"
+           alt="Territorio Pewenche — araucarias, volcán y valle del sur de Chile"
+           class="hero-photo" width="1024" height="558" fetchpriority="high" decoding="async" />
+    </picture>
     <div class="max-w-5xl mx-auto px-5 pt-20 pb-16 sm:pt-24 sm:pb-20 text-center text-white">
       <p class="hero-eyebrow text-xs sm:text-sm font-bold uppercase tracking-[0.28em] mb-5">Corretaje inmobiliario · Chile</p>
       <h1 class="font-display text-4xl sm:text-5xl lg:text-[3.35rem] font-bold leading-[1.12] mb-5 max-w-3xl mx-auto">El lugar correcto, con la confianza que mereces</h1>

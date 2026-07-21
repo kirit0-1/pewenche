@@ -19,6 +19,7 @@ const COPY = [
   '.htaccess',
   'css',
   'js',
+  'img',
   'uploads',
 ];
 
