@@ -1,12 +1,26 @@
 -- Borrado automático de consultas con más de 14 días
--- Ejecutar en Supabase → SQL Editor (requiere extensión pg_cron)
+-- Ejecutar en Supabase → SQL Editor
+--
+-- ANTES: habilita Cron por UI (más seguro):
+--   Dashboard → Integrations → Cron → Enable
+--   o Database → Extensions → pg_cron → Enable
+--
+-- Si ya activaste la extensión y falló cron.schedule, vuelve a correr ESTE archivo completo.
 
--- 1) Habilitar pg_cron: Dashboard → Database → Extensions → pg_cron → Enable
+-- 1) Extensión (crea el schema "cron")
+create extension if not exists pg_cron with schema pg_catalog;
+grant usage on schema cron to postgres;
+grant all privileges on all tables in schema cron to postgres;
 
 -- 2) Función de limpieza
 create or replace function public.purge_old_leads(days integer default 14)
-returns integer language plpgsql security definer set search_path = public as $$
-declare removed integer;
+returns integer
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  removed integer;
 begin
   delete from public.leads
   where created_at < now() - make_interval(days => days);
@@ -15,13 +29,15 @@ begin
 end;
 $$;
 
--- 3) Programar limpieza diaria a las 03:00 UTC (medianoche Chile en invierno aprox.)
--- Si el job ya existe, primero: select cron.unschedule('purge-pewenche-leads');
+-- 3) Job diario 03:00 UTC
+-- Si el job ya existe, descomenta la línea siguiente:
+-- select cron.unschedule('purge-pewenche-leads');
+
 select cron.schedule(
   'purge-pewenche-leads',
   '0 3 * * *',
   $$ select public.purge_old_leads(14); $$
 );
 
--- Borrado manual inmediato (opcional):
+-- 4) Prueba inmediata (opcional):
 -- select public.purge_old_leads(14);

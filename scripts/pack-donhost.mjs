@@ -1,5 +1,5 @@
 /**
- * Genera carpeta dist-hosting/ lista para subir a DonHost (public_html).
+ * Genera dist-hosting/ + pewenche-donhost.zip para subir a DonHost (public_html).
  * Uso: npm run pack:donhost
  */
 import { execSync } from 'child_process';
@@ -12,6 +12,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const out = join(root, 'dist-hosting');
+const zipPath = join(root, 'pewenche-donhost.zip');
 
 const COPY = [
   'index.html',
@@ -56,5 +57,11 @@ for (const item of COPY) {
   else cpSync(src, dest);
 }
 
-console.log('\n✓ Listo: dist-hosting/');
-console.log('  Sube TODO el contenido de esa carpeta a public_html en DonHost.\n');
+if (existsSync(zipPath)) rmSync(zipPath, { force: true });
+execSync(
+  `powershell -NoProfile -Command "Compress-Archive -Path '${out}\\*' -DestinationPath '${zipPath}' -Force"`,
+  { cwd: root, stdio: 'inherit' },
+);
+
+console.log('\n✓ Listo: dist-hosting/ + pewenche-donhost.zip');
+console.log('  En DonHost: sube el zip a public_html → Extraer → borra el zip.\n');

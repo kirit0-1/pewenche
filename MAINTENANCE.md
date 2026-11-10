@@ -1,9 +1,8 @@
 # Mantenimiento — Pewenche Propiedades
 
-Checklist para el **primer mantenimiento** y rutinas periódicas.
+Checklist para rutinas periódicas. Producción principal: **DonHost** (`https://pewenche.cl`).
 
 ## Contacto oficial (público)
-
 
 | Canal            | Valor                                                                                            |
 | ---------------- | ------------------------------------------------------------------------------------------------ |
@@ -12,22 +11,22 @@ Checklist para el **primer mantenimiento** y rutinas periódicas.
 | WhatsApp         | +56 9 8289 1650                                                                                  |
 | Admin (Supabase) | `admin@pewenche.cl` — solo panel interno                                                         |
 
-
 Fuente única en código: `js/config.js` → `CONTACT`.
 
 ---
 
-## 1. Antes del primer mantenimiento (una vez)
+## 1. Una vez (estado actual)
 
-- [ ] **Vercel** — confirmar deploy en [https://pewenche.vercel.app](https://pewenche.vercel.app) tras cada push a `main`
-- [ ] **Supabase** — ejecutar en SQL Editor (si no se hizo):
+- [x] **DonHost** — sitio en `public_html` (`https://pewenche.cl`)
+- [x] **DNS** — nic.cl → `ns1`–`ns4.donhost.cl` (dominio quitado de Vercel)
+- [x] **Vercel** — respaldo en [https://pewenche.vercel.app](https://pewenche.vercel.app)
+- [x] **GitHub Pages** — [https://kirit0-1.github.io/pewenche/](https://kirit0-1.github.io/pewenche/)
+- [ ] **Supabase SQL** — confirmar en SQL Editor:
   - `supabase/schema-v2-rls.sql`
   - `supabase/schema-leads-hardening.sql`
-  - `supabase/schema-leads-retention.sql` (requiere extensión `pg_cron`)
-- [ ] **Variables Vercel** — `SUPABASE_URL` y `SUPABASE_ANON_KEY` configuradas
+  - `supabase/schema-leads-retention.sql` (activar **Integrations → Cron** / `pg_cron` antes)
 - [ ] **Auth** — sign-ups deshabilitados; usuario `admin@pewenche.cl` activo
-- [ ] **Dominio** — en nic.cl apuntar servidores a DonHost (`ns1`–`ns4.donhost.cl`); subir `dist-hosting/` a `public_html`
-- [ ] **Instagram / Gmail** — bio y firma de correo con enlace a la web
+- [ ] **Instagram / Gmail** — bio y firma con enlace a `https://pewenche.cl`
 
 ---
 
@@ -35,26 +34,26 @@ Fuente única en código: `js/config.js` → `CONTACT`.
 
 ### Contenido
 
-- [ ] Revisar propiedades publicadas: precios UF, fotos, descripciones, ubicación
-- [ ] Quitar o marcar como vendida/arrendada lo que ya no esté disponible
+- [ ] Revisar propiedades: precios UF, fotos, descripciones, ubicación
+- [ ] Quitar o marcar vendida/arrendada lo no disponible
 - [ ] Subir 1–2 propiedades nuevas si hay stock
 
 ### Consultas (leads)
 
 - [ ] Admin → **Consultas** → responder pendientes
 - [ ] Botón **Borrar consultas +14 días** (o verificar cron en Supabase)
-- [ ] Probar formulario de contacto en producción (1 envío de prueba)
+- [ ] Probar formulario de contacto en `pewenche.cl` (1 envío de prueba)
 
 ### Respaldo
 
 - [ ] Admin → **Configuración** → **Crear respaldo en Supabase**
-- [ ] Opcional: exportar tabla `leads` y `properties` desde Supabase Dashboard
+- [ ] Opcional: exportar `leads` y `properties` desde Supabase Dashboard
 
 ### Técnico
 
-- [ ] Abrir sitio en móvil: menú, tema claro/oscuro, WhatsApp flotante
+- [ ] Abrir sitio en móvil: menú, WhatsApp flotante, listado
 - [ ] Verificar indicador UF en header (mindicador.cl)
-- [ ] Revisar Vercel → Deployments (último build OK)
+- [ ] Ctrl+F5 en `https://pewenche.cl` tras cada subida a DonHost
 
 ---
 
@@ -63,27 +62,25 @@ Fuente única en código: `js/config.js` → `CONTACT`.
 - [ ] Cambiar contraseña admin en Supabase Auth
 - [ ] Revisar políticas RLS en Supabase
 - [ ] Actualizar dependencias: `npm outdated` → `npm update` → probar local → push
-- [ ] Si usas DonHost: `npm run pack:donhost` y subir zip si no usas Vercel
-- [ ] Revisar enlaces rotos en propiedades (imágenes externas)
+- [ ] Regenerar pack DonHost: `npm run pack:donhost` → subir zip a `public_html` y Extraer
+- [ ] Revisar enlaces rotos / imágenes en Storage
 
 ---
 
-## 4. Mini auditoría (estado actual)
+## 4. Mini auditoría (nov 2026)
 
 
-| Área                  | Estado              | Notas                                                  |
-| --------------------- | ------------------- | ------------------------------------------------------ |
-| Contacto centralizado | OK                  | `js/config.js`                                         |
-| WhatsApp              | OK                  | +56 9 8289 1650                                        |
-| Correo público        | OK                  | Gmail oficial                                          |
-| Instagram             | OK                  | @pewenchepropiedades                                   |
-| Admin producción      | OK                  | Supabase Auth, no contraseña en JS                     |
-| Leads en nube         | OK                  | Supabase + validación + rate limit                     |
-| Retención leads       | Pendiente verificar | SQL + botón admin 14 días                              |
-| Dominio pewenche.cl   | Listo para DonHost  | NIC: ns1–ns4.donhost.cl · quitar DNS Vercel ✓                   |
-| Facebook              | Revisar             | URL genérica en config — actualizar si hay página real |
-| CSP / headers         | OK                  | `vercel.json`                                          |
-| Modo claro / oscuro   | OK                  | Corregido en `css/styles.css`                          |
+| Área                  | Estado | Notas                                      |
+| --------------------- | ------ | ------------------------------------------ |
+| Contacto              | OK     | `js/config.js`                             |
+| WhatsApp / Instagram  | OK     | Oficiales                                  |
+| Dominio pewenche.cl   | OK     | DonHost + SSL                              |
+| Propiedades (API)     | OK     | 5 en Supabase (lectura pública)            |
+| Admin                 | OK     | Supabase Auth                              |
+| Retención leads 14 d  | Revisar| Activar Cron + SQL retention               |
+| Modo visual           | OK     | Solo claro                                 |
+| Facebook              | Revisar| URL genérica `facebook.com/pewenche`       |
+| OG image              | OK     | `https://pewenche.cl/img/og-pewenche.jpg`  |
 
 
 ---
@@ -91,23 +88,29 @@ Fuente única en código: `js/config.js` → `CONTACT`.
 ## 5. Comandos útiles
 
 ```powershell
-cd C:\Users\josue\Desktop\ded
+cd C:\Users\josue\Desktop\Pewenche
 npm install
-npm run build      # genera bundle antes de deploy
-npm start          # local con API Node (dev)
-npm run pack:donhost   # zip para DonHost
-npm run seed:supabase  # propiedades demo (solo si hace falta)
+npm run build
+npm start
+npm run pack:donhost   # genera dist-hosting/ + usar zip pewenche-donhost.zip
 ```
+
+### Subida DonHost
+
+1. cPanel → Administrador de archivos → `public_html`
+2. Subir `pewenche-donhost.zip` → **Extraer** (sobrescribir)
+3. Borrar el zip del servidor
+4. Ctrl+F5 en `https://pewenche.cl`
 
 ---
 
 ## 6. Después de cada cambio importante
 
-1. Probar en local (`npm start` o `npm run static`)
-2. Commit + push a `main`
-3. Esperar deploy Vercel (~2 min)
-4. Ctrl+F5 en producción y verificar sección afectada
+1. Probar en local (`npm start`)
+2. Commit + push a `main` (actualiza Vercel / Pages)
+3. `npm run pack:donhost` y subir a DonHost
+4. Ctrl+F5 en producción
 
 ---
 
-*Última actualización de contacto: junio 2026*
+*Última revisión de mantenimiento: noviembre 2026*

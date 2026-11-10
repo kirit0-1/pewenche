@@ -1,16 +1,35 @@
 # DNS pewenche.cl → DonHost
 
-## Estado preparado (hoy)
+## Datos de tu cuenta DonHost (cPanel)
 
-- Dominio **sacado de Vercel** (ya no usa `ns1.vercel-dns.com`).
-- Paquete listo: `dist-hosting/` y `pewenche-donhost.zip`.
-- Falta solo cambiar nameservers en **NIC Chile** (tú debes hacerlo con tu cuenta).
+| Dato | Valor |
+|------|--------|
+| Usuario | `pewenche` |
+| Dominio principal | `pewenche.cl` |
+| IP compartida | `167.114.185.225` |
+| Home | `/home/pewenche` |
+| Servidor | `srv37.donhost.cl` |
+| SSL | Activo |
 
-## Qué poner en nic.cl
+Paquete local listo: `dist-hosting/` y `pewenche-donhost.zip`.
 
-Entra a [https://nic.cl](https://nic.cl) → dominio `pewenche.cl` → **Servidores de nombre autorizados**.
+## 1) Subir el sitio (cPanel)
 
-Reemplaza los actuales por **exactamente** estos 4 (borra los de Vercel u otros):
+1. En cPanel → **Archivos** → **Administrador de archivos**.
+2. Entra a `public_html`.
+3. Borra el `index.html` / placeholders por defecto de DonHost (si hay).
+4. Sube **el contenido** de `dist-hosting` (o el zip y descomprime **dentro** de `public_html`).
+5. Debe quedar así:
+   - `public_html/index.html`
+   - `public_html/propiedad.html`
+   - `public_html/.htaccess`
+   - `public_html/css/`
+   - `public_html/js/`
+   - `public_html/img/`
+
+## 2) DNS en nic.cl (obligatorio)
+
+En [nic.cl](https://nic.cl) → `pewenche.cl` → **Servidores de nombre autorizados**, deja solo:
 
 ```
 ns1.donhost.cl
@@ -19,16 +38,22 @@ ns3.donhost.cl
 ns4.donhost.cl
 ```
 
-Guarda. Propagación: desde minutos hasta 24–48 horas.
+Propagación: minutos a 24–48 h.
 
-## Después de cambiar NIC
+## 3) DNS dentro de DonHost (Zone Editor)
 
-1. En DonHost / cPanel, confirma el dominio `pewenche.cl` (y `www`) → `public_html`.
-2. Sube el contenido de `dist-hosting/` a `public_html`.
-3. Activa SSL (Let’s Encrypt / AutoSSL) cuando el dominio ya apunte a DonHost.
-4. Prueba: `https://pewenche.cl` y `https://www.pewenche.cl`.
+Si nic.cl ya apunta a DonHost, en cPanel → **Dominios** → **Zone Editor** verifica:
 
-## Mientras tanto (ya online)
+| Tipo | Nombre | Valor |
+|------|--------|--------|
+| A | `pewenche.cl` / `@` | `167.114.185.225` |
+| CNAME o A | `www` | `pewenche.cl` o misma IP |
 
-- https://pewenche.vercel.app
-- https://kirit0-1.github.io/pewenche/
+SSL ya aparece **Active** en cPanel; si `https://` falla, espera propagación DNS y fuerza AutoSSL.
+
+## 4) Probar
+
+- https://pewenche.cl
+- https://www.pewenche.cl
+
+Mientras propaga: https://pewenche.vercel.app

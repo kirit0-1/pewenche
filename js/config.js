@@ -8,7 +8,7 @@ import { PUBLIC_CONTACT } from './contact-public.js';
 export const SITE = {
   name: 'Pewenche Propiedades',
   tagline: 'Propiedades en Chile',
-  url: 'https://pewenche.cl', // cambia por tu dominio real
+  url: 'https://pewenche.cl',
   description: 'Propiedades en venta, arriendo, terrenos, hostales y campings en Chile.',
   year: 2026,
 };
