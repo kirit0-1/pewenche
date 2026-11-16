@@ -4,7 +4,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "env": {
-    "SUPABASE_URL": "https://kiatnwjnvuutrwfivlzx.supabase.co"
+    "SUPABASE_URL": "https://twckfzdlwgaydvddeker.supabase.co"
   },
   "rewrites": [
     { "source": "/propiedad", "destination": "/propiedad.html" }

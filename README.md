@@ -59,7 +59,7 @@ Variables de entorno (**obligatorias**):
 
 | Variable | Valor |
 |----------|--------|
-| `SUPABASE_URL` | `https://kiatnwjnvuutrwfivlzx.supabase.co` |
+| `SUPABASE_URL` | `https://twckfzdlwgaydvddeker.supabase.co` |
 | `SUPABASE_ANON_KEY` | clave anon `eyJ...` |
 
 Build: `npm run build` → carpeta `public/` (automático en Vercel). **Redeploy** después de cambiar variables.

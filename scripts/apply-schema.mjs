@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const PROJECT_REF = 'kiatnwjnvuutrwfivlzx';
+const PROJECT_REF = process.env.SUPABASE_PROJECT_REF || 'twckfzdlwgaydvddeker';
 const password = process.env.SUPABASE_DB_PASSWORD || process.env.DATABASE_URL;
 
 if (!password) {
