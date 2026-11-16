@@ -478,8 +478,8 @@ export function createApp(store, state) {
     if (!el) return;
     const uf = getUF();
     const date = getUFDate();
-    if (!uf) { el.textContent = 'UF: cargando…'; return; }
-    el.textContent = `UF $${uf.toLocaleString('es-CL')}${date ? ` · ${date.split('T')[0]}` : ''}`;
+    if (!uf) { el.textContent = 'UF: sin conexión'; return; }
+    el.textContent = `UF $${uf.toLocaleString('es-CL')}${date ? ` · ${String(date).split('T')[0]}` : ''}`;
   }
 
   function initTheme() {
